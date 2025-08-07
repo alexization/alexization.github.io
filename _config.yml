@@ -37,9 +37,9 @@ comments:
   provider               : "giscus" # false (default), "disqus", "discourse", "facebook", "staticman", "staticman_v2", "utterances", "giscus", "custom"
   giscus:
     data-repo: "alexization/alexization.github.io"
-    data-repo-id: "R_kgDOPZGahQ"
+    data-repo-id: "R_kgDOPZzCig"
     data-category: "Announcements"
-    data-category-id: "DIC_kwDOPZGahc4Ct2ho"
+    data-category-id: "DIC_kwDOPZzCis4Ct4yS"
     data-mapping: "pathname"
     data-strict: "0"
     data-reactions-enabled: "1"
