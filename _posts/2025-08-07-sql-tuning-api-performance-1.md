@@ -175,7 +175,7 @@ CREATE INDEX pet_id ON care_estimates(pet_id);
 
 > `EXPALIN ANALYZE` 에서 측정된 실행 시간은 `0.0578ms` 이지만, 실제 쿼리 실행 시간은 `30ms` 입니다. 이 차이는 왜 발생하는 것일까요?
 
-### 실행 계획 측정 시간과 실제 실행 시간의 차이점
+## 실행 계획 측정 시간과 실제 실행 시간의 차이점
 
 1. **`EXPLAIN ANALYZE` 가 측정하는 시간**
 - 순수한 쿼리 실행 엔진 내부의 처리 시간

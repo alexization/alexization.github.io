@@ -516,6 +516,7 @@
     background: $primary-color;
     border-start-start-radius: $border-radius;
     border-start-end-radius: $border-radius;
+    word-break: keep-all;
   }
 
   // Scrollspy marks toc items as .active when they are in focus
