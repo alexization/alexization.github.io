@@ -18,7 +18,7 @@ minimal_mistakes_skin    : "default" # "air", "aqua", "contrast", "dark", "dirt"
 locale                   : "ko-KR"
 rtl                      : # true, false (default) # turns direction of the page into right to left for RTL languages
 title                    : "기억보단 기록을"
-title_separator          : "-"
+title_separator          : "-" 
 subtitle                 : # site tagline that appears below site title in masthead
 name                     : "백효석"
 description              : "내 기억력을 믿지 않는다. 꾸준히 기록하자."
