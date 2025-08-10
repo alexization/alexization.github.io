@@ -5,11 +5,12 @@ header:
 title: "SQL 튜닝을 통한 API 성능 최적화 (1편)"
 excerpt: "SQL 튜닝을 통한 API 성능 최적화 (1편)"
 categories:
-  - project 1
-  - project 2
+  - Database
 tags:
-   - tag 1
-   - tag 2
+   - SQL 튜닝
+   - MySQL
+   - 인덱스 최적화
+   - API 성능
   
 toc_label: "SQL 튜닝을 통한 API 성능 최적화"
 toc: true
