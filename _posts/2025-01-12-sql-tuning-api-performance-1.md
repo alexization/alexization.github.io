@@ -16,8 +16,8 @@ toc_label: "SQL 튜닝을 통한 API 성능 최적화"
 toc: true
 toc_sticky: true
 
-date: 2025-08-07
-last_modified_at: 2025-08-07 
+date: 2025-01-12
+last_modified_at: 2025-01-12 
 ---
 현재 댕글 데이터베이스에는 데이터가 약 1,000개 이하로 적은 양이기 때문에 비효율적으로 작성된 쿼리로도 원하는 데이터를 빠른 속도로 가져올 수 있습니다.
 

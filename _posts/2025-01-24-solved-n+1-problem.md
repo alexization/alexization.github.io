@@ -16,8 +16,8 @@ toc_label: "미용사 및 병원 검색 API의 N+1 문제 해결"
 toc: true
 toc_sticky: true
 
-date: 2025-08-08
-last_modified_at: 2025-08-08 
+date: 2025-01-24
+last_modified_at: 2025-01-24 
 ---
 
 댕글 서비스에서는 사용자가 미용사와 병원을 검색할 수 있는 API를 제공하고 있습니다. 이 API는 세 가지 주요 검색 조건을 지원합니다.
