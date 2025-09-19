@@ -3,14 +3,14 @@ header:
    teaser: /assets/images/logo.png
 
 title: "SQL 튜닝을 통한 API 성능 최적화 (2편)"
-excerpt: "SQL 튜닝을 통한 API 성능 최적화 (2편)"
+excerpt: "대기 진료 견적서 상세 조회 API에서 569ms 걸리던 3개의 개별 쿼리를 JOIN과 인덱스 최적화를 통해 50ms로 단축시킨 과정을 다룹니다."
 categories:
   - Database
 tags:
   - SQL 튜닝
   - MySQL
-  - 인덱스 최적화
-  - API 성능
+  - 인덱스
+  - API 성능 최적화
   
 toc_label: "SQL 튜닝을 통한 API 성능 최적화"
 toc: true

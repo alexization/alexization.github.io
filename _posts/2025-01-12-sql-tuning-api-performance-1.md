@@ -10,7 +10,7 @@ tags:
    - SQL 튜닝
    - MySQL
    - API 성능 최적화
-   - 복합 인덱스
+   - 인덱스
   
 toc_label: "SQL 튜닝을 통한 API 성능 최적화"
 toc: true
