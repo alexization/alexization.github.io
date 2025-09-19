@@ -3,16 +3,18 @@ header:
    teaser: /assets/images/logo.png
 
 title: "성장하는 서비스를 위한 DDD 기반 멀티 모듈 전환기"
-excerpt: "성장하는 서비스를 위한 DDD 기반 멀티 모듈 전환기"
+excerpt: "모놀리식 아키텍처의 한계를 극복하기 위해 도메인 주도 설계(DDD)와 포트-어댑터 패턴을 적용한 멀티 모듈 아키텍처로 전환한 과정입니다. 장애 격리와 도메인 경계 명확화를 통해 확장성 있는 시스템을 구축했습니다."
 categories:
-  - Database
+  - Architecture
 tags:
-  - SQL 튜닝
-  - MySQL
-  - 인덱스 최적화
-  - API 성능
+  - DDD
+  - 멀티 모듈
+  - 헥사고날 아키텍처
+  - 포트-어댑터 패턴
+  - 도메인 모델
+  - 시스템 아키텍처
   
-toc_label: "성장하는 서비스를 위한 DDD 기반 멀티 모듈 전환기"
+toc_label: "DDD 기반 멀티 모듈 전환기"
 toc: true
 toc_sticky: true
 
