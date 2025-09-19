@@ -3,14 +3,16 @@ header:
   teaser: /assets/images/logo.png
 
 title: "Spring MVC의 진입점을 파고들어 개선한 JWT 토큰 처리 시스템"
-excerpt: ""
+excerpt: "반복되는 JWT 토큰 검증 코드를 제거하기 위해 Spring MVC의 HandlerInterceptor와 ArgumentResolver를 활용한 토큰 처리 시스템 구축 과정을 다룹니다."
 categories:
  - Backend
 tags:
   - Spring
-  - jwt
+  - JWT
+  - 토큰 처리
+  - 인증 시스템
  
-toc_label: "Spring MVC의 진입점을 파고들어 개선한 JWT 토큰 처리 시스템"
+toc_label: "Spring MVC JWT 토큰 처리 시스템"
 toc: true
 toc_sticky: true
 
