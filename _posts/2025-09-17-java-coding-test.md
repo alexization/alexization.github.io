@@ -3,20 +3,21 @@ header:
    teaser: /assets/images/logo.png
 
 title: "Java 코딩테스트 필수 문법과 자료구조 정리 (1편)"
-excerpt: "코딩테스트를 위한 Java 기초부터 자료구조까지 한 번에 정리 (Java 8 기준, Stream/Lambda 미사용)"
+excerpt: "코딩테스트를 위한 Java 기초부터 자료구조까지 정리 (Java 8 기준, Stream/Lambda 미사용)"
 categories:
-  - Java
+  - Algorithm
 tags:
+  - Java
   - 알고리즘
   - 자료구조
   - 코딩테스트
   
-toc_label: "Java 코딩테스트 필수 문법과 자료구조 정리"
+toc_label: "Java 코딩테스트 필수 문법"
 toc: true
 toc_sticky: true
 
 date: 2025-09-17
-last_modified_at: 2025-09-17 
+last_modified_at: 2025-09-19
 ---
 {% raw %}
 # 입력받고 출력하기
