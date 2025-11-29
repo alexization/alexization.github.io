@@ -2,7 +2,7 @@
 header:
   teaser: /assets/images/logo.png
 
-title: "01. GitHub 활동을 ‘전투력’으로 보여주는 Git Ranker 기획기"
+title: "GitHub 활동을 ‘전투력’으로 보여주는 Git Ranker 기획기"
 excerpt: "미니 PC 홈랩 환경에서 대용량 트래픽과 배치 처리를 경험하기 위한 'Git Ranker' 프로젝트 기획 과정입니다."
 categories:
   - Project
