@@ -2,26 +2,27 @@
 header:
   teaser: /assets/images/logo.png
 
-title: "GitHub 활동을 ‘전투력’으로 보여주는 Git Ranker 기획기"
-excerpt: "미니 PC 홈랩 환경에서 대용량 트래픽과 배치 처리를 경험하기 위한 'Git Ranker' 프로젝트 기획 과정입니다."
+title: "[Git Ranker #1] 홈랩에서 배우는 대용량 배치 처리 - 기획편"
+excerpt: "GitHub API + Spring Batch로 실시간 랭킹 시스템을 구축하며, 홈랩 환경에서 대용량 배치 처리와 인프라 모니터링 경험을 쌓아가는 여정"
 categories:
   - Project
+  - Git Ranker
 tags:
    - Spring Batch
    - System Design
    - GitHub API
-   - Home Server
+   - Home Lab
   
 toc_label: "Git Ranker 기획기"
 toc: true
 toc_sticky: true
 
 date: 2025-11-29
-last_modified_at: 2025-11-29
+last_modified_at: 2025-12-01
 ---
 # 1. 텅 빈 미니 PC 서버에 활기를 불어넣자
 
-## 홈서버 구축과 남겨진 숙제
+## 홈랩 구축과 남겨진 숙제
 
 최근 개인 학습과 서버 관리 역량을 키우기 위해 미니 PC를 장만하여 개인 서버 환경을 구축했습니다. 하드웨어는 준비되었지만, 아직 제 서버는 **운영체제만 설치된 ‘텅 빈 깡통’** 이나 다름없습니다.
 
@@ -48,11 +49,11 @@ last_modified_at: 2025-11-29
 
 # 2. Git Ranker란 무엇인가 ?
 
-GitHub의 잔디는 개발자의 성실함을 보여주는 직관적인 지표지만, 맹점도 존재합니다. 단순 오타 수정도 1커밋, 핵심 로직 리팩토링도 1 커밋으로 처리됩니다.
+GitHub의 잔디는 개발자의 성실함을 보여주는 직관적인 지표지만, 맹점도 존재합니다. 단순 오타 수정도 `1commit`, 핵심 로직 리팩토링도 `1commit`으로 처리됩니다.
 
 즉 ‘양(Quantity)’은 보여주지만 ‘질(Quality)’은 보여주지 못합니다.
 
-*추후 커밋 메시지 분석을 위한 AI/NLP 도입도 고려 중입니다…!*
+( *추후 커밋 메시지 분석을 위한 AI/NLP 도입도 고려 중입니다…!* )
 
 ## 핵심 기능
 
