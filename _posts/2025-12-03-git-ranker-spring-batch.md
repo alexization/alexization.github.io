@@ -62,7 +62,7 @@ Spring Batch 도입을 결정하고 Job을 설계하는 단계에서 가장 큰 
 - **Case A (신규 가입) :** 사용자 가입 즉시 한 명에 대해 1년 치 데이터 처리
 - **Case B (새벽 갱신) :** 매일 정해진 시간에 전체 사용자에 대해 어제 하루 치 데이터 처리
 
-![이원화 Job 아키텍처](https://imgur.com/O9ODJut.png)
+![이원화 Job 아키텍처](https://imgur.com/KXha7Uy.png)
 
 이를 해결하기 위해 두 개의 Job으로 역할을 분리하되, 핵심 로직(Processor)은 재사용하는 구조로 설계했습니다.
 
@@ -111,7 +111,7 @@ Spring Batch 도입을 결정하고 Job을 설계하는 단계에서 가장 큰 
 
 DB에 등록되어있는 전체 사용자의 어제 활동을 수집하고 점수를 계산합니다.
 
-![Chunk 프로세스](https://imgur.com/5QyId0G.png)
+![Chunk 프로세스](https://imgur.com/xv2SdrH.png)
 
 - **Reader (`UserPagingItemReader`)**
     - DB에서 사용자 목록을 Chunk Size 만큼 페이징 하여 읽어옵니다.
