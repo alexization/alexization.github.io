@@ -5,7 +5,7 @@ header:
 title: "[Git Ranker #1] 홈랩에서 배우는 대용량 배치 처리 - 기획편"
 excerpt: "GitHub API + Spring Batch로 실시간 랭킹 시스템을 구축하며, 홈랩 환경에서 대용량 배치 처리와 인프라 모니터링 경험을 쌓아가는 여정"
 categories:
-  - Project
+  - Home Lab
   - Git Ranker
 tags:
    - Spring Batch
