@@ -26,3 +26,17 @@
     <script src="{{ script | relative_url }}"></script>
   {% endfor %}
 {% endif %}
+
+<!-- 외부 링크 새 창에서 열기 -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // 외부 링크만 새 창에서 열기
+  var links = document.querySelectorAll('a[href^="http"]');
+  links.forEach(function(link) {
+    if (link.hostname !== window.location.hostname) {
+      link.setAttribute('target', '_blank');
+      link.setAttribute('rel', 'noopener noreferrer');
+    }
+  });
+});
+</script>

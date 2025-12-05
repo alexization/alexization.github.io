@@ -5,14 +5,12 @@ header:
 title: "[Git Ranker #2] 대용량 데이터 처리와 무결성, 왜 하필 Spring Batch여야만 했나 ?"
 excerpt: "단순 반복문과 스케줄러의 한계를 넘어, 데이터 무결성과 대용량 트래픽을 감당하기 위해 Spring Batch를 도입한 기술적 의사결정 과정과 Job 아키텍처 상세 설계"
 categories:
-  - Home Lab
   - Git Ranker
   - Spring Batch
 tags:
    - Spring Batch
    - Architecture
    - GitHub API
-   - Home Lab
   
 toc_label: "Spring Batch 도입기"
 toc: true
