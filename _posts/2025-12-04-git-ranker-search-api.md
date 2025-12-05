@@ -125,6 +125,7 @@ Search API의 도입으로 기존의 불안전했던 데이터 수집 기획을 
 변경된 기획에 따라 사용자 가입 시 Search API를 활용해 데이터를 수집하는 로직을 구현했습니다.
 
 ## 3.1 데이터 수집 코드 (`GitHubActivityService`)
+[자세한 코드는 Git Ranker Repository 에서 확인해주세요 !](https://github.com/alexization/git-ranker)
 
 사용자의 활동 내역을 5가지 카테고리로 분류하여, 각각 최적화된 Search Query를 전송합니다.
 
