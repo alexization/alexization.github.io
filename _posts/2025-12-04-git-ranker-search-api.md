@@ -190,7 +190,7 @@ Search API 도입으로 ‘전체 데이터 수집’ 문제는 해결했지만,
 
 ## 한계 1 : 극도로 낮은 Rate Limit
 
-GitHub Search API는 일반 API보다 훨씬 엄격한 호출 제한을 가집니다. [공식 문서에 따르면 인증된 사용자(`Authenticated User`) 라도 분당 30회의 요청만 혀용됩니다.](https://docs.github.com/ko/enterprise-server@3.15/rest/search/search?apiVersion=2022-11-28#rate-limit)
+GitHub Search API는 일반 API보다 훨씬 엄격한 호출 제한을 가집니다. [공식 문서에 따르면 인증된 사용자(`Authenticated User`) 라도 분당 30회의 요청만 허용됩니다.](https://docs.github.com/ko/enterprise-server@3.15/rest/search/search?apiVersion=2022-11-28#rate-limit)
 
 사용자 1명의 점수를 계산하는 데 5번의 API 호출이 필요하므로, 이론상 **분당 최대 6명**의 사용자만 처리할 수 있습니다. 이는 추후 대규모 사용자의 순위를 갱신하는 배치 작업에서 심각한 병목 지점이 될 것입니다.
 
