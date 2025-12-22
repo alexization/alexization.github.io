@@ -60,7 +60,7 @@ last_modified_at: 2025-12-16
 
 가정용 인터넷은 ISP(인터넷 서비스 제공자) 정책에 따라 **유동 IP**를 사용합니다. 즉, 공유기를 재부팅하거나 일정 시간이 지나면 서버의 공인 IP가 수시로 바뀔 수 있습니다.
 
-**DDNS**는 공유기의 IP가 바뀔 때마다 그 정보를 DDNS 서버에 즉각 업데이트하여, IP 변화와 상관없이 항상 고정된 도메인 이름으로 내 서버를 찾아올 수 있게 해주는 기술입니다.
+**DDNS**는 공유기의 IP가 바뀔 때마다 그 정보를 DDNS 서버에 즉각 업데이트하여, **IP 변화와 상관없이 항상 고정된 도메인 이름으로 내 서버를 찾아올 수 있게 해주는 기술**입니다.
 
 ---
 
@@ -100,7 +100,7 @@ Nginx를 사용하는 가장 큰 이유 중 하나는 **리버스 프록시** �
 제가 리버스 프록시를 설정하면서 느낀 가장 큰 장점은 **포트 추상화를 통한 유연성**입니다.
 
 1. 외부에서는 표준 포트인 `80(HTTP)`이나 `443(HTTPS)`으로만 접속하면 됩니다. 뒤에서 실제 서비스가 `8080` 으로 돌든 `3000` 으로 돌든 사용자는 알 필요가 없으며, URL 뒤에 지저분한 포트 번호를 붙이지 않아도 됩니다.
-2. 또한, 단일 진입점 관리가 가능한데,
+2. 또한, **단일 진입점 관리**가 가능한데,
     - [`git-ranker.com`](http://git-ranker.com) → 내부 8080 포트 연결
     - [`grafana.git-ranker.com`](http://grafana.git-ranker.com) → 내부 3000 포트 연결
 
@@ -125,8 +125,15 @@ sudo systemctl enable nginx
 
 ## 6.2 `nginx.conf` 설정
 
+`nginx.conf`
+```bash
+include /etc/nginx/conf.d/*.conf;
+include /etc/nginx/sites-enabled/*;
+```
+
 유지보수성을 높이기 위해 Nginx는 `/etc/nginx/conf.d/` 디렉토리의 파일들을 include 하여 관리하는 방식을 권장합니다.
 
+따라서, `conf.d` 하위 경로에 애플리케이션 별로 원하는 nginx 설정 conf 파일을 작성해주면 됩니다.
 ```bash
 sudo vim /etc/nginx/conf.d/{애플리케이션 이름}.conf
 ```
@@ -177,7 +184,7 @@ Certbot이 자동으로 생성해준 리다이렉트 설정은 기본적으로 *
 
 ### 왜 308 리다이렉트를 사용하는가 ?
 
-- **301 Moved Permanently :** 요청을 새 주소로 영구 이동시킵니다. 하지만 과거 브라우저 표주에 따라 **POST 요청을 GET 요청으로 변경해버리는 고질적인 문제**가 있습니다. API 요청 시 데이터 손실이 발생할 수 있습니다.
+- **301 Moved Permanently :** 요청을 새 주소로 영구 이동시킵니다. 하지만 과거 브라우저 표준에 따라 **POST 요청을 GET 요청으로 변경해버리는 고질적인 문제**가 있습니다. API 요청 시 데이터 손실이 발생할 수 있습니다.
 - **308 Permanent Redirect :** 301과 동일하게 영구 이동을 의미하지만, **HTTP 메서드(GET/POST 등)를 절대 변경하지 않습니다.** 즉, POST로 보낸 데이터가 리다이렉트 후에도 그대로 POST로 유지됩니다.
 
 따라서, Certbot이 생성한 코드 부분을 찾아 아래와 같이 수정했습니다.
@@ -202,8 +209,8 @@ sudo systemctl reload nginx
 curl -I https://app.domain.com
 ```
 
-- Before : `http://공인IP:8080` → 공인IP와 포트번호 모두 노출
-- After : `https://app.domain.com` → HTTPS 자물쇠 마크, 포트 번호 제거, 유동 IP 대응
+- **Before :** `http://공인IP:8080` → 공인IP와 포트번호 모두 노출
+- **After :** `https://app.domain.com` → HTTPS 자물쇠 마크, 포트 번호 제거, 유동 IP 대응
 
 ---
 
@@ -216,3 +223,7 @@ curl -I https://app.domain.com
 # 참고 자료
 
 [홈 서버 구축기 - 웹서버 추가와 DNS 설정](https://hyeon9mak.github.io/home-server-web-server-and-dns/)
+
+[[개발환경 설정]  Ubuntu 서버에 Nginx 설치 및 설정 (+ SSL 인증)](https://lightningtech.tistory.com/100)
+
+[Let’s Encrypt 인증서로 NGINX SSL 설정하기](https://nginxstore.com/blog/nginx/lets-encrypt-%EC%9D%B8%EC%A6%9D%EC%84%9C%EB%A1%9C-nginx-ssl-%EC%84%A4%EC%A0%95%ED%95%98%EA%B8%B0/)
