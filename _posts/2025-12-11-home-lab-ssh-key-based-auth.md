@@ -150,7 +150,7 @@ sudo systemctl restart ssh
 
 ---
 
-# 레퍼런스
+# 6. 참고 자료
 
 [가비아 라이브러리](https://library.gabia.com/contents/infrahosting/9002/)
 
