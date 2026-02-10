@@ -12,7 +12,6 @@ tags:
   - GitHub Camo
   - HTTP Cache
   - Cache-Control
-  - Spring
 
 toc_label: "배지 캐싱 해결기"
 toc: true
@@ -22,14 +21,15 @@ date: 2025-12-20
 last_modified_at: 2025-12-20
 ---
 
-Git Ranker에는 사용자의 티어와 점수를 SVG 이미지로 보여주는 **배지 기능**이 있습니다.
 ![GitRanker Master 티어](https://imgur.com/LcsQMUX.png)
+
+Git Ranker에는 사용자의 티어와 점수를 SVG 이미지로 보여주는 **배지 기능**이 있습니다.
 
 사용자가 자신의 GitHub README에 배지 URL을 한 번 삽입해두면, 방문자가 프로필을 볼 때마다 최신 점수와 티어가 자동으로 표시되는 구조입니다.
 
 ![Solved.ac 티어와 비교](https://imgur.com/LSgOu0q.png)
 
-> Git Ranker의 배지 시스템은 백준 티어를 나타내주는 배지를 모티브했습니다. 백준 티어 배지와 잘 어울리도록 크기와 디자인을 고안하여 개발했습니다.
+> Git Ranker의 배지 시스템은 백준 티어를 나타내주는 배지를 모티브했으며, 백준 배지와 잘 어울리도록 크기와 디자인을 고려하여 개발했습니다.
 
 배지를 처음 배포하고 테스트했을 때는 잘 동작했습니다. 하지만 랭킹 재산정 배치가 돌고 점수가 갱신된 이후에도, GitHub README에 표시되는 배지는 **과거의 점수와 티어를 그대로 보여주고 있었습니다.**
 
