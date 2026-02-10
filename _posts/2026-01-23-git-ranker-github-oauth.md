@@ -2,7 +2,7 @@
 header:
   teaser: /assets/images/logo.png
 
-title: "[Git Ranker #8] GitHub OAuth 인증 시스템 구축기"
+title: "[Git Ranker #9] GitHub OAuth 인증 시스템 구축기"
 excerpt: "사용자 피드백으로 급히 도입한 인증 시스템에서 SameSite 쿠키 삽질, Private/Public 데이터 불일치 문제를 Token Pool로 해결한 과정"
 
 categories:
