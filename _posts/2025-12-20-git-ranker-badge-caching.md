@@ -55,7 +55,7 @@ Git Ranker에는 사용자의 티어와 점수를 SVG 이미지로 보여주는 
 
 ![camo url](https://imgur.com/iYrnlYp.png)
 
-제가 삽입한 URL은 `https://gitranker.com/api/v1/badges/...` 였는데, GitHub에서 실제로 로드하는 이미지 URL은 **`https://camo.githubusercontent.com/...`** 으로 변환되어 있었습니다.
+제가 삽입한 URL은 `https://www.git-ranker.com/api/v1/badges/...` 였는데, GitHub에서 실제로 로드하는 이미지 URL은 **`https://camo.githubusercontent.com/...`** 으로 변환되어 있었습니다.
 
 내 서버에 직접 요청하는 것이 아니라, GitHub 중간에 있는 **다른 서버를 거쳐서** 이미지를 가져오고 있었습니다.
 
@@ -67,7 +67,7 @@ Git Ranker에는 사용자의 티어와 점수를 SVG 이미지로 보여주는 
 
 ## GitHub Camo란?
 
-GitHub는 사용자가 README나 이슈에 삽입한 외부 이미지를 직접 로드하지 않습니다. 대신 [**Camo**](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-anonymized-urls)라는 이미지 프록시 서버를 통해 이미지를 중계합니다. GitHub 공식 문서에서는 이를 **Anonymized URL**이라고 부릅니다.
+GitHub는 사용자가 README나 이슈에 삽입한 외부 이미지를 직접 로드하지 않습니다. 대신 [**Camo**](https://github.com/atmos/camo)라는 이미지 프록시 서버를 통해 이미지를 중계합니다. GitHub 공식 문서에서는 이를 **Anonymized URL**이라고 부릅니다.
 
 Camo가 존재하는 이유는 크게 두 가지입니다.
 
@@ -85,7 +85,9 @@ GitHub 페이지는 HTTPS로 서빙됩니다. 사용자가 HTTP로 호스팅되�
 
 Camo는 HTTP 표준 캐시 헤더를 존중하도록 설계되어 있습니다. GitHub 공식 문서에서도 이미지가 갱신되지 않는 경우 원본 서버의 `Cache-Control` 헤더를 확인하라고 안내하고 있습니다.
 
-> If you own the server that hosts the image, modify the `Cache-Control` header.
+> If you own the server that's hosting the image, modify it so that it returns a `Cache-Control` of `no-cache` for images
+> 
+> [- GitHub Docs, About anonymized URLs](https://docs.github.com/ko/authentication/keeping-your-account-and-data-secure/about-anonymized-urls)
 
 즉, 원본 서버가 응답에 `Cache-Control` 헤더를 포함하면 Camo는 해당 지시를 따릅니다. 반대로 **`Cache-Control` 헤더가 없으면**, Camo는 한 번 가져온 이미지를 언제 갱신해야 할지 판단할 근거가 없으므로 **캐시된 이미지를 계속 반환합니다.**
 
