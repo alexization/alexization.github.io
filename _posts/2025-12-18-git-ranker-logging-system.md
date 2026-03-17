@@ -1,6 +1,7 @@
 ---
 header:
   teaser: /assets/images/logo.png
+  og_image: "https://imgur.com/izwcCPF.png"
 
 title: "[Git Ranker #7] 로그는 텍스트가 아니라 데이터다 : 관측 가능한 시스템 구축기"
 excerpt: "텍스트 파일에 불과했던 로그를 추적 가능하고 구조화된 데이터 자산으로 변화시킨 Git Ranker의 로깅 시스템 고도화 과정"
@@ -14,6 +15,7 @@ toc_label: "로깅 시스템 구축기"
 toc: true
 toc_sticky: true
 
+permalink: /git-ranker/git-ranker-logging-system/
 date: 2025-12-18
 last_modified_at: 2025-12-18
 ---

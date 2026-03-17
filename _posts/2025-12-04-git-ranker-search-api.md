@@ -1,6 +1,7 @@
 ---
 header:
   teaser: /assets/images/logo.png
+  og_image: "https://imgur.com/iyjUKX7.png"
 
 title: "[Git Ranker #3] 사용자 데이터 수집 : Events API의 실패와 Search API로의 전환"
 excerpt: "GitHub Events API의 데이터 유실 및 정책 변경 이슈를 분석하고, Search API 도입을 통해 전체 활동 데이터 기반의 정확한 점수 시스템을 구현한 기술적 의사결정 과정"
@@ -14,6 +15,7 @@ toc_label: "데이터 수집 로직 개선"
 toc: true
 toc_sticky: true
 
+permalink: /git-ranker/git-ranker-search-api/
 date: 2025-12-04
 last_modified_at: 2025-12-04
 ---

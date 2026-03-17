@@ -1,6 +1,7 @@
 ---
 header:
    teaser: /assets/images/logo.png
+   og_image: "https://i.imgur.com/3iiclCA.png"
 
 title: "SQL 튜닝을 통한 API 성능 최적화 (1편)"
 excerpt: "100만 개 데이터 환경에서 6.57초 걸리던 API를 409ms로 단축시킨 SQL 튜닝 과정입니다. 인덱스 설계 전략, 복합 인덱스 활용, JOIN 최적화를 통해 94% 성능 향상을 달성했습니다."

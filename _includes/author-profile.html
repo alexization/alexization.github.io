@@ -15,6 +15,11 @@
     <h3 class="author__name p-name" itemprop="name">
       <a class="u-url" rel="me" href="{{ author.home | default: '/' | absolute_url }}" itemprop="url">{{ author.name }}</a>
     </h3>
+    {% if author.job_title %}
+      <div class="author__bio" itemprop="jobTitle">
+        {{ author.job_title }}
+      </div>
+    {% endif %}
     {% if author.bio %}
       <div class="author__bio p-note" itemprop="description">
         {{ author.bio | markdownify }}
@@ -34,7 +39,7 @@
       {% if author.links %}
         {% for link in author.links %}
           {% if link.label and link.url %}
-            <li><a href="{{ link.url }}" rel="nofollow noopener noreferrer me"{% if link.url contains 'http' %} itemprop="sameAs"{% endif %}><i class="{{ link.icon | default: 'fas fa-link' }}" aria-hidden="true"></i><span class="label">{{ link.label }}</span></a></li>
+            <li><a href="{{ link.url }}" rel="noopener noreferrer me"{% if link.url contains 'http' %} itemprop="sameAs"{% endif %}><i class="{{ link.icon | default: 'fas fa-link' }}" aria-hidden="true"></i><span class="label">{{ link.label }}</span></a></li>
           {% endif %}
         {% endfor %}
       {% endif %}
@@ -58,7 +63,7 @@
 
       {% if author.keybase %}
         <li>
-          <a href="https://keybase.io/{{ author.keybase }}" itemprop="sameAs" rel="nofollow noopener noreferrer me">
+          <a href="https://keybase.io/{{ author.keybase }}" itemprop="sameAs" rel="noopener noreferrer me">
             <i class="fab fa-fw fa-keybase" aria-hidden="true"></i><span class="label">Keybase</span>
           </a>
         </li>
@@ -66,7 +71,7 @@
 
       {% if author.twitter %}
         <li>
-          <a href="https://twitter.com/{{ author.twitter }}" itemprop="sameAs" rel="nofollow noopener noreferrer me">
+          <a href="https://twitter.com/{{ author.twitter }}" itemprop="sameAs" rel="noopener noreferrer me">
             <i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i><span class="label">Twitter</span>
           </a>
         </li>
@@ -74,7 +79,7 @@
 
       {% if author.facebook %}
         <li>
-          <a href="https://www.facebook.com/{{ author.facebook }}" itemprop="sameAs" rel="nofollow noopener noreferrer me">
+          <a href="https://www.facebook.com/{{ author.facebook }}" itemprop="sameAs" rel="noopener noreferrer me">
             <i class="fab fa-fw fa-facebook-square" aria-hidden="true"></i><span class="label">Facebook</span>
           </a>
         </li>
@@ -82,7 +87,7 @@
 
       {% if author.linkedin %}
         <li>
-          <a href="https://www.linkedin.com/in/{{ author.linkedin }}" itemprop="sameAs" rel="nofollow noopener noreferrer me">
+          <a href="https://www.linkedin.com/in/{{ author.linkedin }}" itemprop="sameAs" rel="noopener noreferrer me">
             <i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span class="label">LinkedIn</span>
           </a>
         </li>
@@ -90,7 +95,7 @@
 
       {% if author.xing %}
         <li>
-          <a href="https://www.xing.com/profile/{{ author.xing }}" itemprop="sameAs" rel="nofollow noopener noreferrer me">
+          <a href="https://www.xing.com/profile/{{ author.xing }}" itemprop="sameAs" rel="noopener noreferrer me">
             <i class="fab fa-fw fa-xing-square" aria-hidden="true"></i><span class="label">XING</span>
           </a>
         </li>
@@ -98,7 +103,7 @@
 
       {% if author.instagram %}
         <li>
-          <a href="https://instagram.com/{{ author.instagram }}" itemprop="sameAs" rel="nofollow noopener noreferrer me">
+          <a href="https://instagram.com/{{ author.instagram }}" itemprop="sameAs" rel="noopener noreferrer me">
             <i class="fab fa-fw fa-instagram" aria-hidden="true"></i><span class="label">Instagram</span>
           </a>
         </li>
@@ -106,7 +111,7 @@
 
       {% if author.tumblr %}
         <li>
-          <a href="https://{{ author.tumblr }}.tumblr.com" itemprop="sameAs" rel="nofollow noopener noreferrer me">
+          <a href="https://{{ author.tumblr }}.tumblr.com" itemprop="sameAs" rel="noopener noreferrer me">
             <i class="fab fa-fw fa-tumblr-square" aria-hidden="true"></i><span class="label">Tumblr</span>
           </a>
         </li>
@@ -114,7 +119,7 @@
 
       {% if author.bitbucket %}
         <li>
-          <a href="https://bitbucket.org/{{ author.bitbucket }}" itemprop="sameAs" rel="nofollow noopener noreferrer me">
+          <a href="https://bitbucket.org/{{ author.bitbucket }}" itemprop="sameAs" rel="noopener noreferrer me">
             <i class="fab fa-fw fa-bitbucket" aria-hidden="true"></i><span class="label">Bitbucket</span>
           </a>
         </li>

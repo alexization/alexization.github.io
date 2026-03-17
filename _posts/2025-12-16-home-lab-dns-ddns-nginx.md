@@ -1,6 +1,7 @@
 ---
 header:
   teaser: /assets/images/logo.png
+  og_image: "https://imgur.com/r7NHaAV.png"
 
 title: "[Home Lab #3] DNS, DDNS, Nginx로 나만의 도메인으로 서비스 배포하기"
 excerpt: "공인 IP와 포트 번호가 노출되는 환경에서 벗어나, DNS와 DDNS를 결합하고 Nginx 리버스 프록시를 통해 깔끔한 도메인과 HTTPS 보안을 적용 과정"
@@ -17,6 +18,7 @@ toc_label: ""
 toc: true
 toc_sticky: true
 
+permalink: /home-lab/home-lab-dns-ddns-nginx/
 date: 2025-12-16
 last_modified_at: 2025-12-16
 ---

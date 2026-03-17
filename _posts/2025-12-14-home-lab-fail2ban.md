@@ -1,6 +1,7 @@
 ---
 header:
   teaser: /assets/images/logo.png
+  og_image: "https://imgur.com/TPqlHh8.png"
 
 title: "[Home Lab #2] SSH 무차별 대입 공격 방어하기: Fail2ban 설치 및 설정"
 excerpt: "SSH Key 인증 적용 후에도 계속되는 '무차별 대입 공격(Brute Force)'을 탐지하고, Fail2ban을 이용해 공격 IP를 자동으로 차단하는 방법 정리"
@@ -18,6 +19,7 @@ toc_label: ""
 toc: true
 toc_sticky: true
 
+permalink: /home-lab/home-lab-fail2ban/
 date: 2025-12-14
 last_modified_at: 2025-12-14
 ---

@@ -1,0 +1,57 @@
+---
+layout: null
+permalink: /sitemap.xml
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  {% assign homepage_lastmod = site.posts.first.last_modified_at | default: site.posts.first.date | default: site.time %}
+  <url>
+    <loc>{{ '/' | absolute_url }}</loc>
+    <lastmod>{{ homepage_lastmod | date_to_xmlschema }}</lastmod>
+  </url>
+  {% assign indexable_pages = site.pages | sort: 'url' %}
+  {% for item in indexable_pages %}
+    {% assign is_indexable_page = true %}
+    {% if item.url == '/' or item.url == '/sitemap.xml' or item.url == '/robots.txt' %}
+      {% assign is_indexable_page = false %}
+    {% endif %}
+    {% if item.url contains '/assets/' or item.url contains '.css' or item.url contains '.js' or item.url contains '.map' %}
+      {% assign is_indexable_page = false %}
+    {% endif %}
+    {% if item.url contains '/page' %}
+      {% assign is_indexable_page = false %}
+    {% endif %}
+    {% if item.sitemap == false or item.seo_noindex == true %}
+      {% assign is_indexable_page = false %}
+    {% endif %}
+    {% if item.name == 'google167226cfabb37bdd.html' %}
+      {% assign is_indexable_page = false %}
+    {% endif %}
+    {% if is_indexable_page %}
+  <url>
+    <loc>{{ item.url | absolute_url }}</loc>
+    {% assign lastmod = item.last_modified_at | default: item.date | default: site.time %}
+    <lastmod>{{ lastmod | date_to_xmlschema }}</lastmod>
+  </url>
+    {% endif %}
+  {% endfor %}
+  {% assign posts = site.posts | sort: 'date' | reverse %}
+  {% for post in posts %}
+    {% assign is_indexable_post = true %}
+    {% if post.sitemap == false or post.seo_noindex == true %}
+      {% assign is_indexable_post = false %}
+    {% endif %}
+    {% if post.canonical_url and post.canonical_url contains 'http' %}
+      {% unless post.canonical_url contains site.url %}
+        {% assign is_indexable_post = false %}
+      {% endunless %}
+    {% endif %}
+    {% if is_indexable_post %}
+  <url>
+    <loc>{{ post.url | absolute_url }}</loc>
+    {% assign lastmod = post.last_modified_at | default: post.date %}
+    <lastmod>{{ lastmod | date_to_xmlschema }}</lastmod>
+  </url>
+    {% endif %}
+  {% endfor %}
+</urlset>

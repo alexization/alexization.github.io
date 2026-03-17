@@ -1,0 +1,19 @@
+---
+---
+<!doctype html>
+<html lang="{{ site.locale | replace: "_", "-" | default: "en" }}" class="no-js">
+  <head>
+    {% include head.html %}
+    {% include head/custom.html %}
+    <meta http-equiv="refresh" content="0; url={{ page.redirect_to | absolute_url }}">
+  </head>
+  <body>
+    <main style="max-width: 40rem; margin: 4rem auto; padding: 0 1rem; font-family: sans-serif;">
+      <h1>{{ page.title | default: "페이지가 이동했습니다." }}</h1>
+      <p>
+        새 주소로 이동합니다.
+        <a href="{{ page.redirect_to | absolute_url }}">직접 이동하기</a>
+      </p>
+    </main>
+  </body>
+</html>

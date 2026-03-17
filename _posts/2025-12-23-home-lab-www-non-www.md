@@ -1,6 +1,7 @@
 ---
 header:
   teaser: /assets/images/logo.png
+  og_image: "https://imgur.com/r7NHaAV.png"
 
 title: "[Home Lab #4] 홈서버 도메인 정규화: Nginx, Certbot, DNS로 www/non-www 불일치 해결하기"
 excerpt: "HTTPS를 적용했는데도 www 유무에 따라 접속이 갈리던 문제를 DNS와 Nginx 정책 정렬로 해결한 경험"
@@ -19,10 +20,10 @@ toc_label: "도메인 정규화"
 toc: true
 toc_sticky: true
 
+permalink: /home-lab/home-lab-www-non-www/
 date: 2025-12-23
 last_modified_at: 2025-12-23
 ---
-
 [지난 편에서 Nginx와 Certbot으로 HTTPS를 붙였을 때](https://alexization.github.io/home%20lab/home-lab-dns-ddns-nginx/)는 작업이 거의 끝났다고 생각했습니다.
 `https://www.git-ranker.com` 접속이 정상이고, 브라우저 경고도 사라졌기 때문입니다.
 

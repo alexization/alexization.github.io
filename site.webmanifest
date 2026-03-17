@@ -1,6 +1,6 @@
 {
-  "name": "MyWebSite",
-  "short_name": "MySite",
+  "name": "효석의 기술 블로그",
+  "short_name": "효석의 블로그",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",

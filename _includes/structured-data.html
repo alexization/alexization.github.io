@@ -1,0 +1,88 @@
+{%- assign author = page.author | default: page.authors[0] | default: site.author -%}
+{%- assign author = site.data.authors[author] | default: author -%}
+{%- assign author_name = author.name | default: site.social.name | default: site.name -%}
+{%- assign author_url = author.home | default: '/about/' | absolute_url -%}
+{%- assign author_image = author.avatar | default: site.og_image | absolute_url -%}
+{%- assign author_same_as = site.social.links | default: empty -%}
+{%- assign page_image = page.header.og_image | default: page.header.overlay_image | default: page.header.image | default: page.header.teaser | default: site.og_image | absolute_url -%}
+{%- assign page_url = include.canonical_url | default: page.url | absolute_url -%}
+{%- assign page_description = include.seo_description | default: page.description | default: page.excerpt | default: site.description | markdownify | strip_html | strip_newlines | escape_once | strip -%}
+{%- assign website_url = '/' | absolute_url -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": {{ website_url | append: "#website" | jsonify }},
+      "url": {{ website_url | jsonify }},
+      "name": {{ site.title | jsonify }},
+      "description": {{ site.description | jsonify }},
+      "inLanguage": {{ site.locale | jsonify }},
+      "publisher": {
+        "@id": {{ website_url | append: "#person" | jsonify }}
+      }
+    },
+    {
+      "@type": "Person",
+      "@id": {{ website_url | append: "#person" | jsonify }},
+      "name": {{ author_name | jsonify }},
+      "url": {{ author_url | jsonify }},
+      "image": {{ author_image | jsonify }},
+      "description": {{ author.bio | default: site.description | jsonify }}{% if author_same_as and author_same_as.size > 0 %},
+      "sameAs": {{ author_same_as | jsonify }}{% endif %}
+    }{% if page.collection == 'posts' %},
+    {
+      "@type": "BlogPosting",
+      "@id": {{ page_url | append: "#blogposting" | jsonify }},
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": {{ page_url | jsonify }}
+      },
+      "url": {{ page_url | jsonify }},
+      "headline": {{ include.seo_title | default: page.title | jsonify }},
+      "description": {{ page_description | jsonify }},
+      "datePublished": {{ page.date | date_to_xmlschema | jsonify }},
+      "dateModified": {{ page.last_modified_at | default: page.date | date_to_xmlschema | jsonify }},
+      "author": {
+        "@id": {{ website_url | append: "#person" | jsonify }}
+      },
+      "publisher": {
+        "@id": {{ website_url | append: "#person" | jsonify }}
+      },
+      "image": {
+        "@type": "ImageObject",
+        "url": {{ page_image | jsonify }}
+      },
+      "isPartOf": {
+        "@id": {{ website_url | append: "#website" | jsonify }}
+      }{% if page.tags and page.tags.size > 0 %},
+      "keywords": {{ page.tags | jsonify }}{% endif %}
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": {{ page_url | append: "#breadcrumb" | jsonify }},
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": {{ website_url | jsonify }}
+        }{% assign breadcrumb_position = 2 %}{% if page.categories and page.categories.size > 0 %},
+        {
+          "@type": "ListItem",
+          "position": {{ breadcrumb_position }},
+          "name": {{ page.categories[0] | jsonify }},
+          "item": {{ '/categories/' | absolute_url | append: '#' | append: page.categories[0] | slugify | jsonify }}
+        }{% assign breadcrumb_position = breadcrumb_position | plus: 1 %}{% endif %},
+        {
+          "@type": "ListItem",
+          "position": {{ breadcrumb_position }},
+          "name": {{ page.title | jsonify }},
+          "item": {{ page_url | jsonify }}
+        }
+      ]
+    }{% endif %}
+  ]
+}
+</script>

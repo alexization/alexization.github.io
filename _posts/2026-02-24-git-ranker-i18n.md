@@ -1,6 +1,7 @@
 ---
 header:
   teaser: /assets/images/logo.png
+  og_image: "https://imgur.com/mIanPUL.png"
 
 title: "[Git Ranker #10] 외국인도 참여할 수 있도록. 국제화(i18n) 구축기"
 excerpt: "Google Search Console/Analytics에서 한국인 사용자 비중이 약 96%라는 지표를 확인하고, 외국인도 참여 가능한 서비스로 확장하기 위해 국제화를 도입한 기록"
@@ -17,10 +18,10 @@ toc_label: "i18n 구축기"
 toc: true
 toc_sticky: true
 
+permalink: /git-ranker/git-ranker-i18n/
 date: 2026-02-24
 last_modified_at: 2026-02-24
 ---
-
 Git Ranker를 처음 만들 때는 타겟 사용자를 사실상 **한국인**으로만 생각했습니다.
 
 실제로 운영 지표를 보면 그 생각이 맞아 보이기도 했습니다.  

@@ -1,6 +1,7 @@
 ---
 header:
   teaser: /assets/images/logo.png
+  og_image: "https://imgur.com/94i25FG.png"
 
 title: "[Git Ranker #9] GitHub OAuth 인증 시스템 구축기"
 excerpt: "사용자 피드백으로 급히 도입한 인증 시스템에서 SameSite 쿠키 삽질, Private/Public 데이터 불일치 문제를 Token Pool로 해결한 과정"
@@ -19,6 +20,7 @@ toc_label: "OAuth 인증 구축기"
 toc: true
 toc_sticky: true
 
+permalink: /git-ranker/git-ranker-github-oauth/
 date: 2026-01-23
 last_modified_at: 2026-01-23
 ---

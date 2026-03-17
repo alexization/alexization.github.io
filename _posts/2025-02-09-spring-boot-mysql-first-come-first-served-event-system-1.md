@@ -1,6 +1,7 @@
 ---
 header:
    teaser: /assets/images/logo.png
+   og_image: "https://imgur.com/v6JGz86.png"
 
 title: "Spring Boot + MySQL 선착순 이벤트 시스템 구축기 (1편)"
 excerpt: "매일 선착순 100명에게 도서를 증정하는 이벤트 시스템을 개발하며 직면한 동시성 문제와 성능 병목을 분석하고, 비관적 락과 DB 커넥션 풀의 한계를 경험한 과정을 다룹니다."

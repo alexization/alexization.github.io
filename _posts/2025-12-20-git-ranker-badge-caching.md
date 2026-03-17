@@ -1,6 +1,7 @@
 ---
 header:
   teaser: /assets/images/logo.png
+  og_image: "https://imgur.com/LcsQMUX.png"
 
 title: "[Git Ranker #8] GitHub SVG 배지 캐싱 문제 해결기"
 excerpt: "배지가 갱신이 안 된다? 서버 문제가 아니라 GitHub Camo 프록시의 캐싱 때문이었다. Cache-Control 헤더 한 줄로 해결한 과정"
@@ -17,10 +18,10 @@ toc_label: "배지 캐싱 해결기"
 toc: true
 toc_sticky: true
 
+permalink: /git-ranker/git-ranker-badge-caching/
 date: 2025-12-20
 last_modified_at: 2025-12-20
 ---
-
 ![GitRanker Master 티어](https://imgur.com/LcsQMUX.png)
 
 Git Ranker에는 사용자의 티어와 점수를 SVG 이미지로 보여주는 **배지 기능**이 있습니다.

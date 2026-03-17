@@ -1,6 +1,7 @@
 ---
 header:
   teaser: /assets/images/logo.png
+  og_image: "https://imgur.com/MhEwqHC.png"
 
 title: "[Home Lab #1] SSH Password 인증에서 Key 기반(Ed25519) 인증으로 갈아타기"
 excerpt: "미니 PC로 구축한 홈 서버의 보안을 강화하기 위해, 취약한 비밀번호 인증 대신 차세대 알고리즘인 Ed25519 기반의 SSH Key 인증을 설정하는 과정을 기록합니다."
@@ -16,6 +17,7 @@ toc_label: ""
 toc: true
 toc_sticky: true
 
+permalink: /home-lab/home-lab-ssh-key-based-auth/
 date: 2025-12-11
 last_modified_at: 2025-12-11
 ---

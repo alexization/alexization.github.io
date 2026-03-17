@@ -1,6 +1,7 @@
 ---
 header:
   teaser: /assets/images/logo.png
+  og_image: "https://imgur.com/KXha7Uy.png"
 
 title: "[Git Ranker #2] 대용량 데이터 처리와 무결성, 왜 하필 Spring Batch여야만 했나 ?"
 excerpt: "단순 반복문과 스케줄러의 한계를 넘어, 데이터 무결성과 대용량 트래픽을 감당하기 위해 Spring Batch를 도입한 기술적 의사결정 과정과 Job 아키텍처 상세 설계"
@@ -16,6 +17,7 @@ toc_label: "Spring Batch 도입기"
 toc: true
 toc_sticky: true
 
+permalink: /git-ranker/spring-batch/git-ranker-spring-batch/
 date: 2025-12-03
 last_modified_at: 2025-12-03
 ---

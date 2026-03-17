@@ -1,6 +1,7 @@
 ---
 header:
   teaser: /assets/images/logo.png
+  og_image: "https://imgur.com/sr3qYNf.png"
 
 title: "[Git Ranker #6] GitHub Search API에서 GraphQL로 전환"
 excerpt: "REST Search API의 Rate Limit 병목과 데이터 정밀도 문제를 해결하기 위해 GraphQL로 전환한 과정과 '1년 조회 제한' 문제를 Alias와 동적 쿼리 매핑으로 극복한 트러블 슈팅"
@@ -14,6 +15,7 @@ toc_label: "GraphQL 도입기"
 toc: true
 toc_sticky: true
 
+permalink: /git-ranker/git-ranker-graphql/
 date: 2025-12-09
 last_modified_at: 2025-12-09
 ---

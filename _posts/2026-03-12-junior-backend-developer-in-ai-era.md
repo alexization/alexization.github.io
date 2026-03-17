@@ -19,7 +19,6 @@ toc_sticky: true
 date: 2026-03-12
 last_modified_at: 2026-03-12
 ---
-
 > teo님의 [AI 시대의 개발자: 현업 개발자의 솔직한 이야기](https://velog.io/@teo/ai-and-developer)를 읽고 느낀점을 정리한 글입니다.
 
 **AI가 등장한 뒤로 개발자라는 직업을 바라보는 시선 자체가 많이 달라졌습니다.**

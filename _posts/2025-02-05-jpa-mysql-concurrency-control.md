@@ -1,6 +1,7 @@
 ---
 header:
   teaser: /assets/images/logo.png
+  og_image: "https://i.imgur.com/ULF1Qk1.png"
 
 title: "JPA와 MySQL로 구현한 동시성 제어"
 excerpt: "Redis 대신 JPA의 Pessimistic Lock과 MySQL을 활용하여 좋아요 기능의 동시성 문제를 해결하고, 시스템 복잡도를 줄이면서 데이터 정합성을 보장한 과정을 다룹니다."

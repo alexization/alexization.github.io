@@ -1,6 +1,7 @@
 ---
 header:
    teaser: /assets/images/logo.png
+   og_image: "https://i.imgur.com/iitj66f.png"
 
 title: "미용사 및 병원 검색 API의 N+1 문제 해결"
 excerpt: "미용사 및 병원 검색 API에서 발생한 N+1 문제를 분석하고, Fetch Join의 한계를 극복하여 Native Query를 활용해 성능을 최적화한 과정을 다룹니다."
@@ -19,7 +20,6 @@ toc_sticky: true
 date: 2025-01-24
 last_modified_at: 2025-01-24 
 ---
-
 댕글 서비스에서는 사용자가 미용사와 병원을 검색할 수 있는 API를 제공하고 있습니다. 이 API는 세 가지 주요 검색 조건을 지원합니다.
 
 1. 주소 `address` 기반 검색

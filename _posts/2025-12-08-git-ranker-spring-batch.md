@@ -1,6 +1,7 @@
 ---
 header:
   teaser: /assets/images/logo.png
+  og_image: "https://imgur.com/bcJSQnn.png"
 
 title: "[Git Ranker #5] 매일 새벽 동작하는 Spring Batch 기능 구현"
 excerpt: "멱등성을 보장하기 위해 누적 방식 대신 전체 재계산 방식을 선택한 기술적 의사결정 과정과 Spring Batch 아키텍처 설계, 그리고 마주한 REST API Rate Limit의 구조적 한계 고민"
@@ -16,6 +17,7 @@ toc_label: "Spring Batch 도입기"
 toc: true
 toc_sticky: true
 
+permalink: /git-ranker/git-ranker-spring-batch/
 date: 2025-12-08
 last_modified_at: 2025-12-08
 ---
