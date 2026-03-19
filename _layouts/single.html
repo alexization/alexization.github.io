@@ -44,6 +44,11 @@ layout: default
           </h1>
           {%- endif %}
           {% include page__meta.html %}
+          {% if site.category_archive.type and page.categories[0] %}
+            <div class="page__header-taxonomy page__header-taxonomy--mobile">
+              {% include category-list.html %}
+            </div>
+          {% endif %}
         </header>
       {% endunless %}
 
