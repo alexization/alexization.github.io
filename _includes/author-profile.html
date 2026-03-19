@@ -1,5 +1,11 @@
 {% assign author = page.author | default: page.authors[0] | default: site.author %}
 {% assign author = site.data.authors[author] | default: author %}
+{% case site.category_archive.type %}
+  {% when "liquid" %}
+    {% assign category_path_type = "#" %}
+  {% when "jekyll-archives" %}
+    {% assign category_path_type = nil %}
+{% endcase %}
 
 <div itemscope itemtype="https://schema.org/Person" class="h-card sidebar-card sidebar-card--profile">
 
@@ -259,7 +265,7 @@
             {% for category in sorted_categories %}
             {% if category %}
             <li>
-              <a href="/categories/#{{category[0] | slugify}}" class="">{{ category[0] }} <span>{{ category[1].size }}</span></a>
+              <a href="{{ category[0] | slugify | prepend: category_path_type | prepend: site.category_archive.path | relative_url }}" class="">{{ category[0] }} <span>{{ category[1].size }}</span></a>
             </li>
             {% endif %}
             {% endfor %}

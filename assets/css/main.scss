@@ -595,14 +595,22 @@ body {
 }
 
 .layout--home .sidebar-card,
-.layout--home .sidebar__section {
+.layout--home .sidebar__section,
+.layout--categories .sidebar-card,
+.layout--categories .sidebar__section,
+.layout--tags .sidebar-card,
+.layout--tags .sidebar__section {
   border-color: transparent;
   background: transparent;
   box-shadow: none;
 }
 
 .layout--home .sidebar-card--profile,
-.layout--home .sidebar__section {
+.layout--home .sidebar__section,
+.layout--categories .sidebar-card--profile,
+.layout--categories .sidebar__section,
+.layout--tags .sidebar-card--profile,
+.layout--tags .sidebar__section {
   padding-inline: 0;
 }
 
@@ -632,12 +640,16 @@ body {
   letter-spacing: -0.02em;
 }
 
-.layout--home .sidebar .author__avatar {
+.layout--home .sidebar .author__avatar,
+.layout--categories .sidebar .author__avatar,
+.layout--tags .sidebar .author__avatar {
   width: 6rem;
   height: 6rem;
 }
 
-.layout--home .sidebar .author__name {
+.layout--home .sidebar .author__name,
+.layout--categories .sidebar .author__name,
+.layout--tags .sidebar .author__name {
   font-size: 1.5rem;
   line-height: 1.25;
 }
@@ -716,6 +728,11 @@ body {
 .sidebar__section {
   margin-top: 1rem;
   padding: 1.25rem 1.5rem;
+}
+
+.layout--categories .sidebar__section--categories,
+.layout--tags .sidebar__section--categories {
+  display: none;
 }
 
 .sidebar__section-title {
@@ -975,11 +992,17 @@ body {
   background: linear-gradient(135deg, #3182f6 0%, #70b2ff 100%);
 }
 
+.archive__item-teaser--fallback:visited,
+.archive__item-teaser--fallback:hover,
+.archive__item-teaser--fallback:focus {
+  color: #ffffff;
+}
+
 .archive__item-teaser-label {
   font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: inherit;
   opacity: 0.9;
 }
 
@@ -988,6 +1011,7 @@ body {
   overflow: hidden;
   font-size: 0.95rem;
   line-height: 1.4;
+  color: inherit;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
 }
@@ -1198,6 +1222,10 @@ body {
 
   .author__urls {
     margin-top: 0.875rem;
+  }
+
+  .layout--home .sidebar__section--categories {
+    display: none;
   }
 
   .archive__item-taxonomy-item {
