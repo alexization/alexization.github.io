@@ -3,12 +3,12 @@
     {% comment %} Link for previous page {% endcomment %}
     {% if paginator.previous_page %}
       {% if paginator.previous_page == 1 %}
-        <li><a href="{{ paginator.first_page_path | relative_url }}">{{ site.data.ui-text[site.locale].pagination_previous | default: "Previous" }}</a></li>
+        <li><a href="{{ paginator.first_page_path | relative_url }}" class="pagination__control pagination__control--prev" aria-label="이전 페이지">{{ site.data.ui-text[site.locale].pagination_previous | default: "Previous" }}</a></li>
       {% else %}
-        <li><a href="{{ paginator.previous_page_path | relative_url }}">{{ site.data.ui-text[site.locale].pagination_previous | default: "Previous" }}</a></li>
+        <li><a href="{{ paginator.previous_page_path | relative_url }}" class="pagination__control pagination__control--prev" aria-label="이전 페이지">{{ site.data.ui-text[site.locale].pagination_previous | default: "Previous" }}</a></li>
       {% endif %}
     {% else %}
-      <li><a href="#" class="disabled"><span aria-hidden="true">{{ site.data.ui-text[site.locale].pagination_previous | default: "Previous" }}</span></a></li>
+      <li><a href="#" class="pagination__control pagination__control--prev disabled" aria-label="이전 페이지"><span aria-hidden="true">{{ site.data.ui-text[site.locale].pagination_previous | default: "Previous" }}</span></a></li>
     {% endif %}
 
     {% comment %} Determine whether the first page and the last page are already included in trail {% endcomment %}
@@ -23,46 +23,46 @@
     {% comment %} First page {% endcomment %}
     {% unless has_first_page %}
       {% if paginator.page == 1 %}
-        <li><a href="#" class="disabled current">1</a></li>
+        <li><a href="#" class="pagination__page disabled current" aria-label="1페이지" aria-current="page">1</a></li>
       {% else %}
-        <li><a href="{{ paginator.first_page_path | relative_url }}">1</a></li>
+        <li><a href="{{ paginator.first_page_path | relative_url }}" class="pagination__page" aria-label="1페이지">1</a></li>
       {% endif %}
     {% endunless %}
 
     {% comment %} Ellipsis for truncated links {% endcomment %}
     {% assign ellipsis_start = paginator.first_page | plus: 1 %}
     {% if paginator.page_trail.first.num > ellipsis_start %}
-      <li><a href="#" class="disabled">&hellip;</a></li>
+      <li><a href="#" class="pagination__ellipsis disabled" aria-hidden="true">&hellip;</a></li>
     {% endif %}
 
     {% comment %} Main pagination trail {% endcomment %}
     {% for trail in paginator.page_trail %}
       {% if paginator.page == trail.num %}
-        <li><a href="{{ trail.path | remove: 'index.html' | relative_url }}" class="disabled current">{{ trail.num }}</a></li>
+        <li><a href="{{ trail.path | remove: 'index.html' | relative_url }}" class="pagination__page disabled current" aria-label="{{ trail.num }}페이지" aria-current="page">{{ trail.num }}</a></li>
       {% else %}
-        <li><a href="{{ trail.path | remove: 'index.html' | relative_url }}">{{ trail.num }}</a></li>
+        <li><a href="{{ trail.path | remove: 'index.html' | relative_url }}" class="pagination__page" aria-label="{{ trail.num }}페이지">{{ trail.num }}</a></li>
       {% endif %}
     {% endfor %}
 
     {% comment %} Ellipsis for truncated links {% endcomment %}
     {% assign ellipsis_end = paginator.last_page | minus: 1 %}
     {% if paginator.page_trail.last.num < ellipsis_end %}
-      <li><a href="#" class="disabled">&hellip;</a></li>
+      <li><a href="#" class="pagination__ellipsis disabled" aria-hidden="true">&hellip;</a></li>
     {% endif %}
 
     {% unless has_last_page %}
       {% if paginator.page == paginator.total_pages %}
-        <li><a href="#" class="disabled current">{{ paginator.page }}</a></li>
+        <li><a href="#" class="pagination__page disabled current" aria-label="{{ paginator.page }}페이지" aria-current="page">{{ paginator.page }}</a></li>
       {% else %}
-        <li><a href="{{ paginator.last_page_path | remove: 'index.html' | relative_url }}">{{ paginator.total_pages }}</a></li>
+        <li><a href="{{ paginator.last_page_path | remove: 'index.html' | relative_url }}" class="pagination__page" aria-label="{{ paginator.total_pages }}페이지">{{ paginator.total_pages }}</a></li>
       {% endif %}
     {% endunless %}
 
     {% comment %} Link next page {% endcomment %}
     {% if paginator.next_page %}
-      <li><a href="{{ paginator.next_page_path | remove: 'index.html' | relative_url }}">{{ site.data.ui-text[site.locale].pagination_next | default: "Next" }}</a></li>
+      <li><a href="{{ paginator.next_page_path | remove: 'index.html' | relative_url }}" class="pagination__control pagination__control--next" aria-label="다음 페이지">{{ site.data.ui-text[site.locale].pagination_next | default: "Next" }}</a></li>
     {% else %}
-      <li><a href="#" class="disabled"><span aria-hidden="true">{{ site.data.ui-text[site.locale].pagination_next | default: "Next" }}</span></a></li>
+      <li><a href="#" class="pagination__control pagination__control--next disabled" aria-label="다음 페이지"><span aria-hidden="true">{{ site.data.ui-text[site.locale].pagination_next | default: "Next" }}</span></a></li>
     {% endif %}
   </ul>
 </nav>
