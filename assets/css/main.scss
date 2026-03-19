@@ -115,7 +115,7 @@ body {
 
 .archive__item-title {
   margin: 0;
-  font-size: clamp(1.3125rem, 1.1rem + 0.8vw, 1.5rem);
+  font-size: clamp(1.3125rem, calc(1.1rem + 0.8vw), 1.5rem);
   font-weight: 700;
   line-height: 1.45;
   letter-spacing: -0.03em;
@@ -145,7 +145,7 @@ body {
 }
 
 .layout--home .archive__item-title {
-  font-size: clamp(1.25rem, 1.06rem + 0.65vw, 1.4rem);
+  font-size: clamp(1.25rem, calc(1.06rem + 0.65vw), 1.4rem);
 }
 
 .layout--home .archive__item-excerpt {
@@ -353,7 +353,7 @@ body {
 
 .page__title {
   color: var(--toss-text-strong);
-  font-size: clamp(2rem, 1.6rem + 1.4vw, 2.5rem);
+  font-size: clamp(2rem, calc(1.6rem + 1.4vw), 2.5rem);
   line-height: 1.35;
   letter-spacing: -0.035em;
 }
@@ -399,7 +399,7 @@ body {
   margin-top: 3.5rem;
   margin-bottom: 0.5rem;
   color: var(--toss-text-strong);
-  font-size: clamp(2rem, 1.8rem + 0.9vw, 2.25rem);
+  font-size: clamp(2rem, calc(1.8rem + 0.9vw), 2.25rem);
   line-height: 1.45;
   letter-spacing: -0.035em;
 }
@@ -407,7 +407,7 @@ body {
 .page__content h2 {
   margin-top: 3.25rem;
   padding-bottom: 0;
-  font-size: clamp(1.7rem, 1.58rem + 0.45vw, 1.85rem);
+  font-size: clamp(1.7rem, calc(1.58rem + 0.45vw), 1.85rem);
   line-height: 1.55;
   border-bottom: 0;
 }
