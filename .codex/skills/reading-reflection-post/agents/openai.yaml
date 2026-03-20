@@ -1,0 +1,7 @@
+interface:
+  display_name: "Reading Reflection Post"
+  short_description: "Write Korean reflective tech posts"
+  default_prompt: "Use $reading-reflection-post to turn the provided references and my notes into a polished Korean essay."
+
+policy:
+  allow_implicit_invocation: true
