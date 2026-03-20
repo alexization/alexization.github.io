@@ -16,6 +16,7 @@ toc_label: "AI 시대의 개발자"
 toc: true
 toc_sticky: true
 
+permalink: /ai/junior-backend-developer-in-ai-era/
 date: 2026-03-12
 last_modified_at: 2026-03-12
 ---
