@@ -699,6 +699,16 @@ body {
   opacity: 1;
 }
 
+.layout--home .sidebar.sticky {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.layout--home .sidebar.sticky::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
 .sidebar > * + * {
   margin-top: 1rem;
 }
