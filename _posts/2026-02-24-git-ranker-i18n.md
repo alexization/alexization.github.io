@@ -1,7 +1,7 @@
 ---
 header:
   teaser: /assets/images/logo.png
-  og_image: "https://imgur.com/mIanPUL.png"
+  og_image: "https://i.imgur.com/mIanPUL.png"
 
 title: "[Git Ranker #10] 외국인도 참여할 수 있도록. 국제화(i18n) 구축기"
 excerpt: "Google Search Console/Analytics에서 한국인 사용자 비중이 약 96%라는 지표를 확인하고, 외국인도 참여 가능한 서비스로 확장하기 위해 국제화를 도입한 기록"
@@ -19,6 +19,8 @@ toc: true
 toc_sticky: true
 
 permalink: /git-ranker/git-ranker-i18n/
+redirect_from:
+  - /git ranker/git-ranker-i18n/
 date: 2026-02-24
 last_modified_at: 2026-02-24
 ---
@@ -26,8 +28,8 @@ Git Ranker를 처음 만들 때는 타겟 사용자를 사실상 **한국인**�
 
 실제로 운영 지표를 보면 그 생각이 맞아 보이기도 했습니다.  
 
-![google search console](https://imgur.com/mIanPUL.png)
-![google search console2](https://imgur.com/T7nyw1n.png)
+![google search console](https://i.imgur.com/mIanPUL.png)
+![google search console2](https://i.imgur.com/T7nyw1n.png)
 
 Google Search Console를 확인했을 때 사용자 비중이 **약 96% 한국인**이었고, 외국인 유입은 거의 없었기 때문입니다.
 
@@ -325,7 +327,7 @@ error.github.rate-limit-retry-after=Please try again after {0}.
 ---
 
 # 마무리
-![git-ranker-main](https://imgur.com/zuB0kHz.png)
+![git-ranker-main](https://i.imgur.com/zuB0kHz.png)
 이번 국제화 작업에서 가장 크게 바뀐 생각은
 
 > 국제화는 번역 작업이 아니라 설계 작업이다.

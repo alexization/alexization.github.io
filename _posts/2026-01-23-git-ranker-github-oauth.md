@@ -1,7 +1,7 @@
 ---
 header:
   teaser: /assets/images/logo.png
-  og_image: "https://imgur.com/94i25FG.png"
+  og_image: "https://i.imgur.com/94i25FG.png"
 
 title: "[Git Ranker #9] GitHub OAuth 인증 시스템 구축기"
 excerpt: "사용자 피드백으로 급히 도입한 인증 시스템에서 SameSite 쿠키 삽질, Private/Public 데이터 불일치 문제를 Token Pool로 해결한 과정"
@@ -21,6 +21,8 @@ toc: true
 toc_sticky: true
 
 permalink: /git-ranker/git-ranker-github-oauth/
+redirect_from:
+  - /git ranker/git-ranker-github-oauth/
 date: 2026-01-23
 last_modified_at: 2026-01-23
 ---
@@ -38,13 +40,13 @@ Git Ranker를 처음 기획할 때 **로그인 기능은 전혀 생각하지 않
 
 *"이거 **개인정보 보호에 위반**되는 거 아닌가요?"*
 
-![피드백1](https://imgur.com/94i25FG.png)
+![피드백1](https://i.imgur.com/94i25FG.png)
 
 *"**다른 사람 정보도 그냥 이름만 넣으면 조회**가 되네요?"*
 
-![피드백3](https://imgur.com/6LYsf7v.png)
+![피드백3](https://i.imgur.com/6LYsf7v.png)
 
-![피드백2](https://imgur.com/7sBnx03.png)
+![피드백2](https://i.imgur.com/7sBnx03.png)
 
 피드백을 받고 보니 확실히 문제가 있었습니다. 누군가가 나의 GitHub 사용자명을 입력하면, **내 동의 없이 활동 데이터가 수집되고 랭킹에 표시**됩니다. 게다가 "삭제해주세요"라는 요청이 와도 **본인인지 확인할 방법이 없었습니다.**
 
@@ -192,7 +194,7 @@ ResponseCookie.from("refresh_token", tokenValue)
 
 OAuth 로그인 흐름을 다시 생각해보겠습니다.
 
-![OAuth 로그인 흐름](https://imgur.com/ENKOTnz.png)
+![OAuth 로그인 흐름](https://i.imgur.com/ENKOTnz.png)
 
 1. 사용자가 우리 사이트에서 "GitHub 로그인" 클릭
 2. GitHub 로그인 페이지로 이동

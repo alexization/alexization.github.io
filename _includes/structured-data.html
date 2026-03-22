@@ -5,9 +5,10 @@
 {%- assign author_image = author.avatar | default: site.og_image | absolute_url -%}
 {%- assign author_same_as = site.social.links | default: empty -%}
 {%- assign page_image = page.header.og_image | default: page.header.overlay_image | default: page.header.image | default: page.header.teaser | default: site.og_image | absolute_url -%}
-{%- assign page_url = include.canonical_url | default: page.url | absolute_url -%}
+{%- assign page_url = include.canonical_url | default: page.url | replace: "/index.html", "/" | absolute_url -%}
 {%- assign page_description = include.seo_description | default: page.description | default: page.excerpt | default: site.description | markdownify | strip_html | strip_newlines | escape_once | strip -%}
 {%- assign website_url = '/' | absolute_url -%}
+{%- capture category_archive_path -%}{{ site.category_archive.path | default: '/categories/' }}{%- endcapture -%}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -16,7 +17,8 @@
       "@type": "WebSite",
       "@id": {{ website_url | append: "#website" | jsonify }},
       "url": {{ website_url | jsonify }},
-      "name": {{ site.title | jsonify }},
+      "name": {{ site.title | jsonify }}{% if site.alternate_name %},
+      "alternateName": {{ site.alternate_name | jsonify }}{% endif %},
       "description": {{ site.description | jsonify }},
       "inLanguage": {{ site.locale | jsonify }},
       "publisher": {
@@ -73,7 +75,7 @@
           "@type": "ListItem",
           "position": {{ breadcrumb_position }},
           "name": {{ page.categories[0] | jsonify }},
-          "item": {{ '/categories/' | absolute_url | append: '#' | append: page.categories[0] | slugify | jsonify }}
+          "item": {% capture category_item_url %}{{ category_archive_path }}#{{ page.categories[0] | slugify }}{% endcapture %}{{ category_item_url | absolute_url | jsonify }}
         }{% assign breadcrumb_position = breadcrumb_position | plus: 1 %}{% endif %},
         {
           "@type": "ListItem",

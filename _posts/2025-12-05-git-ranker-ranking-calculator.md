@@ -1,7 +1,7 @@
 ---
 header:
   teaser: /assets/images/logo.png
-  og_image: "https://imgur.com/qPY6Ii7.png"
+  og_image: "https://i.imgur.com/qPY6Ii7.png"
 
 title: "[Git Ranker #4] 순위 및 티어 계산 기능 구현"
 excerpt: "대규모 정렬 없이 순위를 구하는 효율적인 알고리즘과, 초기 사용자 부족으로 인한 티어 산정의 모순을 해결하기 위해 Tasklet과 Window Function을 활용한 배치 최적화 과정"
@@ -18,6 +18,8 @@ toc: true
 toc_sticky: true
 
 permalink: /git-ranker/git-ranker-ranking-calculator/
+redirect_from:
+  - /git ranker/git-ranker-ranking-calculator/
 date: 2025-12-05
 last_modified_at: 2025-12-05
 ---
@@ -153,7 +155,7 @@ public void runHourlyRankingRecalculation() {
 배치를 구현하는 방식에는 크게 두 가지가 있습니다. 저는 여기서 일반적인 `Chunk` 방식 대신 **`Tasklet` 을 활용한 Bulk Update 방식**을 선택했습니다.
 
 ### 왜 Chunk 대신 Tasklet 인가 ?
-![Tasklet vs chunk](https://imgur.com/qPY6Ii7.png)
+![Tasklet vs chunk](https://i.imgur.com/qPY6Ii7.png)
 
 일반적인 Spring Batch 패턴인 `ItemReader` → `ItemProcessor` → `ItemWriter` 로 구성하는 Chunk 방식은 데이터를 DB에서 애플리케이션 메모리로 꺼내와서(`SELECT`) 처리한 뒤 다시 DB로 넣는(`UPDATE`) 구조입니다.
 대량의 데이터를 메모리에 올리고 내리는 과정에서 불필요한 네트워크/메모리 오버헤드가 발생합니다.

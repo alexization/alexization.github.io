@@ -21,6 +21,7 @@ title                    : "효석의 기술 블로그"
 title_separator          : "-"
 subtitle                 : "내 기억력을 믿지 않는다. 꾸준히 기록하자."
 name                     : "백효석"
+alternate_name           : "alexization.github.io"
 description              : "백엔드, 데이터베이스, 인프라를 중심으로 Spring Boot, JPA, MySQL, Redis, 홈랩 운영 경험을 기록하는 효석의 기술 블로그입니다."
 url                      : "https://alexization.github.io"
 baseurl                  : # the subpath of your site, e.g. "/blog"
@@ -83,7 +84,7 @@ google:
   search_engine_id       : # YOUR_SEARCH_ENGINE_ID
   instant_search         : # false (default), true
 # SEO Related
-google_site_verification :
+google_site_verification : "google167226cfabb37bdd.html"
 bing_site_verification   :
 naver_site_verification  :
 yandex_site_verification :
@@ -97,6 +98,7 @@ facebook:
   app_id                 :
   publisher              :
 og_image                 : "/assets/images/author.png" # Open Graph/Twitter default site image
+og_image_alt             : "효석의 기술 블로그 대표 이미지"
 # For specifying social profiles
 # - https://developers.google.com/structured-data/customize/social-profiles
 social:
@@ -249,9 +251,13 @@ pagination:
     before: 2
     after: 2
 
+redirect_from:
+  json: false
+
 
 # Plugins (previously gems:)
 plugins:
+  - jekyll-redirect-from
   - jekyll-sitemap
   - jekyll-paginate
   - jekyll-gist

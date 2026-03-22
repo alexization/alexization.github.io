@@ -1,7 +1,7 @@
 ---
 header:
   teaser: /assets/images/logo.png
-  og_image: "https://imgur.com/LcsQMUX.png"
+  og_image: "https://i.imgur.com/LcsQMUX.png"
 
 title: "[Git Ranker #8] GitHub SVG 배지 캐싱 문제 해결기"
 excerpt: "배지가 갱신이 안 된다? 서버 문제가 아니라 GitHub Camo 프록시의 캐싱 때문이었다. Cache-Control 헤더 한 줄로 해결한 과정"
@@ -19,16 +19,18 @@ toc: true
 toc_sticky: true
 
 permalink: /git-ranker/git-ranker-badge-caching/
+redirect_from:
+  - /git ranker/git-ranker-badge-caching/
 date: 2025-12-20
 last_modified_at: 2025-12-20
 ---
-![GitRanker Master 티어](https://imgur.com/LcsQMUX.png)
+![GitRanker Master 티어](https://i.imgur.com/LcsQMUX.png)
 
 Git Ranker에는 사용자의 티어와 점수를 SVG 이미지로 보여주는 **배지 기능**이 있습니다.
 
 사용자가 자신의 GitHub README에 배지 URL을 한 번 삽입해두면, 방문자가 프로필을 볼 때마다 최신 점수와 티어가 자동으로 표시되는 구조입니다.
 
-![Solved.ac 티어와 비교](https://imgur.com/LSgOu0q.png)
+![Solved.ac 티어와 비교](https://i.imgur.com/LSgOu0q.png)
 
 > Git Ranker의 배지 시스템은 백준 티어를 나타내주는 배지를 모티브했으며, 백준 배지와 잘 어울리도록 크기와 디자인을 고려하여 개발했습니다.
 
@@ -54,7 +56,7 @@ Git Ranker에는 사용자의 티어와 점수를 SVG 이미지로 보여주는 
 
 그래서 GitHub README에서 배지 이미지의 **실제 요청 URL**을 확인해봤습니다.
 
-![camo url](https://imgur.com/iYrnlYp.png)
+![camo url](https://i.imgur.com/iYrnlYp.png)
 
 제가 삽입한 URL은 `https://www.git-ranker.com/api/v1/badges/...` 였는데, GitHub에서 실제로 로드하는 이미지 URL은 **`https://camo.githubusercontent.com/...`** 으로 변환되어 있었습니다.
 

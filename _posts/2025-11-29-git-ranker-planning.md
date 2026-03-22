@@ -18,6 +18,8 @@ toc: true
 toc_sticky: true
 
 permalink: /home-lab/git-ranker/git-ranker-planning/
+redirect_from:
+  - /home lab/git ranker/git-ranker-planning/
 date: 2025-11-29
 last_modified_at: 2025-12-01
 ---

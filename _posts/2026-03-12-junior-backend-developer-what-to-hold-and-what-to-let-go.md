@@ -1,7 +1,7 @@
 ---
 header:
   teaser: /assets/images/logo.png
-  og_image: "https://imgur.com/ehp0oU4.png"
+  og_image: "https://i.imgur.com/ehp0oU4.png"
 
 title: "AI 시대의 주니어 백엔드 개발자는 무엇을 붙잡고 무엇을 내려놓아야 할까"
 excerpt: "teo님의 글들과 토스의 글, 그리고 개인 프로젝트와 레거시 고도화 경험을 바탕으로 AI 시대의 주니어 백엔드 개발자가 어디까지를 AI에게 위임하고 무엇을 끝까지 책임져야 하는지 정리한 글입니다."
@@ -22,7 +22,7 @@ date: 2026-03-12
 last_modified_at: 2026-03-12
 ---
 
-![main](https://imgur.com/ehp0oU4.png)
+![main](https://i.imgur.com/ehp0oU4.png)
 
 <aside>
 이 글은 토스의 [개발자는 AI에게 대체될 것인가](https://toss.tech/article/will-ai-replace-developers), teo님의 [AI 시대의 개발자: 현업 개발자의 솔직한 이야기](https://velog.io/@teo/ai-and-developer)와 [우리, 프로그래머들 - .md로 코딩하는 시대](https://velog.io/@teo/we-programmer)를 읽고, AI 시대를 살아가는 주니어 백엔드 개발자로서 제가 무엇을 붙잡고 무엇을 내려놓아야 하는지에 대한 생각을 다시 정리해 본 글입니다.

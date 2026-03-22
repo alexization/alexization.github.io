@@ -1,7 +1,7 @@
 ---
 header:
   teaser: /assets/images/logo.png
-  og_image: "https://imgur.com/MhEwqHC.png"
+  og_image: "https://i.imgur.com/MhEwqHC.png"
 
 title: "[Home Lab #1] SSH Password 인증에서 Key 기반(Ed25519) 인증으로 갈아타기"
 excerpt: "미니 PC로 구축한 홈 서버의 보안을 강화하기 위해, 취약한 비밀번호 인증 대신 차세대 알고리즘인 Ed25519 기반의 SSH Key 인증을 설정하는 과정을 기록합니다."
@@ -18,6 +18,8 @@ toc: true
 toc_sticky: true
 
 permalink: /home-lab/home-lab-ssh-key-based-auth/
+redirect_from:
+  - /home lab/home-lab-ssh-key-based-auth/
 date: 2025-12-11
 last_modified_at: 2025-12-11
 ---
@@ -55,7 +57,7 @@ SSH key 인증의 핵심은 비대칭키 알고리즘입니다. 여기에는 한
 
 서버와 클라이언트가 연결될 때, 단순히 Key 파일을 주고받는 것이 아닙니다. 아래와 같은 정교한 과정을 거칩니다.
 
-![image.png](https://imgur.com/MhEwqHC.png)
+![image.png](https://i.imgur.com/MhEwqHC.png)
 
 *(이해를 돕기 위해 Gemini를 사용해 이미지를 생성했습니다.)*
 

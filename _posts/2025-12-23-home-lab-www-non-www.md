@@ -1,7 +1,7 @@
 ---
 header:
   teaser: /assets/images/logo.png
-  og_image: "https://imgur.com/r7NHaAV.png"
+  og_image: "https://i.imgur.com/r7NHaAV.png"
 
 title: "[Home Lab #4] 홈서버 도메인 정규화: Nginx, Certbot, DNS로 www/non-www 불일치 해결하기"
 excerpt: "HTTPS를 적용했는데도 www 유무에 따라 접속이 갈리던 문제를 DNS와 Nginx 정책 정렬로 해결한 경험"
@@ -21,6 +21,8 @@ toc: true
 toc_sticky: true
 
 permalink: /home-lab/home-lab-www-non-www/
+redirect_from:
+  - /home lab/home-lab-www-non-www/
 date: 2025-12-23
 last_modified_at: 2025-12-23
 ---
@@ -144,7 +146,7 @@ Cloudflare 이전을 보류한 뒤에는, 현재 홈서버 환경에서 루트 �
 
 ## DNS 레코드를 먼저 고정하기
 
-![record](https://imgur.com/r7NHaAV.png)
+![record](https://i.imgur.com/r7NHaAV.png)
 
 현재 레코드는 아래처럼 유지했습니다.
 
@@ -180,7 +182,7 @@ server {
 }
 ```
 
-![요청 흐름](https://imgur.com/ONBqxne.png)
+![요청 흐름](https://i.imgur.com/ONBqxne.png)
 
 ### 실제 요청 흐름
 

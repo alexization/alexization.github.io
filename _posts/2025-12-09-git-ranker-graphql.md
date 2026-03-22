@@ -1,7 +1,7 @@
 ---
 header:
   teaser: /assets/images/logo.png
-  og_image: "https://imgur.com/sr3qYNf.png"
+  og_image: "https://i.imgur.com/sr3qYNf.png"
 
 title: "[Git Ranker #6] GitHub Search API에서 GraphQL로 전환"
 excerpt: "REST Search API의 Rate Limit 병목과 데이터 정밀도 문제를 해결하기 위해 GraphQL로 전환한 과정과 '1년 조회 제한' 문제를 Alias와 동적 쿼리 매핑으로 극복한 트러블 슈팅"
@@ -16,6 +16,8 @@ toc: true
 toc_sticky: true
 
 permalink: /git-ranker/git-ranker-graphql/
+redirect_from:
+  - /git ranker/git-ranker-graphql/
 date: 2025-12-09
 last_modified_at: 2025-12-09
 ---
@@ -348,9 +350,9 @@ public int getCommitCount() {
 
 최종적으로 쿼리 빌드부터 DB 저장까지의 전체 데이터 처리 흐름은 아래와 같습니다. 클라이언트가 동적 쿼리를 생성하면, GitHub 서버는 이를 파싱하여 데이터를 수집하고, 다시 클라이언트는 이를 Jackson을 통해 유연하게 받아냅니다.
 
-![GraphQL.png](https://imgur.com/sr3qYNf.png)
+![GraphQL.png](https://i.imgur.com/sr3qYNf.png)
 
-![End-to-End.png](https://imgur.com/GY6uXWh.png)
+![End-to-End.png](https://i.imgur.com/GY6uXWh.png)
 
 ---
 

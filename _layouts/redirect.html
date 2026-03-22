@@ -1,18 +1,23 @@
 ---
 ---
+{% assign redirect_target = page.redirect.to | default: page.redirect_to | absolute_url %}
 <!doctype html>
 <html lang="{{ site.locale | replace: "_", "-" | default: "en" }}" class="no-js">
   <head>
-    {% include head.html %}
-    {% include head/custom.html %}
-    <meta http-equiv="refresh" content="0; url={{ page.redirect_to | absolute_url }}">
+    <meta charset="utf-8">
+    <title>{{ site.title }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex,follow,max-image-preview:large">
+    <link rel="canonical" href="{{ redirect_target }}">
+    <meta http-equiv="refresh" content="0; url={{ redirect_target }}">
+    <script>window.location.replace({{ redirect_target | jsonify }});</script>
   </head>
   <body>
     <main style="max-width: 40rem; margin: 4rem auto; padding: 0 1rem; font-family: sans-serif;">
-      <h1>{{ page.title | default: "페이지가 이동했습니다." }}</h1>
+      <h1>페이지가 이동했습니다.</h1>
       <p>
         새 주소로 이동합니다.
-        <a href="{{ page.redirect_to | absolute_url }}">직접 이동하기</a>
+        <a href="{{ redirect_target }}">직접 이동하기</a>
       </p>
     </main>
   </body>

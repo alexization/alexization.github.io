@@ -1,7 +1,7 @@
 ---
 header:
   teaser: /assets/images/logo.png
-  og_image: "https://imgur.com/iyjUKX7.png"
+  og_image: "https://i.imgur.com/iyjUKX7.png"
 
 title: "[Git Ranker #3] 사용자 데이터 수집 : Events API의 실패와 Search API로의 전환"
 excerpt: "GitHub Events API의 데이터 유실 및 정책 변경 이슈를 분석하고, Search API 도입을 통해 전체 활동 데이터 기반의 정확한 점수 시스템을 구현한 기술적 의사결정 과정"
@@ -16,6 +16,8 @@ toc: true
 toc_sticky: true
 
 permalink: /git-ranker/git-ranker-search-api/
+redirect_from:
+  - /git ranker/git-ranker-search-api/
 date: 2025-12-04
 last_modified_at: 2025-12-04
 ---
@@ -123,7 +125,7 @@ Search API의 도입으로 기존의 불안전했던 데이터 수집 기획을 
 이러한 기획 변경을 통해, 사용자가 5년 전에 작성한 커밋 하나까지도 놓치지 않고 점수에 반영할 수 있는 정확하고 공정한 점수 시스템의 기반을 마련했습니다.
 
 # 3. 전체 데이터 기반 점수 계산 로직
-![Search API 기반 점수 산정 로직](https://imgur.com/iyjUKX7.png)
+![Search API 기반 점수 산정 로직](https://i.imgur.com/iyjUKX7.png)
 변경된 기획에 따라 사용자 가입 시 Search API를 활용해 데이터를 수집하는 로직을 구현했습니다.
 
 ## 3.1 데이터 수집 코드 (`GitHubActivityService`)

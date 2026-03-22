@@ -1,7 +1,7 @@
 ---
 header:
   teaser: /assets/images/logo.png
-  og_image: "https://imgur.com/bcJSQnn.png"
+  og_image: "https://i.imgur.com/bcJSQnn.png"
 
 title: "[Git Ranker #5] 매일 새벽 동작하는 Spring Batch 기능 구현"
 excerpt: "멱등성을 보장하기 위해 누적 방식 대신 전체 재계산 방식을 선택한 기술적 의사결정 과정과 Spring Batch 아키텍처 설계, 그리고 마주한 REST API Rate Limit의 구조적 한계 고민"
@@ -18,6 +18,8 @@ toc: true
 toc_sticky: true
 
 permalink: /git-ranker/git-ranker-spring-batch/
+redirect_from:
+  - /git ranker/git-ranker-spring-batch/
 date: 2025-12-08
 last_modified_at: 2025-12-08
 ---
@@ -78,7 +80,7 @@ last_modified_at: 2025-12-08
 
 배치 작업은 성격에 따라 크게 크게 **Daily Job(점수 갱신)과 Hourly Job(순위 갱신)** 으로 분리했습니다.
 
-![Job Step 구조.png](https://imgur.com/bcJSQnn.png)
+![Job Step 구조.png](https://i.imgur.com/bcJSQnn.png)
 
 ## 2.2 Chunk 방식과 Tasklet 방식
 
@@ -121,7 +123,7 @@ Step 1 은 외부 API 통신이 핵심이기 때문에, **Chunk 방식**을 사�
 
 **처리 흐름**
 
-![처리 흐름](https://imgur.com/hVI2fLw.png)
+![처리 흐름](https://i.imgur.com/hVI2fLw.png)
 
 위 그림과 같이 `Chunk` 단위(50명) 로 데이터를 읽고 처리합니다.
 
@@ -182,7 +184,7 @@ public class ScoreRecalculationProcessor implements ItemProcessor<User, User> {
 
 ## 4.1 Rate Limit 발생
 
-![image.png](https://imgur.com/27toNyI.png)
+![image.png](https://i.imgur.com/27toNyI.png)
 
 ```
 HTTP 403 Forbidden

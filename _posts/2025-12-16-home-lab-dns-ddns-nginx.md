@@ -1,7 +1,7 @@
 ---
 header:
   teaser: /assets/images/logo.png
-  og_image: "https://imgur.com/r7NHaAV.png"
+  og_image: "https://i.imgur.com/r7NHaAV.png"
 
 title: "[Home Lab #3] DNS, DDNS, Nginx로 나만의 도메인으로 서비스 배포하기"
 excerpt: "공인 IP와 포트 번호가 노출되는 환경에서 벗어나, DNS와 DDNS를 결합하고 Nginx 리버스 프록시를 통해 깔끔한 도메인과 HTTPS 보안을 적용 과정"
@@ -19,6 +19,8 @@ toc: true
 toc_sticky: true
 
 permalink: /home-lab/home-lab-dns-ddns-nginx/
+redirect_from:
+  - /home lab/home-lab-dns-ddns-nginx/
 date: 2025-12-16
 last_modified_at: 2025-12-16
 ---
@@ -50,7 +52,7 @@ last_modified_at: 2025-12-16
   (예: [`example.com`](http://example.com) → `myserver.iptime.org`)
 
 
-![record](https://imgur.com/r7NHaAV.png)
+![record](https://i.imgur.com/r7NHaAV.png)
 
 *(A 레코드 관련 설정은 다음 포스팅에서 다룰 예정입니다.)*
 
@@ -97,7 +99,7 @@ Nginx를 사용하는 가장 큰 이유 중 하나는 **리버스 프록시** �
 - 클라이언트는 서버의 존재를 직접 알지 못하고 리버스 프록시(Nginx) 주소로 요청을 보냅니다. Nginx는 이 요청을 받아 내부 네트워크에서 실제 동작 중인 적절한 서비스로 전달합니다.
 - 실제 서버 정보를 외부에 숨겨 보안을 강화하고, **여러 포트에서 돌아가는 서비스들을 하나의 도메인 아래로 묶어주는 단일 진입점** 역할을 합니다.
 
-![image.png](https://imgur.com/KbdgQ7u.png)
+![image.png](https://i.imgur.com/KbdgQ7u.png)
 
 제가 리버스 프록시를 설정하면서 느낀 가장 큰 장점은 **포트 추상화를 통한 유연성**입니다.
 

@@ -1,7 +1,7 @@
 ---
 header:
    teaser: /assets/images/logo.png
-   og_image: "https://imgur.com/vz4o0WK.png"
+   og_image: "https://i.imgur.com/vz4o0WK.png"
 
 title: "Redis Stream으로 개선한 선착순 이벤트 시스템 (2편)"
 excerpt: "Spring Boot + MySQL 구조의 성능 병목을 Redis Stream 비동기 처리로 해결하여 1,666 RPS 달성과 66% 성능 향상을 이룬 과정을 다룹니다."
@@ -322,7 +322,7 @@ public class ApplyService {
 
 Redis Stream을 적용한 선착순 이벤트 시스템의 전체 프로세스 흐름은 크게 **클라이언트 요청 처리**와 **비동기 메시지 처리** 두 부분으로 나눌 수 있습니다.
 
-![redis-stream-architecture-revised.svg](https://imgur.com/vz4o0WK.png)
+![redis-stream-architecture-revised.svg](https://i.imgur.com/vz4o0WK.png)
 
 ## 클라이언트 요청 처리 과정
 
@@ -381,9 +381,9 @@ Redis Stream을 적용한 선착순 이벤트 시스템의 전체 프로세스 �
 
 ## JVM 메모리 및 GC 분석
 
-![스크린샷 2025-03-22 오전 12.34.08.png](https://imgur.com/ZINn961.png)
+![스크린샷 2025-03-22 오전 12.34.08.png](https://i.imgur.com/ZINn961.png)
 
-![스크린샷 2025-03-22 오전 12.34.26.png](https://imgur.com/BOpqyjg.png)
+![스크린샷 2025-03-22 오전 12.34.26.png](https://i.imgur.com/BOpqyjg.png)
 
 **기존 시스템 (1,000 RPS)**
 
@@ -403,11 +403,11 @@ Redis Stream 도입으로 객체 생성 패턴이 최적화되었습니다. 처�
 
 ## Thread Pool 분석
 
-![스크린샷 2025-03-22 오전 12.34.51.png](https://imgur.com/nj044tz.png)
+![스크린샷 2025-03-22 오전 12.34.51.png](https://i.imgur.com/nj044tz.png)
 
-![스크린샷 2025-03-22 오전 12.34.18.png](https://imgur.com/RcvPPXz.png)
+![스크린샷 2025-03-22 오전 12.34.18.png](https://i.imgur.com/RcvPPXz.png)
 
-![스크린샷 2025-03-22 오전 12.35.01.png](https://imgur.com/9cQ3INS.png)
+![스크린샷 2025-03-22 오전 12.35.01.png](https://i.imgur.com/9cQ3INS.png)
 
 **기존 시스템 (1,000 RPS)**
 
@@ -426,9 +426,9 @@ Redis Stream을 도입함으로써 스레드 활용도가 향상되었습니다.
 
 ## DB Connection Pool 분석
 
-![스크린샷 2025-03-22 오전 12.34.33.png](https://imgur.com/m6Pz809.png)
+![스크린샷 2025-03-22 오전 12.34.33.png](https://i.imgur.com/m6Pz809.png)
 
-![스크린샷 2025-03-22 오전 12.34.44.png](https://imgur.com/TKZcO1H.png)
+![스크린샷 2025-03-22 오전 12.34.44.png](https://i.imgur.com/TKZcO1H.png)
 
 **기존 시스템 (1,000 RPS)**
 
@@ -449,9 +449,9 @@ HikariCP 통계를 보면 환성 커넥션이 평균 1개로 기존 대비 현�
 
 ## CPU 사용률 분석
 
-![스크린샷 2025-03-22 오전 12.33.50.png](https://imgur.com/Z9lfzkQ.png)
+![스크린샷 2025-03-22 오전 12.33.50.png](https://i.imgur.com/Z9lfzkQ.png)
 
-![스크린샷 2025-03-22 오전 12.33.55.png](https://imgur.com/5uLFNuv.png)
+![스크린샷 2025-03-22 오전 12.33.55.png](https://i.imgur.com/5uLFNuv.png)
 
 **기존 시스템 (1,000 RPS)**
 

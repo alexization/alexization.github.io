@@ -1,7 +1,7 @@
 ---
 header:
   teaser: /assets/images/logo.png
-  og_image: "https://imgur.com/TPqlHh8.png"
+  og_image: "https://i.imgur.com/TPqlHh8.png"
 
 title: "[Home Lab #2] SSH 무차별 대입 공격 방어하기: Fail2ban 설치 및 설정"
 excerpt: "SSH Key 인증 적용 후에도 계속되는 '무차별 대입 공격(Brute Force)'을 탐지하고, Fail2ban을 이용해 공격 IP를 자동으로 차단하는 방법 정리"
@@ -20,6 +20,8 @@ toc: true
 toc_sticky: true
 
 permalink: /home-lab/home-lab-fail2ban/
+redirect_from:
+  - /home lab/home-lab-fail2ban/
 date: 2025-12-14
 last_modified_at: 2025-12-14
 ---
@@ -33,7 +35,7 @@ last_modified_at: 2025-12-14
 
 실제 서버에서 기록된 무차별 대입 공격의 패턴을 일부 분석해 보았습니다.
 
-![image.png](https://imgur.com/TPqlHh8.png)
+![image.png](https://i.imgur.com/TPqlHh8.png)
 
 - **`Invalid user [ID] from [IP]` :** 공격자가 존재하지 않는 계정명(`user`, `admin`, `ubuntu` 등)으로 로그인을 시도하는 경우입니다. 이는 특정 타깃을 노린 공격이라기보다, **자동화된 봇(Bot)**이 인터넷상의 모든 IP를 스캔하며 흔하게 사용되는 계정 리스트를 대입하는 전형적인 **사전 공격(Dictionary Attack)**의 양상입니다.
 - **`Connection closed ... [preauth]` :** SSH Key 인증이 강제된 환경에서 나타나는 로그인입니다. 클라이언트가 서버에 접속을 시도할 때 인증에 필요한 비공개키를 제시하지 못했으므로, 실제 인증 절차가 시작되기도 전인 **인증 전 단계(Pre-authentication)**에서 서버가 연결을 끊어 버린 상태입니다.
@@ -143,7 +145,7 @@ sudo fail2ban-client status {필터 이름}
 sudo fail2ban-client status sshd
 ```
 
-![1.png](https://imgur.com/jV6rSVB.png)
+![1.png](https://i.imgur.com/jV6rSVB.png)
 
 - `Currently filed: 6` → 최근 감시 범위(`findtime`) 내에서 접속에 실패하여 실시간 감시 중인 IP가 6개 존재함을 의미하며, 이들은 아직 차단 임계치인 `2회` 에 도달하지 않은 상태입니다.
 - `Currently banned: 23` → 현재 방화벽에 의해 완전히 격리된 공격 IP가 23개임을 의미합니다. 이 IP들로부터의 접속 시도는 이제 **서버 리소스를 소모하지 않고 네트워크 하부 단계에서 즉시 드랍**됩니다.

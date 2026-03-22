@@ -1,7 +1,7 @@
 ---
 header:
   teaser: /assets/images/logo.png
-  og_image: "https://imgur.com/KXha7Uy.png"
+  og_image: "https://i.imgur.com/KXha7Uy.png"
 
 title: "[Git Ranker #2] 대용량 데이터 처리와 무결성, 왜 하필 Spring Batch여야만 했나 ?"
 excerpt: "단순 반복문과 스케줄러의 한계를 넘어, 데이터 무결성과 대용량 트래픽을 감당하기 위해 Spring Batch를 도입한 기술적 의사결정 과정과 Job 아키텍처 상세 설계"
@@ -18,6 +18,8 @@ toc: true
 toc_sticky: true
 
 permalink: /git-ranker/spring-batch/git-ranker-spring-batch/
+redirect_from:
+  - /git ranker/spring batch/git-ranker-spring-batch/
 date: 2025-12-03
 last_modified_at: 2025-12-03
 ---
@@ -62,7 +64,7 @@ Spring Batch 도입을 결정하고 Job을 설계하는 단계에서 가장 큰 
 - **Case A (신규 가입) :** 사용자 가입 즉시 한 명에 대해 1년 치 데이터 처리
 - **Case B (새벽 갱신) :** 매일 정해진 시간에 전체 사용자에 대해 어제 하루 치 데이터 처리
 
-![이원화 Job 아키텍처](https://imgur.com/KXha7Uy.png)
+![이원화 Job 아키텍처](https://i.imgur.com/KXha7Uy.png)
 
 이를 해결하기 위해 두 개의 Job으로 역할을 분리하되, 핵심 로직(Processor)은 재사용하는 구조로 설계했습니다.
 
@@ -111,7 +113,7 @@ Spring Batch 도입을 결정하고 Job을 설계하는 단계에서 가장 큰 
 
 DB에 등록되어있는 전체 사용자의 어제 활동을 수집하고 점수를 계산합니다.
 
-![Chunk 프로세스](https://imgur.com/xv2SdrH.png)
+![Chunk 프로세스](https://i.imgur.com/xv2SdrH.png)
 
 - **Reader (`UserPagingItemReader`)**
     - DB에서 사용자 목록을 Chunk Size 만큼 페이징 하여 읽어옵니다.
