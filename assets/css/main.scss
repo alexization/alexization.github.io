@@ -37,6 +37,7 @@ $sans-serif-narrow: $toss-font-stack;
   --toss-text-muted: #6b7684;
   --toss-text-subtle: #8b95a1;
   --toss-border: #e5e8eb;
+  --toss-table-border: #d1d6db;
   --toss-surface: #f9fafb;
   --toss-surface-muted: #f2f4f6;
   --toss-accent: #3182f6;
@@ -595,6 +596,91 @@ body {
   border-radius: 16px;
 }
 
+.page__content > table,
+.page__content-body > table {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  margin: 1.5rem 0 0.5rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-collapse: collapse;
+  border-top: 1px solid var(--toss-table-border);
+  border-left: 1px solid var(--toss-table-border);
+  background: #ffffff;
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  color: var(--toss-text-primary);
+}
+
+.page__content > table thead,
+.page__content > table tbody,
+.page__content > table tr,
+.page__content-body > table thead,
+.page__content-body > table tbody,
+.page__content-body > table tr {
+  background: #ffffff;
+}
+
+.page__content > table thead,
+.page__content-body > table thead {
+  border-bottom: 0;
+}
+
+.page__content > table th,
+.page__content > table td,
+.page__content-body > table th,
+.page__content-body > table td {
+  min-width: 7.5rem;
+  min-height: 2.125rem;
+  padding: 0.4375rem 0.5625rem;
+  border-right: 1px solid var(--toss-table-border);
+  border-bottom: 1px solid var(--toss-table-border);
+  vertical-align: top;
+  text-align: left;
+  white-space: normal;
+}
+
+.page__content > table th,
+.page__content-body > table th {
+  color: var(--toss-text-strong);
+  font-weight: 700;
+}
+
+.page__content > table thead th:first-child,
+.page__content-body > table thead th:first-child {
+  font-weight: 600;
+}
+
+.page__content > table tbody td:first-child,
+.page__content-body > table tbody td:first-child {
+  color: var(--toss-text-strong);
+  font-weight: 700;
+}
+
+.page__content > table p,
+.page__content > table ul,
+.page__content > table ol,
+.page__content-body > table p,
+.page__content-body > table ul,
+.page__content-body > table ol {
+  margin: 0;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.page__content > table ul,
+.page__content > table ol,
+.page__content-body > table ul,
+.page__content-body > table ol {
+  padding-left: 1rem;
+}
+
+.page__content > table li + li,
+.page__content-body > table li + li {
+  margin-top: 0.25rem;
+}
+
 .sidebar {
   opacity: 0.95;
 }
@@ -662,6 +748,19 @@ body {
 
   .page__content aside {
     padding: 1rem 1.25rem 1rem;
+  }
+
+  .page__content > table,
+  .page__content-body > table {
+    margin: 1.5rem 0 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  .page__content > table th,
+  .page__content > table td,
+  .page__content-body > table th,
+  .page__content-body > table td {
+    min-width: 6.5rem;
   }
 }
 
