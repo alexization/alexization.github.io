@@ -1,6 +1,7 @@
 ---
 header:
   teaser: /assets/images/logo.png
+  og_image: "https://i.imgur.com/Czp68Om.png"
 
 title: "[Git Ranker #2] 작은 서비스에 Spring Batch를 붙여본 이유"
 excerpt: "사용자 수가 많지 않은 GitHub 랭킹 서비스에서, 단순 @Scheduled 대신 Spring Batch를 선택한 이유와 현재 배치 구조를 코드 기준으로 정리한다."
@@ -23,6 +24,9 @@ redirect_from:
 date: 2025-12-03
 last_modified_at: 2026-03-29
 ---
+
+![mainImage](https://i.imgur.com/Czp68Om.png)
+
 Git Ranker는 GitHub 활동 데이터를 바탕으로 개발자의 점수와 순위를 계산하는 서비스입니다. 사용자 한 명을 등록할 때는 가입일부터 현재까지의 활동을 한 번에 읽고, 그 이후에는 매일 자정에 전체 사용자의 점수를 다시 계산합니다.
 
 이 흐름만 보면 굳이 `Spring Batch`까지 꺼낼 이유가 없어 보일 수 있습니다. 실제로 현재 규모만 놓고 보면 `@Scheduled` 안에서 `userRepository.findAll()`을 읽고 반복문으로 처리해도 충분히 굴러갈 가능성이 큽니다. 데이터 처리도 거대한 ETL 수준은 아니고, 사용자 수도 아직 폭발적으로 많지 않기 때문입니다.

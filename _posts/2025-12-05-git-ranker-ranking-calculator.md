@@ -1,17 +1,19 @@
 ---
 header:
   teaser: /assets/images/logo.png
-  og_image: "https://i.imgur.com/qPY6Ii7.png"
+  og_image: "https://i.imgur.com/BwOufrv.png"
 
 title: "[Git Ranker #4] 순위 및 티어 계산 기능 구현"
-excerpt: "대규모 정렬 없이 순위를 구하는 효율적인 알고리즘과, 초기 사용자 부족으로 인한 티어 산정의 모순을 해결하기 위해 Tasklet과 Window Function을 활용한 배치 최적화 과정"
+excerpt: "가입 직후에는 COUNT 쿼리로 즉시 순위를 계산하고, 전체 분포는 MySQL Window Function과 Spring Batch Tasklet으로 다시 맞췄다. 서비스 초기의 '1등인데도 낮은 티어' 문제를 하이브리드 티어 규칙으로 정리한 구현 기록"
 
 categories:
   - Git Ranker
 
 tags:
-   - MySQL
-   - Spring Batch
+  - MySQL
+  - Spring Batch
+  - Ranking
+  - Architecture
 
 toc_label: "순위 및 티어 로직 구현"
 toc: true
@@ -21,227 +23,239 @@ permalink: /git-ranker/git-ranker-ranking-calculator/
 redirect_from:
   - /git ranker/git-ranker-ranking-calculator/
 date: 2025-12-05
-last_modified_at: 2025-12-05
+last_modified_at: 2026-03-29
 ---
-# 1. 점수 기반 순위 및 티어 계산 로직
 
-[앞선 포스팅](https://alexization.github.io/git%20ranker/git-ranker-search-api/)에서 Search API를 통해 수집한 데이터를 바탕으로 사용자의 총점을 계산했습니다. 이번에는 이 점수를 기반으로 **순위와 티어**를 부여하는 핵심 비즈니스 로직을 구현했습니다.
+![mainImage](https://i.imgur.com/BwOufrv.png)
 
-## 1.1 순위 계산 알고리즘 : 정렬하지 않고 순위 구하기
+[앞선 글](/git-ranker/git-ranker-search-api/)에서 GitHub 활동을 집계해 총점을 만들었다면, 그 다음 단계는 이 점수가 전체 사용자 안에서 어떤 위치를 가지는지 계산하는 일입니다. Git Ranker에서는 이 문제를 한 번에 풀지 않고, **가입 직후 보여줄 즉시 계산**과 **전체 분포를 다시 맞추는 일괄 재산정**으로 나눠 접근했습니다.
 
-가장 먼저 고민한 것은 **“사용자 등록 시점에 어떻게 효율적으로 순위를 매길 것인가?”** 였습니다. 단순하게 생각하면 전체 사용자를 리스트로 가져와 정렬하거나 DB의 `RANK()` 함수를 사용할 수 있습니다.
+처음에는 순위와 티어를 모두 백분위로 정하면 간단할 것 같았습니다. 하지만 서비스 초기에 사용자가 적을 때는 바로 모순이 생겼습니다. **1등인데도 상위 100%가 되어 낮은 티어를 받는 상황**이 나왔기 때문입니다. 그래서 현재 구현은 **순위는 상대 비교로 계산하고**, **티어는 절대 점수와 백분위를 함께 보는 하이브리드 방식**으로 정리되어 있습니다.
 
-하지만, **"신규 가입자 한 명"** 의 순위를 알기 위해 전체 데이터를 매번 정렬하는 것은 비효율적입니다. 사용자 수가 늘어날수록 정렬의 시간 복잡도는 **`O(N log N)`** 으로 증가하며, 실시간 트랜잭션 내에서 처리하기에는 애플리케이션 메모리와 DB에 큰 부담을 줄 것입니다.
+<aside>
+<strong>이 글에서 집중하는 내용</strong><br>
+이번 글은 점수 계산식 자체보다, 계산된 점수를 어떻게 순위와 티어로 바꾸고 그 결과를 일관되게 유지했는지에 집중합니다. 점수 수집 로직은 앞선 글에서 다뤘고, 배치 파이프라인 전체는 다음 글에서 이어서 설명합니다.
+</aside>
 
-따라서 **“나보다 점수가 높은 사람의 수 +1”** 이 곧 나의 순위라는 점을 이용해, `COUNT` 쿼리 하나로 가볍게 해결했습니다.
+# 1. 가입 직후 순위는 전체 정렬 없이 계산했다
+
+사용자가 가입하거나 수동 갱신을 눌렀을 때, 전체 사용자를 매번 정렬해서 순위를 구하고 싶지는 않았습니다. 필요한 것은 "전체 정렬 결과"가 아니라 **"내 앞에 몇 명이 있는가"** 였기 때문입니다.
+
+Git Ranker의 즉시 계산 경로는 `UserPersistenceService`에서 시작합니다. 새 점수를 계산한 뒤, 나보다 점수가 높은 사용자 수만 `COUNT`로 조회하고 전체 사용자 수와 함께 `RankInfo`에 넘깁니다.
 
 ```java
-@Transactional(readOnly = true)
-public RankingInfo calculateRankingForNewUser(int userScore) {
-    // 자신보다 높은 점수를 가진 사용자 수 조회 (DB Index 활용)
-    long higherScoreCount = userRepository.countByTotalScoreGreaterThan(userScore);
+@Transactional
+public User saveNewUser(User newUser, ActivityStatistics totalStats, ActivityStatistics baselineStats) {
+    int newScore = totalStats.calculateScore().getValue();
+    long higherScoreCount = userRepository.countByScoreValueGreaterThan(newScore);
+    long totalUserCount = userRepository.count() + 1;
 
-    // 순위 = 자신보다 높은 점수의 사용자 수 + 1
-    int ranking = (int) higherScoreCount + 1;
+    newUser.updateActivityStatistics(totalStats, higherScoreCount, totalUserCount);
+    userRepository.save(newUser);
 
-    return new RankingInfo(ranking, ...);
+    rankingRecalculationService.recalculateIfNeeded();
+
+    return newUser;
 }
 ```
 
-**Jpa Repository 쿼리 메서드**
+`RankInfo.calculate()`는 여기서 순위와 백분위를 계산합니다.
 
 ```java
-public interface UserRepository extends JpaRepository<User, Long> {
-    // SELECT COUNT(*) FROM users WHERE total_score > ?
-    long countByTotalScoreGreaterThan(int totalScoreIsGreaterThan);
-}
-```
-
-이 방식은 `total_score` 컬럼에 인덱스만 걸려있다면 수백만 건의 데이터에서도 매우 빠르게(`O(log N)`) 동작하며, **동점자 처리** 까지 자연스럽게 해결됩니다.
-
-*(예: A, B, C가 모두 100점이면 모두 1등, 그 다음 90점인 D는 4등)*
-
-## 1.2 백분위(Percentile) 와 티어 산정
-
-순위는 상대적입니다. 사용자가 10명일 때의 5등과, 10,000명일 때의 5등은 가치가 다릅니다.
-
-따라서 **상위 몇 %** 에 위치하는지를 나타내는 백분위를 계산하여 티어를 산정합니다.
-
-```java
-// 전체 사용자 수 조회
-long totalUserCount = userRepository.count();
-
-// 백분위 계산
-double percentile = (double) ranking / totalUserCount * 100.0;
-```
----
-# 2. 직면한 문제 : “1등인데 왜 `IRON` 인가요?”
-
-로직 구현 후 테스트를 진행하던 중, “서비스 초기 단계” 에서 발생할 수 있는 문제를 발견했습니다.
-
-## 2.1 1등이 `IRON` 을 받는 상황
-
-서비스 오픈 직후 사용자가 적을 때, 가입 순서에 따라 티어가 왜곡되는 현상이 발생했습니다.
-
-**상황1 : 서비스 최초 가입자 A**
-
-```
-사용자 A 가입 (총점 150점)
-→ 전체 사용자: 1명
-→ 자신보다 높은 점수: 0명
-→ 순위: 1위
-→ 백분위: 1/1 * 100 = 100% (상위 100%)
-→ 티어: IRON
-```
-
-첫 번째 사용자는 무조건 1위지만, 전체 중 100% 이므로 `IRON` 티어를 받게 됩니다.
-
-**상황2 : 고득점자 B 가입**
-
-```
-사용자 B 가입 (총점 200점)
-→ 전체 사용자: 2명
-→ 자신보다 높은 점수: 0명
-→ 순위: 1위
-→ 백분위: 1/2 * 100 = 50% (상위 50%)
-→ 티어: BRONZE
-```
-
-**문제점**
-
-1. **사용자 A 의 박탈감 :** 아무리 점수를 많이 얻어도, 혼자 있으면 백분위상 꼴찌(100%)가 되어 최하위 티어를 받습니다.
-2. **데이터 정합성 불일치 :** B가 가입하여 A의 순위가 2위로 밀려났지만, A의 DB 정보는 여전히 ‘1위’로 남아있습니다.
-
-기획 단계에서는 “매일 새벽 배치”로 이를 바로잡으려 했으나, 초기 사용자 입장에서 가입 직후 24시간 동안 잘못된 티어를 보는 것은 사용자 경험에 치명적이라 판단했습니다.
-
----
-# 3. 해결 방안 : 배치 주기 단축과 조건부 실행
-
-이 문제를 해결하기 위해 **순위 재조정 배치(Job)의 주기를 단축**하고, 대량의 데이터를 효율적으로 처리하기 위해 **Tasklet 방식**을 도입했습니다.
-
-## 3.1 1시간 간격 재산정 Job
-
-사용자가 가입했을 때마다 실시간으로 전체 사용자의 순위를 재계산하는 것은 DB에 과도한 락(Lock)을 유발할 수 있습니다.
-
-따라서 타협점으로 **1시간 간격**으로 순위를 재조정하도록 기획을 변경했습니다.
-
-- **변경 전 :** 사용자 가입 시 계산(1회) → 24시간 대기 → 새벽 배치
-- **변경 후 :** 사용자 가입 시 계산(1회) → **매 1시간마다 순위 재산정** → 새벽 배치
-
-이렇게 하면 티어 정보의 불일치가 최대 1시간 이내로 해소됩니다.
-
-## 3.2 조건부 실행을 통한 리소스 최적화
-
-또한, 1시간마다 무조건 배치를 실행하면 신규 사용자가 없는 상황임에도 동작하는 리소스 낭비가 발생합니다. 따라서 **“지난 1시간 동안 신규 가입자가 있는 경우”** 에만 배치가 동작하도록 가드 로직을 추가했습니다.
-
-```java
-@Scheduled(cron = "0 0 * * * *")
-public void runHourlyRankingRecalculation() {
-    // 지난 1시간 이내 신규 가입자 확인
-    LocalDateTime oneHourAgo = LocalDateTime.now().minusHours(1);
-    long newUserCount = userRepository.countByCreatedAtAfter(oneHourAgo);
-
-    // 신규 유입이 없는 경우 스킵
-    if (newUserCount == 0) {
-        return;
+public static RankInfo calculate(long higherScoreCount, long totalUserCount, int totalScore) {
+    if (totalUserCount == 0) {
+        return initial();
     }
 
-    /* 재조정 Job 실행... */
+    int ranking = (int) higherScoreCount + 1;
+    double percentile = (double) ranking / totalUserCount * 100.0;
+
+    return of(ranking, percentile, totalScore);
 }
 ```
 
-## 3.3 Chunk vs Tasklet
+핵심 아이디어는 단순합니다.
 
-배치를 구현하는 방식에는 크게 두 가지가 있습니다. 저는 여기서 일반적인 `Chunk` 방식 대신 **`Tasklet` 을 활용한 Bulk Update 방식**을 선택했습니다.
+- **순위**: 나보다 높은 점수의 사용자 수 + 1
+- **백분위**: 현재 순위 / 전체 사용자 수 x 100
 
-### 왜 Chunk 대신 Tasklet 인가 ?
-![Tasklet vs chunk](https://i.imgur.com/qPY6Ii7.png)
+이 방식의 장점은 분명합니다.
 
-일반적인 Spring Batch 패턴인 `ItemReader` → `ItemProcessor` → `ItemWriter` 로 구성하는 Chunk 방식은 데이터를 DB에서 애플리케이션 메모리로 꺼내와서(`SELECT`) 처리한 뒤 다시 DB로 넣는(`UPDATE`) 구조입니다.
-대량의 데이터를 메모리에 올리고 내리는 과정에서 불필요한 네트워크/메모리 오버헤드가 발생합니다.
+- 전체 사용자 목록을 애플리케이션 메모리로 가져오지 않아도 됩니다.
+- `users.total_score` 인덱스를 활용한 범위 조회로 즉시 순위를 계산할 수 있습니다.
+- 동점자는 자연스럽게 같은 순위권으로 묶입니다.
 
-반면, 순위 및 티어 재산정 로직은 복잡한 비즈니스 연산보다는 **전체 데이터의 정렬과 업데이트**가 핵심입니다. 이는 애플리케이션보다 DB 엔진 내부에서 처리하는 것이 훨씬 효율적이라고 판단했습니다.
+> 순위 계산에서 정말 필요했던 것은 "전체를 다시 정렬한 결과"가 아니라, "나보다 앞선 사람이 몇 명인가"였다.
 
-따라서, JPA가 아닌 **Native Query**를 사용하여 DB 내부에서 단 한 번의 연산으로 모든 업데이트를 처리하는 **Tasklet 방식**을 채택했습니다.
+# 2. 티어를 백분위에만 맡기면 서비스 초기에 바로 깨진다
 
-### Window Function (`CUME_DIST`)
+순위만 보면 위 공식을 그대로 써도 됩니다. 문제는 티어였습니다.
 
-순위와 백분위를 동시에 구하기 위해 MySQL 8.0 이상에서 지원하는 윈도우 함수를 활용했습니다.
+만약 티어까지 순수 백분위로만 결정하면, 사용자가 한 명뿐인 상황에서는 아래 같은 결과가 나옵니다.
 
-특히 백분위 계산을 위해 `PERCENT_RANK()` 대신 `CUME_DIST()` 를 선택했습니다.
+```text
+higherScoreCount = 0
+totalUserCount = 1
 
-**왜 `PERCENT_RANK()` 가 아닌 `CUME_DIST()` 를 선택했는가 ?**
+ranking = 1
+percentile = 1 / 1 * 100 = 100
+```
 
-저희가 흔히 말하는 **“상위 N%”** 의 개념은 누적 분포에 해당합니다.
+즉, **1등이면서도 상위 100%가 됩니다.** 수식만 보면 맞지만, 사용자 경험은 전혀 직관적이지 않습니다.
 
-- `PERCENT_RANK()` : 0 부터 1 사이의 상대적 순위를 반환합니다. 1등의 경우 항상 `0` 을 반환합니다.
-    - 만약, 100명 중 1등이라면, `(1 - 1) / (100 - 1) = 0.0` , 상위 0%는 의미가 모호합니다.
-- `CUME_DIST()` : 나보다 점수가 높거나 같은 사람들의 비율을 반환합니다.
-    - 만약, 100명 중 1등이라면, `1 / 100 = 0.01` , 상위 1%라는 직관적인 결과를 얻을 수 있습니다.
+이 모순은 테스트에도 그대로 남아 있습니다. `RankInfoTest`에는 "유일한 사용자는 1등이지만 백분위 100%라 상대 티어를 받지 못한다"는 케이스가 들어 있습니다. 이 테스트는 단순히 예외 상황을 검증하는 것을 넘어, **서비스 초기에는 모수가 너무 작아 상대 평가만으로 티어를 정의하기 어렵다**는 사실을 드러냅니다.
+
+<aside>
+<strong>문제의 핵심</strong><br>
+순위는 상대 비교만으로도 계산할 수 있지만, 티어는 "몇 명 중 몇 등인가"만으로 끝나지 않습니다. 특히 사용자 풀이 작은 초기 서비스에서는 절대 점수 기준이 함께 있어야 결과가 덜 왜곡됩니다.
+</aside>
+
+# 3. 그래서 티어는 하이브리드 규칙으로 나눴다
+
+현재 Git Ranker는 **하위 티어는 절대 점수**, **상위 티어는 절대 점수와 백분위**를 함께 사용합니다. 이 규칙은 Java 도메인 코드와 MySQL 벌크 업데이트 SQL 양쪽에 동일하게 들어 있습니다.
+
+먼저 Java 쪽 기준은 `RankInfo.calculateTier()`에 있습니다.
+
+```java
+private static Tier calculateTier(double percentile, int totalScore) {
+    if (totalScore >= 2000) {
+        if (percentile <= 1.0) return Tier.CHALLENGER;
+        if (percentile <= 5.0) return Tier.MASTER;
+        if (percentile <= 12.0) return Tier.DIAMOND;
+        if (percentile <= 25.0) return Tier.EMERALD;
+        if (percentile <= 45.0) return Tier.PLATINUM;
+    }
+
+    if (totalScore >= 1500) return Tier.GOLD;
+    if (totalScore >= 1000) return Tier.SILVER;
+    if (totalScore >= 500) return Tier.BRONZE;
+
+    return Tier.IRON;
+}
+```
+
+정리하면 기준은 아래와 같습니다.
+
+| 티어 | 기준 |
+| --- | --- |
+| `CHALLENGER` | 2,000점 이상 + 상위 1% |
+| `MASTER` | 2,000점 이상 + 상위 5% |
+| `DIAMOND` | 2,000점 이상 + 상위 12% |
+| `EMERALD` | 2,000점 이상 + 상위 25% |
+| `PLATINUM` | 2,000점 이상 + 상위 45% |
+| `GOLD` | 1,500점 이상 |
+| `SILVER` | 1,000점 이상 |
+| `BRONZE` | 500점 이상 |
+| `IRON` | 500점 미만 |
+
+이 구조로 바꾸자 두 가지가 동시에 해결됐습니다.
+
+- 사용자 수가 적을 때도 **낮은 티어가 지나치게 왜곡되지 않습니다.**
+- 상위 티어는 여전히 **"분포 안에서 충분히 높은 위치"**라는 의미를 유지합니다.
+
+예를 들어 총점이 2,500점인 사용자가 혼자라면, 순위는 1위지만 백분위는 100입니다. 이 경우 상대 티어 조건을 만족하지 못하므로 `CHALLENGER`가 아니라 `GOLD`가 됩니다. "1등인데 왜 최하위인가"라는 모순은 사라지고, 동시에 상위 티어를 너무 쉽게 주지도 않게 됩니다.
+
+# 4. 전체 랭킹 재산정은 DB에 맡겼다
+
+가입 직후에는 `COUNT` 기반 즉시 계산으로 충분합니다. 하지만 전체 사용자의 순위와 백분위는 다른 사용자의 가입, 갱신, 점수 변화에 따라 계속 달라집니다. 결국 어느 시점에는 전체를 다시 맞춰야 합니다.
+
+여기서 Git Ranker는 `Chunk`보다 `Tasklet`을 택했습니다. 이유는 간단했습니다. 이 문제는 사용자별 복잡한 자바 비즈니스 로직을 돌리는 작업이 아니라, **전체 집합을 정렬하고 같은 규칙으로 한 번에 갱신하는 작업**에 더 가까웠기 때문입니다.
+
+현재 재산정 SQL은 `UserRepository.bulkUpdateRanking()`에 들어 있습니다.
 
 ```sql
 UPDATE users u
 JOIN (
-    SELECT 
+    SELECT
         id,
-        RANK() OVER (ORDER BY total_score DESC) as new_rank,
-        CUME_DIST() OVER (ORDER BY total_score DESC) as new_percentile
+        RANK() OVER (ORDER BY total_score DESC) AS new_rank,
+        CUME_DIST() OVER (ORDER BY total_score DESC) AS new_percentile
     FROM users
 ) r ON u.id = r.id
-SET 
+SET
     u.ranking = r.new_rank,
     u.percentile = r.new_percentile * 100,
-    u.tier = CASE 
-        WHEN r.new_percentile <= 0.01 THEN 'DIAMOND'
-        WHEN r.new_percentile <= 0.05 THEN 'PLATINUM'
-        ...
+    u.tier = CASE
+        WHEN r.new_percentile <= 0.01 AND u.total_score >= 2000 THEN 'CHALLENGER'
+        WHEN r.new_percentile <= 0.05 AND u.total_score >= 2000 THEN 'MASTER'
+        WHEN r.new_percentile <= 0.12 AND u.total_score >= 2000 THEN 'DIAMOND'
+        WHEN r.new_percentile <= 0.25 AND u.total_score >= 2000 THEN 'EMERALD'
+        WHEN r.new_percentile <= 0.45 AND u.total_score >= 2000 THEN 'PLATINUM'
+        WHEN u.total_score >= 1500 THEN 'GOLD'
+        WHEN u.total_score >= 1000 THEN 'SILVER'
+        WHEN u.total_score >= 500 THEN 'BRONZE'
         ELSE 'IRON'
     END,
     u.updated_at = NOW();
 ```
-이 방식을 통해 기존에 사용자 수(N)만큼 `UPDATE` 쿼리를 날리던 비효율을 제거하고, **단 한 번의 쿼리**로 전체 순위를 재산정할 수 있게 되었습니다.
 
----
-# 4. 향후 개선 과제 : 티어 분포 최적화
+여기서 중요한 포인트는 세 가지입니다.
 
-기능적인 구현과 성능 최적화는 완료되었지만, **티어 분포**에 대한 고민은 여전히 남아있습니다.
+- `RANK()`로 동점자에게 같은 순위를 줍니다.
+- `CUME_DIST()`로 누적 백분위를 계산합니다.
+- `CASE` 문에 Java와 같은 티어 규칙을 넣어 실시간 경로와 배치 경로의 결과를 맞춥니다.
 
-| **티어** | **기준 (상위 %)** |
-| --- | --- |
-| **DIAMOND** | 0% ~ 1% |
-| **PLATINUM** | 1% ~ 5% |
-| **GOLD** | 5% ~ 10% |
-| **SILVER** | 10% ~ 25% |
-| **BRONZE** | 25% ~ 50% |
-| **IRON** | 50% ~ 100% |
+여기서 백분위 함수로 `PERCENT_RANK()`가 아니라 `CUME_DIST()`를 쓴 이유도 있습니다. `PERCENT_RANK()`는 1등에게 `0`을 반환하므로 "상위 0%"라는 표현이 됩니다. 반면 `CUME_DIST()`는 100명 중 1등에게 `1 / 100 = 0.01`을 주기 때문에, Git Ranker가 보여주려는 "상위 1%"라는 표현과 더 자연스럽게 맞습니다.
 
-현재 로직은 상위 50% 미만을 모두 `IRON` 으로 분류합니다. 이는 전체 사용자의 절반이 최하위 티어에 머물게 됨을 의미합니다.
+`Tasklet` 쪽 구현은 매우 얇습니다. 실제 계산은 자바가 아니라 DB가 하도록 두고, 배치는 그 SQL을 호출하는 역할만 맡깁니다.
 
-게임 랭킹 시스템의 심리학적 측면에서, 너무 많은 사용자가 최하위 티어에 정체되면 **성취감 저하와 서비스 이탈**로 이어질 수 있습니다.
+```java
+@Override
+public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
+    userRepository.bulkUpdateRanking();
+    return RepeatStatus.FINISHED;
+}
+```
 
-## 4.1 개선 방향
+이 선택 덕분에 사용자 수만큼 `UPDATE`를 반복하지 않고, **한 번의 집합 연산으로 순위, 백분위, 티어를 함께 갱신**할 수 있었습니다.
 
-1. **다른 서비스 벤치마킹**
-    - `Valorant` 나 `LOL` 과 같은 실제 게임 및 서비스 분석
+# 5. 즉시 계산과 배치 계산이 서로 다른 답을 내지 않게 맞췄다
 
-      **Valorant (2024 티어 분포 기준)**
+실무에서는 계산 공식만 맞아도 끝나지 않습니다. **어떤 경로로 계산하든 같은 결과가 나와야 합니다.**
 
-      | **티어** | **기준 (상위 %)** |
-              | --- | --- |
-      | **RADIANT** | 0% ~ 0.02% |
-      | **IMMORTAL** | 0.02% ~ 0.5% |
-      | **ASCENDANT** | 0.5% ~ 5% |
-      | **DIAMOND** | 5% ~ 15% |
-      | **PLATINUM** | 15% ~ 30% |
-      | **GOLD** | 30% ~ 55% |
-      | **SILVER** | 55% ~ 75% |
-      | **BRONZE** | 75% ~ 90% |
-      | **IRON** | 90% ~ 100% |
-    - GitHub 기반 랭킹 서비스 (GitStar Ranking, GitHub Ranking 등) 분석
-2. 초기 절대평가 도입
-    - 모수가 적은 서비스 초기에는 백분위(상대평가) 대신, **절대 점수 기준**을 병행하여 “1등이 아이언이 되는” 문제를 근본적으로 방지할 계획입니다.
+Git Ranker에서는 이 문제를 두 가지로 맞췄습니다.
 
-      (*예: 100점 넘으면 `BRONZE`, 500점 넘으면 `SILVER`*)
+첫째, 가입과 수동 갱신 직후에는 `RankingRecalculationService`가 `bulkUpdateRanking()`을 다시 호출합니다. 다만 요청이 몰릴 수 있으므로 5분 디바운스를 둬서 연속 호출을 건너뜁니다.
 
+```java
+private static final Duration DEBOUNCE_DURATION = Duration.ofMinutes(5);
 
-이러한 티어 밸런싱은 데이터가 쌓이는 추이를 보며 지속적으로 튜닝해 나갈 예정입니다.
+@Transactional
+public synchronized boolean recalculateIfNeeded() {
+    LocalDateTime now = LocalDateTime.now();
+
+    if (shouldSkipRecalculation(now)) {
+        return false;
+    }
+
+    userRepository.bulkUpdateRanking();
+    rankingService.evictRankingCache();
+    lastRecalculationTime = now;
+    return true;
+}
+```
+
+둘째, 매일 자정에는 `BatchScheduler`가 `dailyScoreRecalculationJob`을 실행합니다. 스케줄은 `0 0 0 * * *`이고, 타임존은 `Asia/Seoul`입니다. 이 잡은 먼저 점수를 다시 계산하는 `chunk` step을 수행한 뒤, 이어서 `rankingRecalculationStep`에서 같은 벌크 업데이트 SQL을 실행합니다.
+
+이렇게 하면 가입 직후, 수동 갱신, 일일 배치라는 서로 다른 세 경로가 **같은 랭킹 재산정 규칙** 위에 올라갑니다. 추가로 `RankingService.evictRankingCache()`를 호출해 랭킹 목록 캐시도 비워 두었기 때문에, 조회 API가 오래된 순위를 계속 보여주는 문제도 줄일 수 있었습니다.
+
+실제로 `RankInfoTest`는 자바 경로의 티어 임계값을 검증하고, `UserRepositoryIT`는 `RANK()`, `CUME_DIST()`, SQL `CASE`가 같은 결과를 내는지 확인합니다. 순위와 티어 규칙이 두 군데에 들어 있는 만큼, **테스트로 두 경로를 계속 묶어 두는 것**도 구현의 일부였습니다.
+
+<aside>
+<strong>현재 코드 기준으로 정리하면</strong><br>
+랭킹 재산정은 "1시간 주기 별도 스케줄러"가 아니라, 가입/갱신 직후의 디바운스 재계산과 매일 자정 배치의 두 경로로 관리됩니다.
+</aside>
+
+# 6. 이번 구현에서 배운 것
+
+이번 기능을 구현하면서 가장 크게 배운 점은 **순위와 티어는 같은 숫자에서 출발해도, 해결해야 하는 문제가 서로 다르다**는 사실이었습니다.
+
+- 순위는 비교적 단순합니다. 나보다 높은 사람이 몇 명인지 알면 됩니다.
+- 티어는 더 어렵습니다. 사용자 풀이 작을 때도 납득할 수 있어야 하고, 사용자가 많아진 뒤에도 상위권의 희소성을 유지해야 합니다.
+- 실시간 계산과 배치 계산이 공존한다면, 자바와 SQL에 들어 있는 규칙이 어긋나지 않도록 계속 검증해야 합니다.
+
+그래서 Git Ranker의 현재 구현은 "순위 계산 공식" 하나보다, 아래 세 가지를 함께 만족시키는 방향으로 정리됐습니다.
+
+1. 가입 직후에는 빠르게 결과를 보여줍니다.
+2. 전체 분포는 DB 집합 연산으로 다시 맞춥니다.
+3. 티어는 서비스 초기와 성장 이후를 모두 견딜 수 있게 하이브리드로 설계합니다.
