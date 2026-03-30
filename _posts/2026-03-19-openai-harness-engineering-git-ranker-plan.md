@@ -1,7 +1,7 @@
 ---
 header:
   teaser: /assets/images/logo.png
-  og_image: "https://i.imgur.com/yYeh1z9.png"
+  og_image: "https://i.imgur.com/o2NmFSa.png"
 
 title: "OpenAI의 Harness Engineering 학습 정리와 적용 계획"
 excerpt: "지난 글의 문제의식을 이어받아 OpenAI가 말한 Harness Engineering의 개념, 기술적 구조, 안정화 방식, 그리고 이를 Git Ranker Workflow에 점진적으로 적용하기 위한 방향과 단계를 정리한 글입니다."
@@ -26,7 +26,7 @@ date: 2026-03-19
 last_modified_at: 2026-03-19
 ---
 
-![mainImage](https://i.imgur.com/yYeh1z9.png)
+![mainImage](https://i.imgur.com/o2NmFSa.png)
 
 지난 글인 [AI 시대의 주니어 백엔드 개발자는 무엇을 붙잡고 무엇을 내려놓아야 할까](/ai/junior-backend-developer-what-to-hold-and-what-to-let-go/)를 쓰고 나서도 한 가지 질문이 남아 있었습니다.
 

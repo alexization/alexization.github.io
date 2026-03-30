@@ -1,16 +1,17 @@
 ---
 header:
   teaser: /assets/images/logo.png
-  og_image: "https://i.imgur.com/izwcCPF.png"
+  og_image: "https://i.imgur.com/Ngh0CIT.png"
 
 title: "[Git Ranker #7] 로그는 텍스트가 아니라 데이터다 : 관측 가능한 시스템 구축기"
-excerpt: "텍스트 파일에 불과했던 로그를 추적 가능하고 구조화된 데이터 자산으로 변화시킨 Git Ranker의 로깅 시스템 고도화 과정"
+excerpt: "요청 단위 trace_id, 구조화 로그, 배치와 GitHub API 관측, Loki/Grafana 검색까지. Git Ranker가 로그를 운영 데이터로 바꾼 과정을 정리한다."
 categories:
   - Git Ranker
 tags:
   - Spring Boot
   - Logging
-  
+  - Observability
+
 toc_label: "로깅 시스템 구축기"
 toc: true
 toc_sticky: true
@@ -19,318 +20,389 @@ permalink: /git-ranker/git-ranker-logging-system/
 redirect_from:
   - /git ranker/git-ranker-logging-system/
 date: 2025-12-18
-last_modified_at: 2025-12-18
+last_modified_at: 2026-03-30
 ---
-서비스를 정식으로 런칭하기 전, 개발자로서 가장 경계해야 할 것은 아마 **“보이지 않는 시스템”**을 배포하는 것일 겁니다. 기능이 정상적으로 동작하는 것을 넘어, 언제 어디서든 시스템의 내부 상태를 투명하게 들여다볼 수 있는 **‘관측 가능성(Observability)’** 이 확보되지 않는다면, 작은 에러 하나가 서비스 전체의 신뢰도를 무너뜨릴 수 있기 때문입니다.
 
-저는 대규모 트래픽을 처리해 본 경험도, 실제 서비스를 운영해 본 경험도 없는 상태에서 프로젝트를 시작했습니다. 그렇기에 더욱더 **“문제가 발생했을 때 내가 과연 원인을 찾을 수 있을까?”** 라는 막연한 불안감을 가졌고, 이를 해소하기 위해 맨땅에 헤딩하며 견고한 로깅 시스템을 구축해 나갔습니다.
+![mainImage](https://i.imgur.com/Ngh0CIT.png)
 
-단순한 텍스트 로그를 **추적 가능하고, 구조화된 데이터 자산**으로 변화시키며 겪었던 기술적 시행착오와 해결 과정에 대해 기록하고자 합니다.
+서비스를 배포할 때 가장 불안한 순간은 기능이 깨지는 순간이 아니라, **문제가 생겼을 때 어디서부터 봐야 하는지 모르는 상태**입니다. 요청은 들어오는데 왜 느린지 모르고, 401이나 404가 늘어나는데 어떤 경로에서 막히는지 모르고, 배치가 실패했는데 어느 사용자에서 터졌는지 모르면 서비스는 사실상 눈을 감고 운영하는 것과 다르지 않습니다.
 
-# 1. 문제의 인식과 출발점
+Git Ranker는 단일 Spring Boot 애플리케이션이지만 실행 경로가 단순하지 않습니다. HTTP 요청은 인증 필터와 컨트롤러, 전역 예외 처리기를 지나고, 새벽 배치는 Spring Batch에서 별도 스레드로 돌고, 점수 계산은 GitHub GraphQL API의 지연 시간과 rate limit 영향을 받습니다. 즉, 로그는 단순히 `println`을 더 예쁘게 찍는 문제가 아니라 **서로 다른 실행 경계를 한 언어로 관찰하는 문제**였습니다.
 
-## 초기 로깅 방식의 한계
+이번 글에서는 Git Ranker가 왜 기존의 텍스트 로그 방식에서 벗어났는지, 그리고 현재 저장소 기준으로 `LoggingFilter`, `LogContext`, `GitHubApiLoggingAspect`, `logback-spring.xml`, `promtail-config.yml`이 어떻게 하나의 운영 체계로 연결되는지 정리합니다.
 
-프로젝트 초기, 로깅 코드는 아래와 같은 구조로 **단순히 동작 과정을 텍스트로 확인하는 수준**이었습니다.
+<aside>
+<strong>이 글에서 집중하는 내용</strong><br>
+이 글은 "로그를 많이 남기는 법"이 아니라, Git Ranker가 <strong>요청 단위 상관관계 ID</strong>, <strong>도메인 이벤트 중심 구조화 로그</strong>, <strong>배치와 외부 API 관측</strong>, <strong>Loki/Grafana 검색</strong>까지 어떻게 이어 붙였는지 설명합니다. 분산 트레이싱까지는 아니지만, 단일 Spring Boot 서비스에서 운영 가능한 관측 기반을 만드는 데 필요한 수준을 목표로 했습니다.
+</aside>
+
+# 1. 로그를 "출력"이 아니라 "관측 데이터"로 다시 정의했다
+
+프로젝트 초반 로그는 흔히 보는 형태였습니다.
 
 ```java
 log.info("회원가입 요청: {}", request.getUsername());
-/*
- * 비즈니스 로직 (DB 조회, API 호출 등)...
- */
+// 비즈니스 로직
 log.info("회원가입 성공, ID: {}", user.getId());
 ```
 
-이 방식은 단일 사용자가 접속하는 로컬 환경에서는 문제가 없었지만, **멀티 스레드 기반의 웹서버 환경** 에서는 한계가 드러났습니다.
+로컬에서 한 명만 테스트할 때는 충분했습니다. 하지만 서버가 동시에 여러 요청을 처리하기 시작하면 곧바로 한계가 드러났습니다.
 
-1. **식별의 한계 :** 동시에 3명의 사용자가 요청을 보내면, 로그 라인들이 서로 뒤섞여 어떤 ‘요청’과 ‘완료’가 하나의 쌍인지 찾기 힘듭니다.
-
-    ```
-    2025-12-18 14:23:01 INFO  회원가입 요청: Alice
-    2025-12-18 14:23:01 INFO  회원가입 요청: Bob  
-    2025-12-18 14:23:02 INFO  GitHub API 호출 시작
-    2025-12-18 14:23:02 INFO  회원가입 요청: Charlie
-    2025-12-18 14:23:03 INFO  GitHub API 호출 완료
-    2025-12-18 14:23:03 INFO  회원가입 성공, ID: 1
-    2025-12-18 14:23:04 INFO  GitHub API 호출 완료
-    2025-12-18 14:23:04 INFO  회원가입 성공, ID: 2
-    2025-12-18 14:23:05 INFO  회원가입 성공, ID: 3
-    ```
-
-2. **추적 불가능 :** 에러가 발생했을 때, 해당 에러가 **“어떤 사용자의”, “어떤 입력값으로”, “어떤 경로를 타다가”** 발생했는지 역추적하는 것이 불가능에 가까웠습니다.
-
-저의 목표는 **수백 개의 스레드가 뒤섞여 돌아가는 상황에서도, 특정 요청 하나의 흐름을 온전히 찾아낼 수 있어야 했습니다.**
-
----
-
-# 2. 핵심 기술 정의
-
-이 문제를 해결하기 위해 도입한 기술은 **Logback**과 [**MDC**](https://www.slf4j.org/api/org/slf4j/MDC.html) 입니다. 단순히 라이브러리를 가져다 쓰는 것을 넘어, 그 동작 원리를 이해해야만 동시성 이슈를 방지할 수 있습니다.
-
-## 2.1 Logback
-
-Java 진영의 표준 로깅 프레임워크이자 Spring Boot의 기본 구현체입니다. Logback의 `Appender` 와 `Encoder` 를 커스텀하여 로그를 단순 파일이 아닌 **JSON 포맷의 데이터 스트림**으로 변환하고자 했습니다.
-
-- **Logger :** 로그 이벤트를 발생시키는 주체 (`log.info()` 를 호출하는 객체)
-- **Appender :** 발생된 로그 이벤트를 **‘어디에’** 출력할지 결정
-    - `ConsoleAppender` : 콘솔에 출력
-    - `FileAppender` : 파일에 저장
-    - `RollingFileAppender` : 일정 크기나 시간마다 파일을 분리하여 저장
-- **Encoder :** 로그 이벤트를 **‘어떻게’** 변환할지 결정
-
-## 2.2 MDC (Mapped Diagnostic Context)
-
-멀티 스레드 환경에서 로그에 **‘문맥(Context)’** 를 붙이기 위해 고안된 개념입니다.
-
-- 내부적으로 Java의 **`ThreadLocal`** 을 사용합니다. `ThreadLocal` 은 오직 **‘현재 실행 중인 스레드’에서만 접근 가능한 전용 저장소**입니다.
-- 요청 진입 시점에 `MDC.put("trace_id", "uuid")` 를 호출하면, 이후 해당 스레드에서 발생하는 모든 로그에 자동으로 `trace_id` 가 함께 기록됩니다.
-
-*쉽게 말해, **“스레드 별로 존재하는 전용 사물함”** 이라고 이해하면 될것 같습니다.*
-
----
-
-# 3. Spring AOP의 구조적 사각지대 발견
-
-로깅은 대표적인 **횡단 관심사(Cross-cutting Concern)** 입니다. 따라서 코드 중복을 제거하기 위해 **Spring AOP**를 도입하는 것이 가장 합리적인 선택이라고 생각했습니다.
-
-## 3.1 초기 구현
-
-```java
-@Slf4j
-@Aspect
-@Component
-public class ControllerLoggingAspect {
-    
-    @Around("execution(* com.gitranker.api.domain..*Controller.*(..))")
-    public Object logApiCall(ProceedingJoinPoint joinPoint) throws Throwable {
-        MDC.put("trace_id", UUID.randomUUID().toString());
-        
-        log.info("[API Start] {}", joinPoint.getSignature().getName());
-        
-        try {
-            return joinPoint.proceed();
-        } finally {
-            log.info("[API End]");
-            MDC.clear();
-        }
-    }
-}
+```text
+14:23:01 INFO 회원가입 요청: Alice
+14:23:01 INFO 회원가입 요청: Bob
+14:23:02 INFO GitHub API 호출 시작
+14:23:03 INFO 회원가입 성공, ID: 1
+14:23:04 INFO GitHub API 호출 완료
+14:23:04 INFO 회원가입 성공, ID: 2
 ```
 
-`AOP` 적용 후 대부분의 API 로그가 잘 남는 것처럼 보였습니다. 메서드 파라미터와 반환 값, 실행 시간까지 자동으로 기록되니 초기 목표였던 **‘자동화’**는 달성한 것처럼 보였습니다.
+이 로그는 "무슨 일이 있었다"는 사실만 보여줍니다. 하지만 운영에서는 그것만으로 부족합니다. 저는 아래 세 가지를 바로 추적할 수 있어야 했습니다.
 
-## 3.2 사각지대 발견 : 404 에러가 로그에 남지 않는다
+- 이 로그들이 **같은 요청에서 나온 것인지**
+- 실패가 났다면 **어느 단계에서, 어떤 사용자 맥락에서** 발생했는지
+- HTTP 요청, 배치 작업, GitHub API 호출처럼 **서로 다른 흐름을 한 기준으로 묶을 수 있는지**
 
-그런데 악의적인 공격을 가정하여 **존재하지 않는 URL(`/api/v1/unknown`)**로 요청을 보냈을 때, 예상과 달리 로그 시스템은 조용했습니다. 서버는 분명 404 에러를 반환했는데, 요청 로그는 남지 않았습니다. 
+> **모니터링이 "이상이 있다"를 감지하는 일이라면, 옵저버빌리티는 "왜 그랬는지"를 거슬러 올라갈 수 있게 만드는 능력에 가깝습니다.**
 
-원인은 **Spring의 요청 처리 생명주기**에 있었습니다.
+그래서 Git Ranker의 로깅 설계는 처음부터 세 가지 원칙으로 정리됐습니다.
 
-1. `DispatcherServlet` 이 처리할 핸들러를 찾지 못하면(`NoHandlerFoundException`), 컨트롤러 자체가 실행되지 않습니다.
-2. AOP는 Spring Bean(Controller)이 실행될 때 동작하는 **프록시 패턴** 기반이므로, 컨트롤러가 실행되지 않으면 AOP 또한 동작하지 않습니다.
+- 모든 로그는 공통 상관관계 키를 가져야 한다.
+- 메서드 진입과 종료보다 상태 변화가 있는 이벤트를 남겨야 한다.
+- 검색을 위한 차원과 상세 문맥을 분리해 저장소의 비용과 검색성을 함께 관리해야 한다.
 
-AOP 방식은 **“정상적으로 매핑된 요청”** 만 로깅할 수 있다는 구조적 한계가 존재했습니다. 
+# 2. 요청 진입점은 `Controller`가 아니라 `Filter`였다
 
-> 현재 Git Ranker에는 인증/인가 기능이 구현되어 있지 않지만, 만약 보안 필터가 존재한다면 그곳에서 차단된 요청 역시 AOP가 동작하지 않을 것입니다.
+![filter](https://i.imgur.com/izwcCPF.png)
 
----
+처음에는 `AOP`가 가장 자연스러워 보였습니다. 로깅은 전형적인 횡단 관심사이고, 컨트롤러나 서비스 메서드 진입과 종료를 감싸면 중복을 크게 줄일 수 있기 때문입니다.
 
-# 4. Servlet Filter를 활용한 HTTP 요청 추적
+하지만 현재 Git Ranker 구조에서는 그것만으로 부족했습니다. 이유는 명확했습니다.
 
-AOP의 한계를 극복하고 **“서버에 도달하는 모든 요청”**을 추적하기 위해, 저는 Spring Context의 바깥인 **Servlet Filter**로 책임을 이동시켰습니다.
+- 컨트롤러에 매핑되지 않은 요청은 컨트롤러 자체가 실행되지 않습니다.
+- 인증과 인가 문제는 컨트롤러보다 앞단의 보안 필터 체인에서 발생할 수 있습니다.
+- 요청 상관관계 ID는 비즈니스 로직이 아니라 **서블릿 컨테이너 진입 시점**에 붙어야 합니다.
 
-## 4.1 왜 Interceptor가 아닌 Filter인가 ?
-
-![image.png](https://i.imgur.com/izwcCPF.png)
-
-Spring의 `HandlerInterceptor` 역시 고려 대상이었으나, 이 또한 `DispatcherServlet` 내부에서 동작하므로 404 에러나 보안 필터에서 차단된 요청을 잡지 못합니다.
-
-반면 **Filter**는 서블릿 컨테이너 레벨에서 동작하여 **가장 먼저 요청을 맞이하고, 가장 마지막에 응답을 보낼 수 있는 위치**이기 때문에 Filter로 책임을 이동시키기로 결정했습니다.
-
-## 4.2 `LoggingFilter` 구현과 Thread-Safe한 Trace ID 관리
-
-`LoggingFilter` 를 구현하여 모든 요청에 고유한 `Trace ID` 를 발급하고, MDC에 주입했습니다.
-
-![image.png](https://i.imgur.com/4V0uzR4.png)
-
-`LoggingFilter.java`
+그래서 실제 요청 추적의 시작점은 AOP가 아니라 `LoggingFilter`가 됐습니다.
 
 ```java
-@Slf4j
 @Component
-@Order(Ordered.HIGHEST_PRECEDENCE) // 가장 먼저 실행되어야 사각지대가 사라짐
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class LoggingFilter implements Filter {
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) ... {
-        // 1. 요청 진입: Trace ID 생성 및 MDC 주입
-        MDC.put("trace_id", UUID.randomUUID().toString().substring(0, 8));
-        long start = System.currentTimeMillis();
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
+
+        LogContext.initRequest(
+                LogContext.generateTraceId(),
+                resolveClientIp(httpRequest),
+                httpRequest.getHeader("User-Agent"),
+                httpRequest.getMethod(),
+                httpRequest.getRequestURI()
+        );
+
+        long start = currentTimeMillis();
 
         try {
-            log.info("[HTTP Request] {} {}", httpRequest.getMethod(), httpRequest.getRequestURI());
-            // 2. 비즈니스 로직 수행
             chain.doFilter(request, response);
         } finally {
-            // 3. 요청 종료: Latency 계산
-            long latency = System.currentTimeMillis() - start;
-            MDC.put("latency_ms", String.valueOf(latency));
-            
-            // Thread Pool 환경에서의 Context 오염 방지
-            MDC.clear();
+            long latency = currentTimeMillis() - start;
+            int status = httpResponse.getStatus();
+
+            LogContext logContext = LogContext.event(Event.HTTP_RESPONSE)
+                    .with("status", status)
+                    .with("latency_ms", latency)
+                    .with("outcome", resolveOutcome(status, latency));
+
+            if (latency > 10_000L) {
+                logContext.warn();
+            } else {
+                logContext.info();
+            }
+
+            LogContext.clear();
         }
     }
 }
 ```
 
-### 왜 `MDC.clear()` 가 필수인가 ?
+핵심은 두 가지였습니다.
 
-**Tomcat과 같은 WAS는 Thread Pool을 사용**합니다. 즉, A 사용자의 요청을 처리한 스레드가 죽지 않고, 바로 B 사용자의 요청을 처리하러 갑니다.
+- `@Order(Ordered.HIGHEST_PRECEDENCE)`로 가장 먼저 실행해 **보안 필터 이전**부터 같은 `trace_id`를 공유하게 만들었습니다.
+- 응답이 끝난 시점에만 경계 로그를 남겨 `status`, `latency_ms`, `outcome`을 한 번에 기록했습니다.
 
-만약 MDC를 비워주지(`clear`) 않으면, **A 사용자의 데이터가 스레드에 남아있다가 B 사용자의 로그에 찍히는 문제**가 발생합니다.
+여기서 `LogContext.clear()`는 선택이 아니라 필수입니다. 서블릿 컨테이너는 요청마다 스레드를 새로 만들지 않고 **재사용된 스레드 풀**을 돌리기 때문입니다. 이전 요청의 MDC가 남아 있으면 다음 사용자의 로그에 과거 문맥이 섞이는 순간, 로그는 즉시 신뢰를 잃습니다.
 
----
+이 동작은 테스트로도 고정했습니다. `LoggingFilterTest`에서는 2xx 응답이 `success`, 4xx/5xx 응답이 `failure`, 느린 2xx 응답이 `warning`으로 기록되는지를 검증합니다. 즉, 로그 레벨과 결과 분류가 운영자 감각이 아니라 코드 계약이 되도록 했습니다.
 
-# 5. 배치 작업과 외부(GitHub) API
+# 3. HTTP 밖의 흐름도 같은 방식으로 추적했다
 
-HTTP 요청에 대한 추적성은 확보되었지만, Git Ranker에는 HTTP를 타지 않는 두 가지 중요한 실행 흐름이 더 있었습니다.
+HTTP 요청만 추적해서는 충분하지 않았습니다. Git Ranker의 중요한 작업 두 개는 HTTP 바깥에서 일어났기 때문입니다.
 
-## 5.1 배치(Batch) 작업 : 스케줄러 실행 시점의 수동 주입
+- 매일 자정에 실행되는 Spring Batch 점수 재계산
+- GitHub GraphQL API 호출과 rate limit 관리
 
-Spring Batch는 백그라운드 스레드에서 실행되므로 Filter가 동작하지 않아 MDC가 비어있습니다. 저는 스케줄러가 Job을 실행하는 시점에 **수동으로 컨텍스트를 주입**하는 전략을 선택했습니다.
+## 3.1 배치는 스케줄러에서 직접 `trace_id`를 발급했다
 
-`BatchScheduler.java`
+배치는 `Filter`를 거치지 않습니다. 그래서 `BatchScheduler`는 배치를 시작할 때 직접 `trace_id`를 발급하고, 시작과 종료, 실패를 이벤트로 남깁니다.
 
 ```java
-@Scheduled(cron = "0 0 0 * * *", zone = "UTC")
+@Scheduled(cron = "0 0 0 * * *", zone = "${app.timezone}")
 public void runDailyScoreRecalculationJob() {
-    // 마치 HTTP 요청이 들어온 것처럼, 배치 작업의 맥락(Context)을 강제로 주입
-    MDC.put("trace_id", UUID.randomUUID().toString().substring(0, 8));
-    
+    final String jobName = "DailyScoreRecalculation";
+
+    LogContext.setTraceId(LogContext.generateTraceId());
+
+    LogContext.event(Event.BATCH_STARTED)
+            .with("job_name", jobName)
+            .info();
+
     try {
-        // ... Job 실행 ...
+        jobLauncher.run(dailyScoreRecalculationJob, jobParameters);
+
+        LogContext.event(Event.BATCH_COMPLETED)
+                .with("job_name", jobName)
+                .info();
+    } catch (Exception e) {
+        LogContext.event(Event.BATCH_FAILED)
+                .with("job_name", jobName)
+                .with("error_message", e.getMessage())
+                .error(e);
+        throw new BusinessException(ErrorType.BATCH_JOB_FAILED, e.getMessage());
     } finally {
-        // 여기서도 Thread Pool Context 오염 방지
-        MDC.clear();
+        LogContext.clear();
     }
 }
 ```
 
-이로써 수백 수천 건의 데이터가 처리되는 배치 작업 중 에러가 발생해도, 해당 작업의 `Trace ID` 만 검색하면 전체 흐름을 파악할 수 있게 되었습니다.
+여기에 `GitHubCostListener`와 `UserScoreCalculationSkipListener`가 붙으면서 배치 로그는 더 운영 친화적으로 바뀌었습니다.
 
-## 5.2 GitHub API : AOP를 활용한 외부 호출 관측
+- 배치 시작 시 `total_user_count`
+- 배치 종료 시 `success_count`, `fail_count`, `skip_count`, `duration_ms`
+- 항목 실패 시 `phase`, `error_type`, `retryable`
 
-컨트롤러 로깅에는 실패했던 AOP가, **특정 객체의 메서드(`GitHubGraphQLClient`) 호출을 감싸는 용도**로는 완벽한 도구였습니다. 특히 외부 API는 **[비용(Cost)](https://docs.github.com/en/graphql/overview/resource-limitations)과 지연 시간(Latency) 추적**이 핵심입니다.
+즉, "배치가 돌았다"에서 끝나는 것이 아니라 **어느 단계에서 얼마나 실패했고, 재시도 가능한 오류인지**까지 로그만으로 설명할 수 있게 됐습니다.
 
-`GitHubApiLoggingAspect.java`
+## 3.2 AOP는 버린 것이 아니라, GitHub API 경계로 옮겼다
+
+반대로 AOP는 완전히 버린 도구가 아닙니다. 요청 진입점에는 맞지 않았지만, `GitHubGraphQLClient`처럼 **특정 협력자 경계**를 감싸는 데는 오히려 잘 맞았습니다.
 
 ```java
-@Around("execution(* ...GitHubGraphQLClient.*(..))")
-public Object logGithubApiCall(ProceedingJoinPoint joinPoint) {
+@Around("execution(* com.gitranker.api.infrastructure.github.GitHubGraphQLClient.*(..))")
+public Object logGithubApiCall(ProceedingJoinPoint joinPoint) throws Throwable {
+    String methodName = joinPoint.getSignature().getName();
     long start = System.currentTimeMillis();
+
     try {
         Object result = joinPoint.proceed();
-        // GitHub API 응답 헤더에서 Cost를 추출해 MDC에 기록
-        String cost = MDC.get("cost"); 
-        log.info("... Cost: {}", cost); 
+        long latency = System.currentTimeMillis() - start;
+
+        GitHubRateLimitInfo rateLimit = extractRateLimit(result);
+
+        LogContext ctx = LogContext.event(Event.GITHUB_API_CALLED)
+                .with("operation", methodName)
+                .with("target", "github_api")
+                .with("latency_ms", latency)
+                .with("outcome", "success");
+
+        if (rateLimit != null) {
+            ctx.with("cost", rateLimit.cost())
+               .with("remaining", rateLimit.remaining());
+        }
+
+        ctx.info();
+        apiMetrics.recordSuccess(latency);
         return result;
     } catch (Exception e) {
-        log.error("... Reason: {}", e.getMessage());
+        LogContext.event(Event.GITHUB_API_CALLED)
+                .with("operation", methodName)
+                .with("target", "github_api")
+                .with("outcome", "failure")
+                .with("error_type", e.getClass().getSimpleName())
+                .with("error_message", e.getMessage())
+                .error();
         throw e;
     }
 }
 ```
 
----
+이 방식 덕분에 GitHub API 로그는 단순 성공/실패를 넘어 아래 문맥을 함께 갖게 됐습니다.
 
-# 6. 로그 품질 향상
+- 어떤 연산이 호출됐는지
+- 얼마나 느렸는지
+- 이번 호출이 얼마나 많은 `cost`를 썼는지
+- 남은 `remaining` 예산이 얼마나 되는지
 
-`Trace ID` 연결로 흐름은 보였지만, 로그의 내용 자체가 부실하다면 그것은 단순한 스토리지 낭비일 뿐입니다. 저는 **“운영 환경에서 로그는 읽는 텍스트가 아니라, 분석하는 데이터다”** 라는 원칙하에 로그 품질을 세 가지 측면에서 개선했습니다.
+그리고 `GitHubGraphQLClient` 내부에서는 남은 예산이 임계치 아래로 떨어지면 `RATE_LIMIT_WARNING` 이벤트를 남기고 예외를 발생시킵니다. 즉, Git Ranker에서 AOP는 "모든 것을 감싸는 도구"가 아니라, **경계가 분명한 외부 API 호출을 관찰하는 도구**로 자리를 잡았습니다.
 
-## 6.1 로그 레벨 표준화
+# 4. `MDC`만 쓰지 않고 `LogContext`로 로그 계약을 고정했다
 
-모든 에러를 `ERROR` 레벨로 기록하면, 진짜 중요한 장애가 발생했을 때 관리자는 알람에 무감각해지게 될 것입니다. 저는 전역 예외 처리 단계에서 예외 타입에 따라 로그 레벨을 엄격히 분리했습니다.
+여기서부터가 실제로 가장 중요했습니다. `MDC`는 편리하지만, 그대로 쓰면 결국 각 클래스가 제멋대로 키를 넣는 **자유로운 해시맵**이 됩니다. 그렇게 되면 로그는 남아도 검색과 집계는 점점 어려워집니다.
 
-- **`INFO` :** 정상적인 비즈니스 이벤트 (사용자 등록, 점수 갱신, 랭킹 재계산 …)
-- **`WARN` :** 시스템 장애는 아니지만 주의가 필요한 상황 (GitHub API 재시도, 네트워크 지연 …)
-- **`ERROR` :** 즉각 조치가 필요한 시스템 장애 (DB 커넥션 실패, 배치 작업 중단 …)
+그래서 Git Ranker는 `MDC` 위에 `Event` enum과 `LogContext`를 올려 **로그 계약 자체를 코드로 고정**했습니다.
 
-## 6.2 중복 로그 제거
+```java
+private static final Set<String> REQUEST_SCOPED_KEYS = Set.of(
+        "trace_id", "username", "client_ip", "user_agent", "request_method", "request_uri"
+);
 
-```
-[trace_id=abc123] [HTTP Request] POST /api/v1/users
-[trace_id=abc123] [Controller] registerUser 메서드 시작
-[trace_id=abc123] [Service] UserService.registerUser 시작
-[trace_id=abc123] [Domain Event] 신규 사용자 등록 - Alice
-[trace_id=abc123] [Service] UserService.registerUser 종료
-[trace_id=abc123] [Controller] registerUser 메서드 종료
-[trace_id=abc123] [HTTP Response] 201 Created
-```
-
-초기에는 “컨트롤러 시작”, “서비스 진입” “서비스 종료” 등 모든 메서드에 로그를 남겼습니다. 하지만 이는 로그 파일의 크기만 키울 뿐 실질적인 가치는 없었습니다.
-
-`LoggingFilter` 가 이미 **가장 바깥쪽에서 요청의 시작과 끝**을 기록하고 있기 때문에, 비즈니스 로직 내부에서는 흐름 추적을 위한 기계적인 로그를 모두 제거하고, **“회원가입 완료”, “점수 갱신”** 과 같이 **상태가 변하는 순간**만 남겨 로그의 밀도를 높였습니다.
-
-## 6.3 운영 환경을 위한 포맷 전략 : Text vs JSON
-
-마지막으로, 환경(Profile)에 따라 로그의 형태를 다르게 가져가는 **이원화 전략**을 채택했습니다.
-
-### **Text (개발/로컬 환경)**
-
-```
-2025-12-18 14:23:01.123 INFO  [http-nio-8080-exec-1] c.g.a.d.u.UserService - [Domain Event] 신규 사용자 등록 - 사용자: Alice, 점수: 1250, 티어: GOLD --> [trace_id=a1b2c3d4, username=Alice]
-```
-
-로컬 환경에서는 개발자가 콘솔에서 눈으로 읽기 편한 텍스트 형태를 유지했습니다.
-
-### **JSON (운영 환경)**
-
-```json
-{
-  "@timestamp": "2025-12-18T14:23:01.123Z",
-  "level": "INFO",
-  "message": "[Domain Event] 신규 사용자 등록",
-  "trace_id": "a1b2c3d4",
-  "username": "Alice",
-  "total_score": 1250,
-  "tier": "GOLD",
-  "latency_ms": 1230,
-  "client_ip": "203.0.113.45"
+public static LogContext event(Event event) {
+    clearEventFields();
+    return new LogContext(event);
 }
 ```
 
-운영 환경에서는 `Loki` 나 `ELK` 같은 시스템이 파싱하기 가장 쉬운 **JSON 포맷**을 채택했습니다. [`LogstashEncoder`](https://github.com/logfellow/logstash-logback-encoder) 설정을 통해 **MDC에 담긴 메타데이터(`trace_id`, `latency`, `cost` …) 는 별도의 JSON 필드**로 자동 분리하고, 비즈니스 데이터는 `message` 필드에 담아 출력합니다.
+이 구조의 장점은 분명합니다.
 
-`logback-spring.xml`
+- 요청 전체에서 유지해야 할 값과 이벤트마다 바뀌는 값을 분리할 수 있습니다.
+- `event`, `log_category`, `phase`, `outcome` 같은 핵심 축이 항상 같은 이름으로 기록됩니다.
+- 각 서비스가 메시지 문자열을 파싱하지 않고도 동일한 스키마를 따를 수 있습니다.
 
-```xml
-<appender name="PROD_JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-    <encoder class="net.logstash.logback.encoder.LogstashEncoder">
-        <includeMdcKeyName>trace_id</includeMdcKeyName>
-        <includeMdcKeyName>latency_ms</includeMdcKeyName>
-        <includeMdcKeyName>github_api_cost</includeMdcKeyName>
-        ...
-    </encoder>
-</appender>
+예를 들어 수동 갱신 요청 로그는 아래처럼 남습니다.
+
+```java
+LogContext.event(Event.USER_REFRESH_REQUESTED)
+        .with("username", updatedUser.getUsername())
+        .with("old_score", oldScore)
+        .with("new_score", updatedUser.getTotalScore())
+        .with("score_diff", scoreDiff >= 0 ? "+" + scoreDiff : String.valueOf(scoreDiff))
+        .info();
 ```
 
----
+여기서 중요한 점은 `username`이 raw value로 저장되지 않는다는 것입니다. `LogContext`는 내부적으로 `LogSanitizer`를 호출해 `username`과 `target_username`을 자동 마스킹합니다. 실제로 `LogContextTest`는 `octocat`이 `oc*****`로 남는지 검증하고 있습니다.
 
-# 7. 마무리
+또 하나 흥미로운 부분은 문맥이 **요청의 진행에 따라 점진적으로 풍부해진다**는 점입니다.
 
-로깅 시스템 고도화 작업을 통해 `Trace ID` 하나만 있으면 **[진입(Filter) → 비즈니스 로직 → 외부 API → DB → 응답]** 에 이르는 전체 라이프사이클을 추적할 수 있게 되었습니다. 또한 기존 방식으로는 보이지 않던 404 에러, 배치 작업 실패, 외부 API 지연 등을 모두 수집하여 **사각지대를 제거**했습니다.
+- `LoggingFilter`는 처음에 `trace_id`, `client_ip`, `request_method`, `request_uri`를 넣습니다.
+- `JwtAuthenticationFilter`와 `OAuth2AuthenticationSuccessHandler`는 인증이 확인된 뒤 `username`을 같은 요청 문맥에 추가합니다.
+- 이후 도메인 서비스와 예외 처리기는 같은 `trace_id` 아래에서 더 구체적인 이벤트를 남깁니다.
 
-현재는 운영 환경의 로그를 단순히 JSON 데이터로 출력하는 단계까지 완료되었습니다. 앞으로는 이 데이터를 시각화하는 모니터링 대시보드를 구축하고, 장애 발생 시 즉시 알림을 받을 수 있는 Alerting 시스템을 연결하여 보다 안전하고 신뢰할 수 있는 서비스로 발전시켜 나갈 계획입니다.
+즉, Git Ranker의 로그는 한 줄짜리 메모가 아니라, **같은 요청 문맥 위에 단계적으로 쌓이는 구조화 이벤트 묶음**에 가깝습니다.
 
----
+<aside>
+<strong>`clearEventFields()`와 `clear()`를 분리한 이유</strong><br>
+같은 요청 안에서도 `trace_id`, `request_uri` 같은 값은 유지되어야 하지만, `status`, `error_code`, `job_name` 같은 이벤트 필드는 다음 로그로 흘러가면 안 됩니다. Git Ranker는 요청 스코프와 이벤트 스코프를 분리해, 한 요청 안의 여러 로그가 서로의 문맥은 공유하되 이벤트 데이터는 오염시키지 않도록 설계했습니다.
+</aside>
+
+# 5. 로그 품질은 양이 아니라 규칙에서 결정됐다
+
+## 5.1 메서드 시작과 종료보다 상태 변화가 있는 순간만 남겼다
+
+초기 로깅에서 가장 먼저 줄인 것은 "컨트롤러 시작", "서비스 진입", "서비스 종료" 같은 기계적인 로그였습니다. 이런 로그는 많을수록 안심이 되기보다는, 오히려 중요한 사건을 묻어버립니다.
+
+현재 Git Ranker가 실제로 남기는 이벤트는 대체로 아래와 같습니다.
+
+- `USER_REGISTERED`
+- `USER_LOGIN`
+- `USER_REFRESH_REQUESTED`
+- `BADGE_VIEWED`
+- `AUTH_FAILED`
+- `BATCH_STARTED`, `BATCH_COMPLETED`, `BATCH_ITEM_FAILED`
+- `GITHUB_API_CALLED`, `RATE_LIMIT_WARNING`
+- `HTTP_RESPONSE`
+- `ERROR_HANDLED`
+
+이벤트 이름을 보면 공통점이 있습니다. **무언가의 상태가 바뀌었거나, 운영자가 관심 가져야 할 결과가 확정된 시점**만 남깁니다. 예를 들어 `UserRegistrationService`는 신규 사용자 저장이 끝난 뒤 `initial_score`, `initial_tier`와 함께 `USER_REGISTERED`를 남기고, `BadgeService`는 배지 생성 시 `BADGE_VIEWED`를 남깁니다. 반면 메서드 진입과 종료 같은 정보는 의도적으로 줄였습니다.
+
+## 5.2 레벨과 민감 정보도 함께 통제했다
+
+좋은 로그는 "무조건 많이"가 아니라 **주의를 어디에 쓰게 만들 것인지**까지 설계해야 합니다.
+
+> **로그의 목적은 더 많은 텍스트를 남기는 것이 아니라, 운영자가 정말 봐야 할 사건을 더 선명하게 남기는 것입니다.**
+
+Git Ranker에서는 이 원칙을 두 가지로 적용했습니다.
+
+첫째, 로그 레벨을 예외 성격과 분리하지 않았습니다. `GlobalExceptionHandler`는 `BusinessException`의 `ErrorType`이 가진 로그 레벨을 그대로 따르고, 404에 해당하는 `NoResourceFoundException`은 `debug`로 낮춰 기록합니다. 크롤러와 봇이 만든 노이즈까지 모두 `error`로 찍기 시작하면, 진짜 장애가 발생했을 때 오히려 감지가 둔해집니다.
+
+둘째, 개인 식별 정보는 로그 친화적으로 다듬었습니다. `LogSanitizer`는 `username`, `target_username`을 자동 마스킹하고, `ScoreRecalculationProcessor`는 예기치 못한 배치 오류를 감쌀 때 raw username 대신 고정 길이 해시를 남깁니다. 덕분에 **같은 사용자를 식별할 수는 있지만, 원문을 그대로 노출하지는 않는** 균형을 맞출 수 있었습니다.
+
+# 6. 운영 환경에서는 JSON 로그와 메트릭을 함께 흘렸다
+
+개발 환경과 운영 환경에서 로그의 목적은 다릅니다. 로컬에서는 사람이 콘솔을 읽기 쉬워야 하고, 운영에서는 수집기와 검색기가 파싱하기 쉬워야 합니다.
+
+그래서 `logback-spring.xml`은 프로필에 따라 출력 형식을 나눴습니다.
+
+```xml
+<springProfile name="!prod">
+    <root level="INFO">
+        <appender-ref ref="LOCAL_CONSOLE"/>
+    </root>
+</springProfile>
+
+<springProfile name="prod">
+    <root level="INFO">
+        <appender-ref ref="PROD_JSON_CONSOLE"/>
+    </root>
+</springProfile>
+```
+
+로컬에서는 MDC를 한 줄에 붙인 텍스트 로그를 사용하고, 운영에서는 `LogstashEncoder`로 JSON 로그를 출력합니다. 운영용 appender는 `includeMdc=true`로 설정되어 있어 `trace_id`, `event`, `log_category`, `latency_ms` 같은 값이 별도 필드로 나뉘어 내려갑니다.
+
+이 로그는 `promtail-config.yml`에서 다시 한 번 가공됩니다.
+
+```yaml
+- labels:
+    level:
+    event:
+    log_category:
+
+- structured_metadata:
+    trace_id:
+    username:
+    client_ip:
+    user_agent:
+    job_name:
+    status:
+    latency_ms:
+```
+
+이 설정이 중요한 이유는 **모든 필드를 라벨로 올리지 않았기 때문**입니다.
+
+`event`, `log_category`, `level`은 값의 종류가 제한된 저카디널리티(low-cardinality) 필드라서 라벨로 두기 좋습니다. 반면 `trace_id`, `username`, `client_ip`는 값이 사실상 무한히 늘어나는 고카디널리티(high-cardinality) 필드입니다. 이런 값을 라벨로 올리면 Loki 인덱스가 금방 비대해지고 검색 비용도 커집니다.
+
+> **구조화 로그의 핵심은 JSON이라는 형식 자체가 아니라, 어떤 필드를 인덱싱하고 어떤 필드를 문맥으로 남길지 분리하는 데 있습니다.**
+
+Git Ranker는 이 구분을 실제 수집 파이프라인에 반영했습니다. 검색 축은 라벨로, 세부 문맥은 `structured_metadata`로 보내는 방식입니다.
+
+그리고 로그만 쌓아두지도 않았습니다. `docker-compose.yml`에는 `Prometheus`, `Loki`, `Promtail`, `Grafana`가 함께 올라가고, 애플리케이션은 `BusinessMetrics`, `GitHubApiMetrics`로 별도 메트릭도 기록합니다.
+
+이 조합 덕분에 대시보드에서는 다음과 같은 화면이 실제로 구성됩니다.
+
+- `Trace Search - 요청 추적`
+- `Error & Warning Logs`
+- `Batch Job Logs`
+- `Rate Limit Warnings`
+- `Error Rate (5xx)`
+- `Latency P99`
+
+알림도 이미 붙어 있습니다. `alert-rules.yml` 기준으로 `High Error Rate`, `Service Unavailable`, `High P99 Latency`, `GitHub API Rate Limit Low` 같은 규칙이 정의되어 있습니다.
+
+> **로그가 한 사건의 맥락을 설명한다면, 메트릭은 같은 사건의 빈도와 추세를 보여줍니다.** 한쪽만 있으면 장애는 늦게 발견되거나, 발견해도 설명되지 않습니다.
+
+# 7. 결과와 한계
+
+지금의 Git Ranker에서는 `trace_id` 하나만 있으면 적어도 아래 흐름은 꽤 안정적으로 복원할 수 있습니다.
+
+- 어떤 HTTP 요청이 들어왔는지
+- 인증이 붙었는지, 어떤 사용자 문맥이 연결됐는지
+- 어떤 도메인 이벤트가 발생했는지
+- GitHub API 호출이 얼마나 느렸고 비용이 얼마나 들었는지
+- 배치가 어디서 실패했고 재시도 가능한 오류인지
+- 최종 응답이 성공인지 실패인지
+
+예전처럼 로그를 줄 세워 놓고 눈으로 읽는 방식과는 결이 다릅니다. 지금은 로그가 **사건 하나를 설명하는 데이터 레코드**가 되고, Grafana와 Loki 위에서는 그것을 조합해 요청, 배치, 외부 API를 같은 기준으로 검색할 수 있습니다.
+
+다만 이 구조가 곧바로 완전한 분산 트레이싱을 뜻하는 것은 아닙니다. 현재의 `trace_id`는 단일 애플리케이션 안에서, 주로 서블릿 요청과 배치 흐름을 기준으로 동작합니다. 앞으로 Git Ranker가 별도 서비스로 분리되거나, 더 깊은 비동기/리액티브 체인까지 세밀하게 추적해야 한다면 `OpenTelemetry` 같은 정식 trace propagation 체계가 필요할 것입니다.
+
+그럼에도 지금 단계에서 중요한 변화는 분명합니다. Git Ranker는 더 이상 "로그를 남기는 서비스"가 아니라, **문제가 생겼을 때 원인을 설명할 수 있는 서비스**에 가까워졌습니다. 운영 관점에서 보면 이 차이가 생각보다 훨씬 큽니다.
 
 # 참고 자료
 
-[옵저버빌리티: 로그라고해서 다 같은 로그가 아니다(1/2) - 넷마블 기술 블로그](https://netmarble.engineering/observability-logging-a)
-
-[옵저버빌리티: 로그라고해서 다 같은 로그가 아니다(2/2) - 넷마블 기술 블로그](https://netmarble.engineering/observability-logging-b/)
-
-[로그는 대체 왜, 언제, 어디서, 무엇을 남겨야 하는가?](https://jaeseo0519.tistory.com/449)
-
-[Logging guidelines](https://developer.atlassian.com/server/confluence/logging-guidelines/#context)
-
-[[Spring] 필터(Filter)와 인터셉터(Interceptor)의 개념 및 차이](https://dev-coco.tistory.com/173)
+- [SLF4J MDC 문서](https://www.slf4j.org/api/org/slf4j/MDC.html)
+- [logstash-logback-encoder](https://github.com/logfellow/logstash-logback-encoder)
+- [Logging guidelines - Atlassian](https://developer.atlassian.com/server/confluence/logging-guidelines/#context)
+- [옵저버빌리티: 로그라고해서 다 같은 로그가 아니다(1/2)](https://netmarble.engineering/observability-logging-a)
+- [옵저버빌리티: 로그라고해서 다 같은 로그가 아니다(2/2)](https://netmarble.engineering/observability-logging-b/)
