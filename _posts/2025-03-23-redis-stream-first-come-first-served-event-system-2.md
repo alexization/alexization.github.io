@@ -1,7 +1,7 @@
 ---
 header:
    teaser: /assets/images/logo.png
-   og_image: "https://i.imgur.com/vz4o0WK.png"
+   og_image: "https://cdn.imgchest.com/files/284059f0f012.png"
 
 title: "Redis Stream으로 개선한 선착순 이벤트 시스템 (2편)"
 excerpt: "Spring Boot + MySQL 구조의 성능 병목을 Redis Stream 비동기 처리로 해결하여 1,666 RPS 달성과 66% 성능 향상을 이룬 과정을 다룹니다."
@@ -21,6 +21,9 @@ toc_sticky: true
 date: 2025-03-23
 last_modified_at: 2025-03-23 
 ---
+
+![mainImage](https://cdn.imgchest.com/files/284059f0f012.png)
+
 1편에서는 Spring Boot와 MySQL만으로 선착순 이벤트 시스템을 구현하고 그 한계점을 분석했습니다.
 
 이번 글에서는 Redis Stream을 활용하여 시스템을 어떻게 개선했는지 그리고 그 결과로 성능이 어떻게 향상 되었는지 공유하고자 합니다.

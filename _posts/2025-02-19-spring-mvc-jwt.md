@@ -1,6 +1,7 @@
 ---
 header:
   teaser: /assets/images/logo.png
+  og_image: "https://cdn.imgchest.com/files/4291300b4fb9.png"
 
 title: "Spring MVC의 진입점을 파고들어 개선한 JWT 토큰 처리 시스템"
 excerpt: "반복되는 JWT 토큰 검증 코드를 제거하기 위해 Spring MVC의 HandlerInterceptor와 ArgumentResolver를 활용한 토큰 처리 시스템 구축 과정을 다룹니다."
@@ -19,6 +20,9 @@ toc_sticky: true
 date: 2025-02-19
 last_modified_at: 2025-02-19 
 ---
+
+![mainImage](https://cdn.imgchest.com/files/4291300b4fb9.png)
+
 # 시작은 불편함에서
 
 멀티 모듈로 구성된 댕글 서비스에서 Auth 모듈은 **사용자 인증과 인가를 담당하는 핵심 모듈**입니다.
@@ -281,7 +285,7 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
 
 <aside>
 
-**💡 요청 별 독립성 보장**
+### 요청 별 독립성 보장
 
 인터셉터를 구현하면서 “여러 요청이 동시에 들어올 때 `request attribute` 가 서로 간섭하지 않을까?”라는 의문이 들었습니다.
 
@@ -440,8 +444,9 @@ public class DetailInfoController {
 
 # 전체 시스템 흐름
 
-> 개선된 시스템의 전체 흐름을 단계별로 살펴보겠습니다.
->
+<aside>
+개선된 시스템의 전체 흐름을 단계별로 살펴보겠습니다.
+
 1. HTTP 요청이 들어오면 `DispatcherServlet` 이 요청을 받음
 2. `WebConfig` 에 등록된 `JwtAuthInterceptor` 의 `preHandle` 메소드 실행
     - `Authorization` 헤더에서 JWT 토큰 추출
@@ -452,6 +457,7 @@ public class DetailInfoController {
     - `request attribute`에서 `PayloadDto` 추출
     - Controller 메소드 파라미터로 전달
 4. Controller에서 `PayloadDto` 사용
+</aside>
 
 # 마치며
 
