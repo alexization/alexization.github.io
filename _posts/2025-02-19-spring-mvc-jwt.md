@@ -23,7 +23,7 @@ last_modified_at: 2025-02-19
 
 ![mainImage](https://cdn.imgchest.com/files/4291300b4fb9.png)
 
-# 시작은 불편함에서
+## 시작은 불편함에서
 
 멀티 모듈로 구성된 댕글 서비스에서 Auth 모듈은 **사용자 인증과 인가를 담당하는 핵심 모듈**입니다.
 
@@ -31,7 +31,7 @@ Spring Security + JWT + OAuth2.0을 기반으로 구축된 이 모듈은 처음�
 
 초기 구현에서는 로그인 성공 시 사용자 정보가 담긴 JWT 토큰을 생성하고, 보호된 엔드포인트에 접근할 때마다 이 토큰을 검증하는 방식이었습니다. 그러나 REST API를 개발하면서 **사용자의 인증 상태나 권한을 확인해야 하는 엔드포인트**가 늘어났고, 각 컨트롤러마다 토큰 처리 코드가 반복되었습니다.
 
-## 초기 구현 방식
+### 초기 구현 방식
 
 ```java
 @RestController
@@ -72,7 +72,7 @@ public class AccountController {
 
 Spring Security의 표준 패턴을 따르는 것도 방법이었지만, 이번 기회에 **Spring MVC의 요청 처리 구조를 더 깊이 이해**하고 싶었습니다. Spring 프레임워크가 요청을 어떻게 처리하는지, 그 과정에서 제가 활용할 수 있는 부분은 무엇인지 찾아보기로 했습니다.
 
-# Spring MVC 요청 처리 구조 탐색
+## Spring MVC 요청 처리 구조 탐색
 
 > 처음에는 `DispatcherServlet`을 그저 “요청을 알맞은 컨트롤러로 전달해주는 무언가” 정도로만 이해하고 있었습니다.
 하지만 요청 처리 구조를 파고들면서, **`DispatcherServlet`이 프론트 컨트롤러 패턴의 구현체이며, 요청 처리 과정에서 다양한 확장 포인트를 제공한다는 것을 알게 되었습니다.**
@@ -106,7 +106,7 @@ protected void doDispatch(HttpServletRequest request, HttpServletResponse respon
 
 코드를 보면 알 수 있듯이, 모든 요청이 컨트롤러에 도달하기 전 **인터셉터 전처리** 단계를 거칩니다. 바로 이 지점이 JWT 토큰을 처리하기에 적합한 위치라고 판단했습니다.
 
-## Spring MVC의 상세 요청 처리 흐름 정리
+### Spring MVC의 상세 요청 처리 흐름 정리
 
 > 더 자세히 알아보기 위해 Spring MVC의 전체 요청 처리 흐름을 단계별로 살펴봤습니다.
 >
@@ -141,7 +141,7 @@ protected void doDispatch(HttpServletRequest request, HttpServletResponse respon
 
 인터셉터는 **컨트롤러 실행 전에 공통 작업을 처리할 수 있는 위치**이고, ArgumentResolver는 **컨트롤러에 전달될 파라미터를 동적으로 만들어내는 위치입니다.**
 
-### HandlerInterceptor
+#### HandlerInterceptor
 
 > Spring MVC의 `HandlerInterceptor` 는 컨트롤러 실행 전후에 공통 작업을 처리할 수 있게 해주는 인터페이스입니다.
 >
@@ -175,7 +175,7 @@ public interface HandlerInterceptor {
 
 여기서 토큰을 검증하고 그 결과를 `request attribute` 에 저장하면, 이후 처리 단계에서 토큰 정보를 사용할 수 있습니다.
 
-### HandlerMethodArgumentResolver
+#### HandlerMethodArgumentResolver
 
 > 검증된 토큰 정보를 컨트롤러에서 편리하게 사용할 수 있도록 `ArgumentResolver` 를 활용했습니다.
 >
@@ -198,9 +198,9 @@ public interface HandlerMethodArgumentResolver {
 
 인터셉터에서 `request attribute` 에 저장한 토큰 정보를 해당 메서드에서 가져와 컨트롤러 파라미터로 변환할 수 있습니다.
 
-# JWT 토큰 처리 시스템 구현
+## JWT 토큰 처리 시스템 구현
 
-## @AuthPayload 어노테이션 구현
+### @AuthPayload 어노테이션 구현
 
 가장 먼저, 인증이 필요한 컨트롤러 파라미터를 명시적으로 표시할 `@AuthPayload` 어노테이션을 만들었습니다.
 
@@ -218,7 +218,7 @@ public @interface AuthPayload {
     - `true(기본값)` : 유효한 토큰이 없으면 예외 발생
     - `false` : 토큰이 없어도 접근 가능, 비로그인 사용자 처리 시 사용
 
-## JWT 인터셉터 구현
+### JWT 인터셉터 구현
 
 모든 요청에 대한 JWT 토큰을 처리할 인터셉터를 구현했습니다.
 
@@ -285,7 +285,7 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
 
 <aside>
 
-### 요청 별 독립성 보장
+#### 요청 별 독립성 보장
 
 인터셉터를 구현하면서 “여러 요청이 동시에 들어올 때 `request attribute` 가 서로 간섭하지 않을까?”라는 의문이 들었습니다.
 
@@ -314,7 +314,7 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
 
 </aside>
 
-### 비로그인 사용자 처리 메커니즘
+#### 비로그인 사용자 처리 메커니즘
 
 ```java
 /* 토큰이 없는 경우는 비회원으로 간주하며, null 값을 넣어준다. */
@@ -330,7 +330,7 @@ if (token == null) {
 
 컨트롤러에서는 `payloadDto.getAccountId() != null` 과 같은 간단한 조건문으로 로그인 여부를 확인할 수 있도록 했습니다.
 
-## ArgumentResolver 구현
+### ArgumentResolver 구현
 
 인터셉터에서 검증한 토큰 정보를 컨트롤러의 파라미터로 자동 변환하는 `ArgumentResolver` 구현했습니다.
 
@@ -370,7 +370,7 @@ public class PayloadArgumentResolver implements HandlerMethodArgumentResolver {
     - `required` 속성에 따른 유효성 검증 → `required = true` 인 경우, 유효한 토큰 정보가 없으면 예외 발생
     - 검증된 `PayloadDto` 객체 반환
 
-## Spring MVC 설정
+### Spring MVC 설정
 
 마지막으로, 구현한 컴포넌트들을 Spring MVC 설정에 등록했습니다.
 
@@ -411,7 +411,7 @@ public class WebConfig implements WebMvcConfigurer {
 
 특히, `excludePathPatterns` 를 통해 로그인, 회원가입 등 인증이 필요 없는 경로를 인터셉터 처리에서 제외시켰습니다.
 
-## Controller 실제 사용
+### Controller 실제 사용
 
 ```java
 @RestController
@@ -442,7 +442,7 @@ public class DetailInfoController {
 
 → **기존에는 각 엔드포인트마다 반복되던 10~15줄의 토큰 처리 코드가 단 한 줄의 파라미터 선언으로 대체**할 수 있었고, 이는 코드의 가독성과 유지보수성을 크게 향상시켰습니다.
 
-# 전체 시스템 흐름
+## 전체 시스템 흐름
 
 <aside>
 개선된 시스템의 전체 흐름을 단계별로 살펴보겠습니다.
@@ -459,7 +459,7 @@ public class DetailInfoController {
 4. Controller에서 `PayloadDto` 사용
 </aside>
 
-# 마치며
+## 마치며
 
 이번 개선 과정을 통해 단순히 문제를 해결하는 것을 넘어, Spring MVC 프레임워크에 대해 깊이 경험할 수 있었습니다.
 

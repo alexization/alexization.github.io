@@ -20,7 +20,7 @@ toc_sticky: true
 date: 2025-02-05
 last_modified_at: 2025-02-05 
 ---
-# Redis를 사용하지 않으려는 이유
+## Redis를 사용하지 않으려는 이유
 
 > 현재 꾸미 서비스에는 좋아요/싫어요 기능의 **동시성 제어를 위해 Redis를 사용하고 있었습니다.**
 그러나 기능 분석 결과, Redis 사용이 **오버 엔지니어링이라고 판단**했습니다.
@@ -40,22 +40,22 @@ last_modified_at: 2025-02-05
 
 이번 기회에 JPA와 MySQL만으로 동시성 문제를 해결하는 방법을 고민하고, 정확한 좋아요 수를 보장하는 방안을 구현하고자 합니다.
 
-## 기능 요구사항
+### 기능 요구사항
 
-### 기본 피드백 기능
+#### 기본 피드백 기능
 
 1. 사용자는 도서에 대해 좋아요/싫어요 표시 가능
 2. 한 도서에 대해 사용자당 하나의 피드백만 가능 (좋아요/싫어요/선택 안함)
 3. 좋아요/싫어요 상태는 변경 및 취소 가능
 
-### 도서 점수 관리
+#### 도서 점수 관리
 
 1. 도서의 전체 좋아요 수 관리
 2. 좋아요 시 도서의 `likes` 증가
 3. 좋아요 취소 시 도서의 `likes` 감소
 4. 좋아요에서 싫어요로 변경 시 좋아요 수 감소
 
-### ~~사용자 성향 분석~~
+#### ~~사용자 성향 분석~~
 
 1. ~~피드백을 통한 사용자(`Child`)의 MBTI 성향 분석~~
 2. ~~도서 추천에 활용~~
@@ -64,7 +64,7 @@ last_modified_at: 2025-02-05
 
 ---
 
-## Entity
+### Entity
 
 해결 과정을 설명하기에 앞서, 요구사항에 필요한 필수 도메인에 대한 코드 먼저 첨부하겠습니다.
 
@@ -117,7 +117,7 @@ public class Feedback {
 }
 ```
 
-# 기존 코드 구현 분석
+## 기존 코드 구현 분석
 
 > 기존 Redis를 활용한 좋아요 처리
 >
@@ -135,9 +135,9 @@ public Long updateLike(Long bookId, Long childId) {
 
 단순한 기능임에도 불구하고 동시성 문제 해결만을 위해 **추가적인 인프라를 관리**해야 하며 **운영DB와 데이터를 동기화하기 위한 추가적인 로직이 필요한 번거로움이 있었습니다.**
 
-# 동시성 문제가 발생 가능한 상황
+## 동시성 문제가 발생 가능한 상황
 
-## 1. Race Condition (경쟁 상태)
+### 1. Race Condition (경쟁 상태)
 
 > 동일한 작업을 수행하는 여러 트랜잭션이 경쟁하는 상황을 가정했을 때
 
@@ -150,7 +150,7 @@ public Long updateLike(Long bookId, Long childId) {
 
 → 기대값은 (7)이지만 실제 저장된 값은 (6)으로, 한 사용자의 작업이 무시됩니다.
 
-## 2. Lost Update (갱신 손실)
+### 2. Lost Update (갱신 손실)
 
 > 서로 다른 작업을 수행하는 트랜잭션들이 충돌하여 마지막 갱신만 남는 상황을 가정했을 때
 
@@ -169,9 +169,9 @@ public Long updateLike(Long bookId, Long childId) {
 
 ---
 
-# 문제 해결을 위한 방안 검토
+## 문제 해결을 위한 방안 검토
 
-## 1. Synchronized
+### 1. Synchronized
 
 ```java
 public synchronized Long updateLike(Long bookId, Long childId) {
@@ -191,7 +191,7 @@ public synchronized Long updateLike(Long bookId, Long childId) {
 
 → 현재 저희 서비스는 단일 서버이기 때문에 `synchronized` 를 사용해도 해당 요구사항을 만족시킬 수 있지만, 추후 **확장성을 고려했을 때 적합하지 않다고 판단했습니다.**
 
-## 2. Optimistic Lock (낙관적 락)
+### 2. Optimistic Lock (낙관적 락)
 
 > JPA에서 제공하는 낙관적 락 방식
 >
@@ -234,9 +234,9 @@ WHERE id = ? AND version = ?
 
 → 좋아요/싫어요 기능에서는 **빈번한 수정으로 충돌 가능성이 있기 때문에 낙관적 락은 적합하지 않다고 판단했습니다.**
 
-## 3. Pessimistic Lock (비관적 락)
+### 3. Pessimistic Lock (비관적 락)
 
-### 3-1. Pessimistic Read (공유 락, Shared Lock, S-Lock)
+#### 3-1. Pessimistic Read (공유 락, Shared Lock, S-Lock)
 
 ```java
 @Lock(LockModeType.PESSIMISTIC_READ)
@@ -256,7 +256,7 @@ SELECT ... FOR SHARE
 
 → 쓰기 작업이 필요한 좋아요/싫어요 기능에서는 공유 락은 적합하지 않다고 판단했습니다.
 
-### 3-2. Pessimistic Write (배타적 락, Exclusive Lock, X-Lock)
+#### 3-2. Pessimistic Write (배타적 락, Exclusive Lock, X-Lock)
 
 ```java
 @Lock(LockModeType.PESSIMISTIC_WRITE)
@@ -274,9 +274,9 @@ SELECT ... FOR UPDATE
 
 → 동시 수정이 완벽히 차단되기 때문에 **데이터 정합성이 보장**되고 JPA가 제공하는 기능으로 **구현이 간단**해 이번 요구사항에 가장 적합하다고 판단했습니다.
 
-# 추가적으로 고려한 부분
+## 추가적으로 고려한 부분
 
-## 1. Lock Timeout 설정
+### 1. Lock Timeout 설정
 
 > 데드락(Deadlock) 방지를 위해 락 획득 대기 시간을 설정했습니다.
 >
@@ -305,7 +305,7 @@ SELECT ... FOR UPDATE
 3. 3초 (`3000ms`) 동안 대기
 4. 3초 내 Lock 획득 실패 시 예외 발생 및 롤백
 
-## 2. 트랜잭션 격리 수준 설정
+### 2. 트랜잭션 격리 수준 설정
 
 DB 락과 더불어 데이터 일관성을 유지하기 위해 트랜잭션 격리 수준 (Isolation Level) 을 고려했습니다.
 
@@ -338,9 +338,9 @@ DB 락과 더불어 데이터 일관성을 유지하기 위해 트랜잭션 격�
 
 **좋아요 수 조회에 대해 일관성을 보장**해 주는 REPEATABLE_READ와 SERIALIZABLE 중 성능을 고려하여 REPEATABLE_READ를 선택했습니다. 특히 좋아요/싫어요 기능에서는 Phantom Read가 큰 문제가 되지 않으므로, **성능 오버헤드가 적은** REPEATABLE_READ가 적합하다고 판단했습니다.
 
-# 계층별 구현 코드
+## 계층별 구현 코드
 
-## Repository
+### Repository
 
 ```java
 @Repository
@@ -358,7 +358,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 2. `lock.timeout` 3초 설정으로 데드락을 방지
 3. 단일 행을 조회하며 `Row-Level Lock` 으로 다른 도서에는 영향이 없도록 해 좋아요/싫어요 작업에 대해 빠르게 처리
 
-## Service
+### Service
 
 ```java
 @Service
@@ -412,12 +412,12 @@ public class BookDetailService {
 }
 ```
 
-# 동시성 검증을 위한 테스트
+## 동시성 검증을 위한 테스트
 
 > 멀티스레드 환경에서 동시 요청에 대한 정확성을 검증하기 위한 테스트 코드를 작성했습니다.
 >
 
-## Race Condition 검증
+### Race Condition 검증
 
 ```java
 @Test
@@ -478,7 +478,7 @@ void concurrentLikeTest() throws InterruptedException {
 
 ![image.png](https://i.imgur.com/sXg5GLC.png)
 
-## Lost Update 검증
+### Lost Update 검증
 
 ```java
 @Test
@@ -552,7 +552,7 @@ void concurrentLikeAndHateTest() throws InterruptedException {
 
 ---
 
-# 마치며
+## 마치며
 
 Redis를 제거함으로써 **시스템 복잡도는 감소**했고, `Amazon ElastiCache` 와 같은 인메모리 DB를 사용하지 않아 **운영 비용 또한 절감**할 수 있었습니다.
 

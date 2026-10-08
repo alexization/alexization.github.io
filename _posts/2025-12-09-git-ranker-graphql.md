@@ -36,11 +36,11 @@ Git Ranker에서 GitHub 활동 수집은 점수, 순위, 티어 계산의 출발
 현재 Git Ranker의 GraphQL 수집기는 <strong>연도별 쿼리 병렬 실행</strong>, <strong>동적 JSON 매핑</strong>, <strong>비용과 토큰 상태 추적</strong>을 함께 묶은 구조입니다. 즉, 단순히 API를 교체한 것이 아니라 운영 가능한 수집 파이프라인으로 바뀐 과정을 다룹니다.
 </aside>
 
-# 1. Search API는 맞는 방향이었지만 오래 버티기 어려웠다
+## 1. Search API는 맞는 방향이었지만 오래 버티기 어려웠다
 
 Search API로 옮겨온 덕분에 Git Ranker는 "최근 이벤트 타임라인"이 아니라 "활동별 누적 count"를 기준으로 점수를 계산할 수 있게 됐습니다. 문제는 그 다음이었습니다. 점수 계산 모델에 맞는 질의는 가능해졌지만, 운영 단계에서는 **호출 수**와 **데이터 정밀도**가 새 병목으로 드러났습니다.
 
-## 1.1 사용자 1명을 계산할 때 호출이 여러 번 필요했다
+### 1.1 사용자 1명을 계산할 때 호출이 여러 번 필요했다
 
 초기 Search API 방식은 활동 종류별로 질의를 나눠야 했습니다.
 
@@ -54,7 +54,7 @@ Search API로 옮겨온 덕분에 Git Ranker는 "최근 이벤트 타임라인"�
 
 사용자 수가 적을 때는 버틸 수 있습니다. 하지만 신규 가입, 수동 갱신, 새벽 배치가 겹치기 시작하면 이야기가 달라집니다. 점수 계산은 "가끔 한 번" 하는 작업이 아니라, 계속 반복되는 작업이기 때문입니다.
 
-## 1.2 리뷰 기여도도 충분히 정확하지 않았다
+### 1.2 리뷰 기여도도 충분히 정확하지 않았다
 
 더 아쉬웠던 부분은 리뷰 데이터였습니다. Search API의 `reviewed-by:username type:pr`는 **리뷰를 남긴 PR 수**를 세는 데는 유용했지만, 실제로 사용자가 **몇 번의 리뷰를 제출했는지**까지는 잘 드러나지 않았습니다.
 
@@ -62,11 +62,11 @@ Search API로 옮겨온 덕분에 Git Ranker는 "최근 이벤트 타임라인"�
 
 > Search API는 문제를 올바르게 다시 정의하게 해준 첫 번째 해법이었다. 하지만 운영 단계에서는 "집계가 가능하다"보다 "적은 비용으로, 더 정확하게 집계할 수 있는가"가 더 중요해졌다.
 
-# 2. GraphQL이 준 것은 단순한 API 교체가 아니라 데이터 모델이었다
+## 2. GraphQL이 준 것은 단순한 API 교체가 아니라 데이터 모델이었다
 
 GraphQL로 넘어오면서 가장 먼저 달라진 점은 "질의 개수"보다 **질의의 표현 방식**이었습니다. Search API가 활동 종류마다 서로 다른 검색 문자열을 만들어 count를 읽어오는 방식이었다면, GraphQL은 사용자의 contribution 모델 안에서 필요한 필드를 직접 선택할 수 있게 해줬습니다.
 
-## 2.1 `ContributionsCollection`이 핵심 집계 구조가 됐다
+### 2.1 `ContributionsCollection`이 핵심 집계 구조가 됐다
 
 [GitHub GraphQL 문서의 `ContributionsCollection`](https://docs.github.com/en/graphql/reference/objects#contributionscollection)에는 Git Ranker가 필요로 하는 핵심 필드들이 이미 들어 있습니다.
 
@@ -94,7 +94,7 @@ Git Ranker 관점에서 이 필드들은 아래처럼 바로 연결됩니다.
 
 다만 여기서 중요한 예외가 하나 있습니다. `ContributionsCollection`은 **열린 PR 수**는 주지만, **머지된 PR 수**를 그대로 주지는 않습니다. 그래서 Git Ranker는 이 필드만으로 모든 점수 항목을 끝내지 않고, `merged PR`은 별도 검색 블록으로 보완합니다.
 
-## 2.2 비용 모델도 Git Ranker의 운영 방식과 더 잘 맞았다
+### 2.2 비용 모델도 Git Ranker의 운영 방식과 더 잘 맞았다
 
 GraphQL 전환의 또 다른 장점은 rate limit을 더 명시적으로 다룰 수 있다는 점이었습니다. [GitHub Docs의 현재 GraphQL rate limit 문서](https://docs.github.com/en/graphql/overview/resource-limitations)와 REST rate limit 응답 예시를 함께 보면, 사용자 토큰 기준 GraphQL primary rate limit은 **시간당 5,000 points**이고 Search API는 별도 search 예산으로 계산됩니다. REST Search API처럼 단순히 "몇 번 호출했는가"보다, **이번 질의가 얼마의 cost를 썼는가**를 함께 볼 수 있습니다.
 
@@ -128,7 +128,7 @@ GraphQL 전환의 또 다른 장점은 rate limit을 더 명시적으로 다룰 
 
 즉, GraphQL은 Git Ranker에 "호출 수를 줄이는 API"라기보다, **비용을 관찰하면서 운영할 수 있는 API**에 가까웠습니다.
 
-# 3. 하지만 현재 구현의 답은 "거대한 한 번의 쿼리"가 아니었다
+## 3. 하지만 현재 구현의 답은 "거대한 한 번의 쿼리"가 아니었다
 
 GraphQL을 처음 보면 자연스럽게 이런 생각을 하게 됩니다.
 
@@ -137,7 +137,7 @@ GraphQL을 처음 보면 자연스럽게 이런 생각을 하게 됩니다.
 
 초기 아이디어도 크게 다르지 않았습니다. 하지만 실제 구현은 더 현실적인 쪽으로 갔습니다.
 
-## 3.1 `ContributionsCollection`은 긴 기간을 한 번에 읽기 어렵다
+### 3.1 `ContributionsCollection`은 긴 기간을 한 번에 읽기 어렵다
 
 현재 저장소의 `GraphQLQueryBuilder`를 보면, Git Ranker는 `ContributionsCollection`을 **연도 단위 조회 블록**으로 생성합니다.
 
@@ -162,7 +162,7 @@ private String buildYearContributionBlock(
 
 첫 해는 사용자의 실제 GitHub 가입 시점부터 시작하고, 중간 연도는 `1월 1일 ~ 12월 31일`, 현재 연도는 `1월 1일 ~ 지금`으로 잡습니다. 즉, Git Ranker가 택한 기준 단위는 "한 사용자 전체 기간"이 아니라 **한 연도 contribution window**입니다.
 
-## 3.2 전체 스캔은 연도별 쿼리를 병렬 실행해 합친다
+### 3.2 전체 스캔은 연도별 쿼리를 병렬 실행해 합친다
 
 그래서 현재 저장소의 전체 스캔 경로는 "GraphQL 한 방"이 아닙니다. `GitHubGraphQLClient#getAllActivities()`는 아래처럼 동작합니다.
 
@@ -198,7 +198,7 @@ GitHubAllActivitiesResponse aggregatedResponse = queries
 `ContributionsCollection`은 사용자가 연 PR 수는 바로 집계해주지만, 그 PR이 실제로 merge됐는지는 구분하지 않습니다. 그래서 Git Ranker는 `author:%s type:pr is:merged` 검색을 GraphQL 쿼리 안의 별도 `search` 블록으로 유지합니다.
 </aside>
 
-## 3.3 배치 경로는 같은 아이디어를 더 가볍게 쓴다
+### 3.3 배치 경로는 같은 아이디어를 더 가볍게 쓴다
 
 이 구조는 일일 배치와도 자연스럽게 연결됩니다. 신규 가입이나 수동 갱신에서는 전체 스캔이 필요하므로 가입 연도부터 현재까지를 모두 읽습니다. 반면 매일 자정 배치에서는 변동 가능성이 큰 **현재 연도만 다시 조회**하고, 이전 연도 데이터는 기준선 로그와 합칩니다.
 
@@ -212,7 +212,7 @@ GitHubAllActivitiesResponse aggregatedResponse = queries
 
 까지 포함한 **수집 전략의 재설계**였습니다.
 
-# 4. 동적 응답 매핑도 중요한 설계 포인트였다
+## 4. 동적 응답 매핑도 중요한 설계 포인트였다
 
 ![mapping](https://i.imgur.com/sr3qYNf.png)
 
@@ -252,11 +252,11 @@ public static class Data {
 
 > GraphQL 전환에서 까다로웠던 부분은 쿼리 문법이 아니라, "쪼개서 받은 응답을 어떻게 다시 하나의 사용자 활동으로 복원할 것인가"였다.
 
-# 5. GraphQL 전환은 곧 운영 코드의 시작이었다
+## 5. GraphQL 전환은 곧 운영 코드의 시작이었다
 
 현재 저장소를 읽어보면 GraphQL 수집기는 단순한 API 호출 코드가 아닙니다. 비용, 잔량, 실패, 토큰 회전까지 같이 다룹니다. 즉, 이 단계부터는 "개발 편의"보다 **운영 안정성**이 더 중요한 문제로 올라옵니다.
 
-## 5.1 비용과 토큰 상태를 함께 추적한다
+### 5.1 비용과 토큰 상태를 함께 추적한다
 
 `GitHubGraphQLClient`는 응답에 포함된 `rateLimit` 정보를 읽어 `GitHubApiMetrics`와 `GitHubTokenPool`에 기록합니다.
 
@@ -271,7 +271,7 @@ private void recordRateLimitInfo(String accessToken, GitHubRateLimitInfo rateLim
 
 즉, Git Ranker는 GraphQL 전환 이후부터 "한 토큰으로 계속 호출한다"가 아니라, **남은 예산을 보며 토큰 상태를 관리하는 구조**를 갖게 됐습니다.
 
-## 5.2 안전선 아래로 내려가면 바로 멈춘다
+### 5.2 안전선 아래로 내려가면 바로 멈춘다
 
 이 구현에서 단순히 `remaining`을 기록만 하지 않습니다. 현재 코드는 `SAFE_REMAINING_THRESHOLD = 50` 아래로 내려가면 경고 로그를 남기고 `GitHubRateLimitException`을 던집니다.
 
@@ -286,7 +286,7 @@ private void checkRateLimitSafety(int remaining, LocalDateTime resetAt) {
 
 이 선택은 "마지막 한도까지 끝까지 쓰자"보다 "안전하게 멈추고 다음 기회를 기다리자"에 가깝습니다. 배치나 수동 갱신처럼 사용자 수가 많은 경로에서는 이런 보수적인 판단이 오히려 전체 시스템 안정성에 유리합니다.
 
-## 5.3 실패도 그냥 던지지 않고 의미를 나눈다
+### 5.3 실패도 그냥 던지지 않고 의미를 나눈다
 
 에러 처리 계층도 함께 들어왔습니다.
 
@@ -298,7 +298,7 @@ private void checkRateLimitSafety(int remaining, LocalDateTime resetAt) {
 
 결국 GraphQL 전환은 단순히 더 예쁜 쿼리를 쓰는 문제가 아니었습니다. **GitHub API를 외부 의존성으로 취급하고, 그 비용과 실패를 시스템적으로 다루기 시작한 시점**에 더 가까웠습니다.
 
-# 6. 그래서 무엇이 좋아졌고, 무엇이 더 복잡해졌을까
+## 6. 그래서 무엇이 좋아졌고, 무엇이 더 복잡해졌을까
 
 현재 구현을 기준으로 보면, GraphQL 전환의 장점과 비용은 꽤 분명합니다.
 
@@ -311,7 +311,7 @@ private void checkRateLimitSafety(int remaining, LocalDateTime resetAt) {
 
 즉, GraphQL은 만능 해법이 아니었습니다. 다만 Git Ranker에는 훨씬 더 적합한 해법이었습니다. Search API가 "활동별 count 집계"라는 문제 정의를 만들어줬다면, GraphQL은 그 문제를 **운영 가능한 구조로 확장**하게 해줬습니다.
 
-# 7. 정리
+## 7. 정리
 
 이번 전환에서 가장 크게 배운 점은, 좋은 수집 구조는 단순히 "데이터를 가져오는 코드"가 아니라는 사실이었습니다.
 

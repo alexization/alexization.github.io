@@ -20,11 +20,11 @@ date: 2025-09-17
 last_modified_at: 2025-09-19
 ---
 {% raw %}
-# 입력받고 출력하기
+## 입력받고 출력하기
 
-## 1. Scanner VS BufferedReader 선택 기준
+### 1. Scanner VS BufferedReader 선택 기준
 
-### Scanner
+#### Scanner
 
 > 입력이 간단하고 데이터가 적을 때 사용 (10,000개 이하)
 >
@@ -40,7 +40,7 @@ String word = sc.next();        // 공백 전까지 문자열
 String line = sc.nextLine();    // 한 줄 전체
 ```
 
-### BufferedReader
+#### BufferedReader
 
 > 대량의 데이터(100,000 개 이상) 또는 시간 제한이 엄격한 경우 사용
 >
@@ -63,9 +63,9 @@ for(int i = 0; i < n; i++) {
 }
 ```
 
-## 2. 2차원 배열 입력 패턴
+### 2. 2차원 배열 입력 패턴
 
-### 공백으로 구분된 숫자
+#### 공백으로 구분된 숫자
 
 ```java
 // 3 4
@@ -91,7 +91,7 @@ for(int i = 0; i < n; i++) {
 }
 ```
 
-### 붙어있는 숫자
+#### 붙어있는 숫자
 
 ```java
 // 3 4
@@ -114,7 +114,7 @@ for(int i = 0; i < n; i++) {
 }
 ```
 
-### 문자 배열
+#### 문자 배열
 
 ```java
 // ###.
@@ -132,15 +132,15 @@ for(int i = 0; i < n; i++) {
 }
 ```
 
-## 3. 출력 최적화
+### 3. 출력 최적화
 
-### System.out.println
+#### System.out.println
 
 > 출력이 적을 때 사용 (1,000개 이하)
 >
 > - 매 출력마다 flush 발생으로 느림
 
-### StringBuilder
+#### StringBuilder
 
 > 대량 출력시(10,000개 이상) 사용
 >
@@ -154,7 +154,7 @@ for(int i = 0; i < n; i++) {
 System.out.print(sb);
 ```
 
-### BufferedWriter
+#### BufferedWriter
 
 > 매우 많은 출력이 필요한 경우 사용
 >
@@ -173,11 +173,11 @@ bw.close();
 
 ---
 
-# 자료구조
+## 자료구조
 
-## 1. 배열과 리스트
+### 1. 배열과 리스트
 
-### 배열 (Array)
+#### 배열 (Array)
 
 > 크기 고정, 인덱스로 빠른 접근 가능
 >
@@ -209,7 +209,7 @@ jagged[1] = new int[3];
 jagged[2] = new int[1];
 ```
 
-### ArrayList
+#### ArrayList
 
 > 동적 크기 조정이 가능하며, 내부적으로는 배열을 사용
 >
@@ -249,9 +249,9 @@ graph.get(0).add(1);  // 0번 노드에 1번 노드 연결
 graph.get(0).add(2);  // 0번 노드에 2번 노드 연결
 ```
 
-## 2. Stack과 Queue
+### 2. Stack과 Queue
 
-### Stack (LIFO - 후입선출)
+#### Stack (LIFO - 후입선출)
 
 ```java
 Stack<Integer> stack = new Stack<>();
@@ -270,7 +270,7 @@ stack2.push(1);           // addFirst()와 동일
 int top2 = stack2.pop();  // removeFirst()와 동일
 ```
 
-### Queue (FIFO - 선입선출)
+#### Queue (FIFO - 선입선출)
 
 ```java
 Queue<Integer> queue = new LinkedList<>();
@@ -283,7 +283,7 @@ int size = queue.size();
 boolean empty = queue.isEmpty();
 ```
 
-### Deque (Double-ended Queue)
+#### Deque (Double-ended Queue)
 
 > 양쪽 끝에서 삽입/삭제가 가능하며, `ArrayDeque` 구현체를 권장한다. (`LinkedList` 보다 빠름)
 >
@@ -306,7 +306,7 @@ int first = deque.pollFirst();   // 앞에서 제거, 없으면 null
 int last = deque.pollLast();     // 뒤에서 제거, 없으면 null
 ```
 
-## 3. 우선순위 큐 (Priority Queue / Heap)
+### 3. 우선순위 큐 (Priority Queue / Heap)
 
 > 우선순위가 높은 원소부터 제거
 >
@@ -368,9 +368,9 @@ pq.clear();              // 모두 제거 O(n)
 pq.contains(2);          // 포함 여부 확인 O(n)
 ```
 
-## 4. Map과 Set
+### 4. Map과 Set
 
-### HashMap
+#### HashMap
 
 > Key-Value 쌍, 순서를 보장하지 않으며 `null` 허용
 >
@@ -408,7 +408,7 @@ for(String key : map.keySet()) { ... }
 for(int value : map.values()) { ... }
 ```
 
-### TreeMap
+#### TreeMap
 
 > Red-Black Tree, Key 기준으로 정렬하며, `null` 키는 불가능하다.
 >
@@ -433,7 +433,7 @@ treeMap.higherKey(3);    // 3보다 큰 첫 키
 treeMap.lowerKey(3)      // 3보다 작은 마지막 키
 ```
 
-### HashSet
+#### HashSet
 
 > 중복을 허용하지 않으며, 순서도 보장하지 않는다.
 >
@@ -465,7 +465,7 @@ set1.retainAll(set2);        // {2, 3}
 set1.removeAll(set2);        // {1}
 ```
 
-### TreeSet
+#### TreeSet
 
 > Red-Black Tree, 정렬된 Set
 >
@@ -488,9 +488,9 @@ treeSet.floor(2);   // 2 이하인 마지막 원소, 2
 
 ---
 
-# 문자열 처리
+## 문자열 처리
 
-## 1. 문자열 기본 조작
+### 1. 문자열 기본 조작
 
 > `String` 은 불변(immutable) 객체이므로 문자열 열결 시 새로운 객체를 생성한다.
 >
@@ -530,7 +530,7 @@ String replaced = str.replace("World", "Java");    // "Hello Java"
 String replacedAll = str.replaceAll("[0-9]", "");  // 정규 표현식 활용
 ```
 
-## 2. 문자열 분리와 결합
+### 2. 문자열 분리와 결합
 
 ```java
 // split
@@ -567,7 +567,7 @@ String result2 = new StringBuilder()
     .toString();
 ```
 
-## 3. 문자와 숫자 변환
+### 3. 문자와 숫자 변환
 
 ```java
 // 문자 <-> 숫자
@@ -601,7 +601,7 @@ int fromBinary = Integer.parseInt("1010", 2);  // 10
 int fromHex = Integer.parseInt("FF", 16);      // 255
 ```
 
-## 4. 문자 판별과 처리
+### 4. 문자 판별과 처리
 
 ```java
 char ch = 'A';
@@ -623,7 +623,7 @@ String fromChars = new String(chars);         // "hello"
 String fromChars2 = String.valueOf(chars);    // "hello"
 ```
 
-## 5. 정규표현식
+### 5. 정규표현식
 
 ```java
 String text = "abc123DEF456";
@@ -652,11 +652,11 @@ boolean isEmail = "test@test.com".matches(".*@.*\\..*"); // true
 
 ---
 
-# 배열 다루기
+## 배열 다루기
 
-## 1. 배열 복사
+### 1. 배열 복사
 
-### 1차원 배열 깊은 복사
+#### 1차원 배열 깊은 복사
 
 ```java
 int[] original = {1, 2, 3, 4, 5};
@@ -677,7 +677,7 @@ int[] copy5 = new int[original.length];
 System.arraycopy(original, 0, copy5, 0, original.length);
 ```
 
-### 2차원 배열 깊은 복사
+#### 2차원 배열 깊은 복사
 
 ```java
 int[][] matrix = {{1, 2}, {3, 4}, {5, 6}};
@@ -697,9 +697,9 @@ for(int i = 0; i < matrix.legnth; i++) {
 }
 ```
 
-## 2. 컬렉션 변환
+### 2. 컬렉션 변환
 
-### List ↔ Array
+#### List ↔ Array
 
 ```java
 // List -> Array
@@ -714,7 +714,7 @@ List<Integer> list2 = Arrays.asList(array);                  // 고정 크기 (�
 List<Integer> list3 = new ArrayList<>(Arrays.asList(array)); // 수정 가능
 ```
 
-### int[] ↔ List<Integer>
+#### int[] ↔ List<Integer>
 
 ```java
 Integer[] intArr = {1, 2, 3};
@@ -731,7 +731,7 @@ for(int i = 0; i < intList2.size(); i++) {
 }
 ```
 
-### Set ↔ List
+#### Set ↔ List
 
 ```java
 // List -> Set (중복 제거)
@@ -745,11 +745,11 @@ List<Integer> listFromSet = new ArrayList<>(set2);
 
 ---
 
-# 정렬과 탐색
+## 정렬과 탐색
 
-## 1. 정렬
+### 1. 정렬
 
-### 1차원 배열 정렬
+#### 1차원 배열 정렬
 
 ```java
 int[] arr = {3, 1, 4, 1, 5};
@@ -763,7 +763,7 @@ Integer[] arrInteger = {3, 1, 4, 1, 5};
 Arrays.sort(arrInteger, Collections.reverseOrder());
 ```
 
-### 2차원 배열 정렬
+#### 2차원 배열 정렬
 
 ```java
 int[][] points = {{3,5}, {1,2}, {4,1}, {1,3}};
@@ -780,7 +780,7 @@ Arrays.sort(points, new Comparator<int[]>() {
 // 결과 : [[1,2], [1,3], [3,5], [4,1]]
 ```
 
-### 리스트 정렬
+#### 리스트 정렬
 
 ```java
 List<Integer> list = new ArrayList<>(Arrays.asList(3,1,4,1,5));
@@ -814,7 +814,7 @@ Collections.sort(people, new Comparator<Person>() {
 });
 ```
 
-### 문자열 정렬
+#### 문자열 정렬
 
 ```java
 String[] words = {"banana", "apple", "cherry"};
@@ -832,12 +832,12 @@ Arrays.sort(words, new Comparator<String>() {
 });
 ```
 
-## 2. 이진 탐색 (Binary Search)
+### 2. 이진 탐색 (Binary Search)
 
 > 정렬된 배열/리스트에서 사용가능하며, O(log n)의 시간복잡도를 가짐
 >
 
-### 배열과 리스트에서 이진 탐색
+#### 배열과 리스트에서 이진 탐색
 
 ```java
 // 배열에서 이진 탐색
@@ -852,7 +852,7 @@ List<Integer> list = Arrays.asList(1, 3, 5, 7, 9);
 int idx = Collections.binarySearch(list, 5);         // 2 반환
 ```
 
-### 기본 이진 탐색
+#### 기본 이진 탐색
 
 ```java
 public int binarySearch(int[] arr, int target, int left, int right) {
@@ -871,7 +871,7 @@ public int binarySearch(int[] arr, int target, int left, int right) {
 }
 ```
 
-### Lower Bound & Upper Bound
+#### Lower Bound & Upper Bound
 
 ```java
 // Lower Bound (target 이상인 첫 위치)
@@ -912,9 +912,9 @@ int count = upperBound(arr, target) - lowerBound(arr, target);
 
 ---
 
-# 수학과 비트 연산
+## 수학과 비트 연산
 
-## 1. 기본 수학 연산
+### 1. 기본 수학 연산
 
 ```java
 // 절댓값, 최대/최소
@@ -936,9 +936,9 @@ double log = Math.log(Math.E);    // 1.0 (자연로그)
 double log10 = Math.log10(100);   // 2.0 (상용로그)
 ```
 
-## 2. 최대공약수와 최소공배수
+### 2. 최대공약수와 최소공배수
 
-### 최대공약수 (Greatest Common Divisor)
+#### 최대공약수 (Greatest Common Divisor)
 
 ```java
 // 유클리드 호제법
@@ -966,7 +966,7 @@ public int gcdMultiple(int[] arr) {
 }
 ```
 
-### 최소공배수 (Least Common Multiple)
+#### 최소공배수 (Least Common Multiple)
 
 ```java
 public int lcm(int a, int b) {
@@ -983,9 +983,9 @@ public int lcmMultiple(int[] arr) {
 }
 ```
 
-## 3. 소수 판별과 에라토스테네스의 체
+### 3. 소수 판별과 에라토스테네스의 체
 
-### 단일 소수 판별 O(√n)
+#### 단일 소수 판별 O(√n)
 
 ```java
 public boolean isPrime(int n) {
@@ -998,7 +998,7 @@ public boolean isPrime(int n) {
 }
 ```
 
-### 에라토스테네스의 체
+#### 에라토스테네스의 체
 
 > 범위 내 모든 소수 구하기
 >
@@ -1023,7 +1023,7 @@ public boolean[] sieveOfEratosthenes(int n) {
 }
 ```
 
-### 소인수분해
+#### 소인수분해
 
 ```java
 public List<Integer> primeFactorization(int n) {
@@ -1041,9 +1041,9 @@ public List<Integer> primeFactorization(int n) {
 }
 ```
 
-## 4. 비트 연산
+### 4. 비트 연산
 
-### 기본 비트 연산
+#### 기본 비트 연산
 
 ```java
 int a = 5;         // 0101
@@ -1055,7 +1055,7 @@ int xor = a ^ b;   // 0110 = 6 (XOR)
 int not = ~a;      // 1111 .... 1010 = -6 (NOT)
 ```
 
-### 시프트 연산
+#### 시프트 연산
 
 ```java
 int left = a << 1;            // 1010 = 10 (왼쪽 시프트, *2)
@@ -1063,7 +1063,7 @@ int right = a >> 1;           // 0010 = 2 (오른쪽 시프트, /2)
 int unsignedRight = a >>> 1;  // 부호 없는 오른쪽 시프트
 ```
 
-### 비트 마스킹
+#### 비트 마스킹
 
 ```java
 int num = 0b1010;                // 10
@@ -1085,7 +1085,7 @@ int clearRightmost = n & (n - 1);                    // 가장 오른쪽 1을 0�
 int isolateRightmost = n & -n;                       // 가장 오른쪽 1만 남기기
 ```
 
-### 부분집합 생성
+#### 부분집합 생성
 
 ```java
 int[] elements = {1, 2, 3};
@@ -1106,14 +1106,14 @@ for(int mask = 0; mask < (1 << n); mask++) {
 
 ---
 
-# 순열과 조합
+## 순열과 조합
 
-## 1. 순열 (Permutation)
+### 1. 순열 (Permutation)
 
 > 순서가 있는 선택, nPr = n! / (n-r)!
 >
 
-### 순열
+#### 순열
 
 ```java
 public void permutation(int[] arr, boolean[] visited, int[] output, int depth, int n, int r) {
@@ -1143,7 +1143,7 @@ int[] output = new int[2];
 permutation(arr, visited, output, 0, 3, 2);
 ```
 
-### 중복 순열
+#### 중복 순열
 
 ```java
 public void permutationWithRep(int[] arr, int[] output, int depth, int n, int r) {
@@ -1162,12 +1162,12 @@ public void permutationWithRep(int[] arr, int[] output, int depth, int n, int r)
 }
 ```
 
-## 2. 조합 (Combination)
+### 2. 조합 (Combination)
 
 > 순서가 없는 선택, nCr = n! / (r! * (n-r)!)
 >
 
-### 조합
+#### 조합
 
 ```java
 public void combination(int[] arr, int[] output, int start, int depth, int n, int r) {
@@ -1186,7 +1186,7 @@ public void combination(int[] arr, int[] output, int start, int depth, int n, in
 }
 ```
 
-### 중복 조합
+#### 중복 조합
 
 ```java
 public void combinationWithRep(int[] arr, int[] output, int start, int depth, int n, int r) {
@@ -1205,7 +1205,7 @@ public void combinationWithRep(int[] arr, int[] output, int start, int depth, in
 }
 ```
 
-### 조합 수 계산
+#### 조합 수 계산
 
 ```java
 public long combination(int n, int r) {
