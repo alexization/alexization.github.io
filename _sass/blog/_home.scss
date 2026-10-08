@@ -1,0 +1,239 @@
+@use "tokens" as *;
+
+// 홈 맨 위 프로필
+.profile {
+  margin-top: 64px;
+  text-align: center;
+}
+
+.profile__avatar {
+  display: block;
+  width: 96px;
+  height: 96px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: var(--surface-gray);
+  object-fit: cover;
+}
+
+.profile__name {
+  margin: 16px 0 0;
+  color: var(--text-heading);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.profile__bio {
+  margin: 4px 0 0;
+  color: var(--text-sub);
+  font-size: 15px;
+  line-height: 1.6;
+  word-break: keep-all;
+}
+
+.profile__links {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+  line-height: 1.6;
+
+  a {
+    display: inline-block;
+    padding: 2px 0;
+    color: var(--text-sub);
+    font-weight: 500;
+    text-underline-offset: 3px;
+
+    &:hover {
+      color: var(--text-heading);
+    }
+  }
+}
+
+// 글 목록
+.posts {
+  margin-top: 48px;
+}
+
+.post-list {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+// 글 카드. 기본은 가로형(썸네일 왼쪽 200px), --featured는 최신 글 큰 카드
+.entry {
+  position: relative;
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  transition: border-color .2s ease-out;
+
+  &:has(.entry__link:hover) {
+    border-color: var(--line-table);
+  }
+}
+
+// 썸네일은 카드 높이만큼 꽉 채움. 그림이 카드 높이를 늘리지 않게 칸 안에 띄움
+.entry__thumb {
+  position: relative;
+  background: linear-gradient(135deg, var(--green), var(--green-soft));
+
+  img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.entry__body {
+  padding: 16px 20px;
+}
+
+.entry__title {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: var(--text-heading);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+// 제목 링크를 카드 전체로 늘림. 칩만 그 위에서 따로 눌림
+.entry__link {
+  color: inherit;
+  text-decoration: none;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  &:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
+
+.entry__excerpt {
+  display: -webkit-box;
+  margin: 4px 0 0;
+  overflow: hidden;
+  color: var(--text-sub);
+  font-size: 14px;
+  line-height: 1.6;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+// 날짜·읽기 시간 왼쪽, 칩 오른쪽. 좁으면 칩이 다음 줄로
+.entry__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin-top: 8px;
+}
+
+.entry__meta {
+  margin: 0;
+  color: var(--text-sub);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.entry__chips {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+// 최신 글 큰 카드: 16:9 이미지 위 + 글 아래. 제목은 자르지 않음
+.entry--featured {
+  display: block;
+
+  .entry__thumb {
+    aspect-ratio: 16 / 9;
+  }
+
+  .entry__body {
+    padding: 20px 24px;
+  }
+
+  .entry__title {
+    display: block;
+    font-size: 20.8px;
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  .entry__excerpt {
+    margin-top: 8px;
+    font-size: 15px;
+    line-height: 1.7;
+    -webkit-line-clamp: 3;
+  }
+
+  .entry__foot {
+    margin-top: 12px;
+  }
+}
+
+// 키보드 포커스는 카드 전체에. :has가 없으면 제목 링크 기본 포커스가 그대로 보임
+@supports selector(:has(*)) {
+  .entry:has(.entry__link:focus-visible) {
+    outline: 2px solid var(--green);
+    outline-offset: 2px;
+  }
+
+  .entry__link:focus-visible {
+    outline: none;
+  }
+}
+
+@media (max-width: $mobile) {
+  .profile {
+    margin-top: 40px;
+  }
+
+  // 모든 카드 세로형: 이미지 위 전체 폭 16:9 + 글 아래
+  .entry {
+    display: block;
+  }
+
+  .entry__thumb {
+    aspect-ratio: 16 / 9;
+  }
+
+  // 제목 2줄 자르기는 가로형 규칙. 세로형은 폭이 좁아서 제목 전체를 보여 줌
+  .entry__title {
+    display: block;
+  }
+
+  .entry--featured .entry__body,
+  .entry__body {
+    padding: 16px 20px;
+  }
+}

@@ -1,0 +1,9 @@
+{%- comment -%}
+  읽는 시간 계산은 여기 한 곳에서만 함. 단어 수 ÷ site.words_per_minute, 내림, 최소 1분.
+  홈은 페이지라 글보다 나중에 그려져서 post.content가 늘 변환된 HTML임. 옛 테마는 화면에 따라
+  마크다운 원문을 세기도 하고 HTML을 세기도 해서 같은 글이 1분씩 달랐음(E15).
+{%- endcomment -%}
+{%- assign read_words = include.post.content | strip_html | number_of_words -%}
+{%- assign read_minutes = read_words | divided_by: site.words_per_minute -%}
+{%- if read_minutes < 1 %}{% assign read_minutes = 1 %}{% endif -%}
+{{ read_minutes }}분 소요
