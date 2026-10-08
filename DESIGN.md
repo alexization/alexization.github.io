@@ -59,6 +59,11 @@ typography:
     fontSize: "15px"
     fontWeight: 500
     lineHeight: 1.6
+  small:
+    fontFamily: "Pretendard Variable, Pretendard, sans-serif"
+    fontSize: "14px"
+    fontWeight: 400
+    lineHeight: 1.6
   meta:
     fontFamily: "Pretendard Variable, Pretendard, sans-serif"
     fontSize: "13px"
@@ -162,6 +167,37 @@ components:
     padding: "16px 20px"
   post-card-thumb:
     rounded: "{rounded.md}"
+  post-entry-featured:
+    textColor: "{colors.text-heading}"
+    typography: "{typography.title-md}"
+    rounded: "{rounded.lg}"
+    padding: "20px 24px"
+  post-entry:
+    textColor: "{colors.text-heading}"
+    rounded: "{rounded.lg}"
+    padding: "16px 20px"
+  post-entry-thumb:
+    width: "200px"
+  post-entry-excerpt:
+    textColor: "{colors.text-sub}"
+    typography: "{typography.small}"
+  post-entry-meta:
+    textColor: "{colors.text-sub}"
+    typography: "{typography.meta}"
+  profile-avatar:
+    rounded: "{rounded.circle}"
+    size: "96px"
+  profile-name:
+    textColor: "{colors.text-heading}"
+    typography: "{typography.title-sm}"
+  profile-bio:
+    textColor: "{colors.text-sub}"
+  profile-link:
+    textColor: "{colors.text-sub}"
+    typography: "{typography.small}"
+    padding: "2px 0"
+  profile-link-hover:
+    textColor: "{colors.text-heading}"
   search-dialog:
     backgroundColor: "{colors.bg}"
     textColor: "{colors.text-body}"
@@ -258,6 +294,7 @@ components:
 - **코드 창:** 본문 칸의 95% 폭, 가운데, 위아래 32px. 480px 이하에서 폭 100%, 둥글기 0.
 - **TOC:** 1401px 이상에서만. 본문 칸 오른쪽 밖 20px, 폭 250px, 본문 첫 줄 높이에서 시작해 위 32px에 sticky. 최대 높이 80vh, 넘치면 안쪽 스크롤. 1400px 이하에는 TOC가 없습니다.
 - **글 끝 그리드:** 이전/다음은 2열(간격 16px), 관련 글 카드는 2열(세로 32px, 가로 24px). 768px 이하에서 둘 다 1열.
+- **홈 세로 리듬:** 헤더 → 프로필 64px(모바일 40px) → 글 목록 48px → 카드 사이 16px. 카드는 1열이고 715px 칸 폭을 그대로 씁니다. 모든 글이 최신순으로 한 페이지에 이어집니다(페이지 나누기 없음).
 - **헤더:** 데스크톱은 로고 왼쪽, 메뉴 4개 + 돋보기 오른쪽 한 줄. 768px 이하에서는 로고 한 줄 + 메뉴·돋보기 한 줄. 햄버거 없음. 메뉴 첫 글자와 돋보기 그림은 음수 여백으로 칸 끝에 맞춥니다.
 - **화면 구분:** 모바일 768px 이하, 코드 480px 이하, TOC 1401px 이상.
 
@@ -324,6 +361,11 @@ components:
 - **이전/다음 카드:** 흰 바탕, 1px 연선, 12px 둥글기, 안쪽 16px 20px. "이전 글/다음 글" 13px 보조 회색 + 제목 15px/600 먹색 두 줄까지. hover에 테두리가 표 선 색으로 짙어지고 제목에 밑줄. 다음 글은 오른쪽 열, 오른쪽 정렬(모바일은 왼쪽).
 - **글 카드 (관련 글, 홈에서 다시 씀):** 테두리 없음. 16:9 썸네일(8px 둥글기, 없으면 숲 녹색 → 부드러운 잎 녹색 135deg 그라데이션, 안에 글자 없음) + 제목 16px/600 먹색 두 줄 + 날짜 13px 보조 회색. hover에 제목 밑줄.
 - **작성자 카드:** 테두리 없음. 72px 원형 아바타 + 이름 16px/700 + 소개 14px + 링크 14px/500.
+- **최신 글 카드 (홈 맨 위 한 장):** 1px 연선, 12px 둥글기, 그림자 없음. 16:9 이미지가 카드 위에 여백 없이 붙고, 위 모서리는 카드 둥글기로 잘립니다. 아래 안쪽 20px 24px. 제목 20.8px/700 먹색, 줄간격 1.35, 자르지 않음. 발췌 15px 보조 회색, 줄간격 1.7, 세 줄까지(제목 아래 8px). 날짜 · "N분 소요" 13px 보조 회색(발췌 아래 12px). 칩과 배지 없음.
+- **가로형 글 카드 (홈 나머지 글):** 1px 연선, 12px 둥글기, 그림자 없음. 왼쪽 200px 썸네일이 카드 높이만큼 꽉 찹니다. 썸네일은 자기 둥글기가 없고 카드 둥글기로 모서리가 잘립니다. 그림이 카드 높이를 늘리지 않고 글 높이를 따라갑니다. 오른쪽 안쪽 16px 20px에 제목 16px/600 먹색(줄간격 1.5, 두 줄까지) + 발췌 14px 보조 회색(줄간격 1.6, 두 줄까지, 제목 아래 4px). 8px 아래 한 줄에 왼쪽 날짜 · "N분 소요" 13px 보조 회색, 오른쪽 카테고리 칩(간격 8px). 좁으면 칩이 다음 줄로 내려갑니다.
+- **홈 카드 공통 동작:** 제목 링크를 카드 전체로 늘려서 카드 어디를 눌러도 글로 갑니다. 칩만 그 위에 올라와 따로 눌립니다. hover에 테두리가 표 선 색으로 짙어지고(0.2초 ease-out) 제목에 밑줄(3px 띄움). 키보드 포커스는 카드 전체에 2px 숲 녹색 outline(2px 띄움). `:has()`가 없는 브라우저에서는 제목 링크 자체 포커스가 보입니다. 썸네일 없는 글은 글 카드와 같은 숲 녹색 → 부드러운 잎 녹색 135deg 그라데이션.
+- **홈 카드 768px 이하:** 모든 카드가 세로형. 16:9 이미지가 위에 전체 폭으로, 글이 아래로 옵니다. 안쪽은 둘 다 16px 20px. 가로형 제목도 자르지 않고 다 보여 줍니다. 발췌는 그대로 두 줄(최신 글은 세 줄).
+- **홈 프로필:** 테두리 없음, 가운데 정렬. 96px 원형 아바타(그림 전에는 회색 면) → 16px 아래 이름 20px/700 먹색 → 4px 아래 소개 15px/400 보조 회색 → 8px 아래 링크 14px/500 보조 회색(간격 16px), hover에 먹색. 메일 말고 다른 링크(GitHub)는 `rel="me"`. 위치 정보는 넣지 않습니다.
 
 ### 검색 창
 - **창:** `<dialog>`, 폭 min(560px, 100% - 32px), 위 12vh(모바일 16px), 흰 바탕, 12px 둥글기, 떠 있는 창 그림자. 뒤는 흐림.
