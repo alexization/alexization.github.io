@@ -190,6 +190,58 @@ main에서 `deploy-actions` 브랜치를 따서 작업해.
 - 데스크톱·모바일 스크린샷으로 확인해.
 ```
 
+## 8.5. 옛 테마 파일 정리
+
+```
+`redesign` 브랜치에서 옛 Minimal Mistakes 테마 파일을 정리해줘. 8단계까지 모든 페이지가 새 셸(`_layouts/base.html`)로 바뀌었어. 이제 `docs/redesign/00-inventory.md` 4절의 "테마 파일은 마지막에 한꺼번에 지우기"를 할 차례야. 화면은 하나도 바뀌면 안 돼.
+
+0. 지우기 전에 기준 빌드부터 해: `JEKYLL_ENV=production bundle exec jekyll build -d <레포 밖 폴더 A>`
+
+1. 남길 것 (새 레이아웃이 실제로 쓰는 것)
+   - `_layouts`: base, post, page, taxonomy, categories, tags, redirect
+   - `_includes`: `blog/` 폴더 전체, `seo.html`, `structured-data.html`, `analytics.html`, `analytics-providers/`, `toc.html`
+   - `_sass/blog/`, `assets/css/blog.scss`, `assets/js/blog.js`
+   - `assets/js/lunr/lunr.min.js`, `assets/js/lunr/lunr-store.js` (검색 모달이 씀)
+   - `_data/navigation.yml`, `_data/ui-text.yml` (헤더·푸터·seo가 읽음)
+   - `assets/images/`, 파비콘·`site.webmanifest`, `robots.txt`, `google167226cfabb37bdd.html`, `.github/`, `.codex/`, `docs/`
+   - `LICENSE`: 남겨. 위에서 남기는 `seo.html`, `toc.html`, `lunr-store.js` 등이 MM(MIT 라이선스) 코드에서 온 거라 저작권 고지가 있어야 해.
+
+2. 지울 것: 하나씩 지우기 전에, 남는 파일 어디서도 안 쓰는지 grep으로 확인해.
+   - `_layouts`: 위 7개 말고 전부 (single, home, archive, default, compress 등 12개)
+   - `_includes`: 위에서 남길 것 말고 전부. 헷갈리기 쉬운 것:
+     - `toc`(확장자 없음, C09 죽은 코드)는 지우고 `toc.html`은 남겨.
+     - `comments-providers/giscus.html`과 `assets/js/_main.js`는 브리프에 "옮겨 쓸 것"으로 적혀 있지만, 7단계에서 이미 `blog/comments.html`, `blog.js`로 옮겼어. 원본은 지워도 돼.
+     - `head/custom.html`(C02 파비콘)도 `blog/head.html`로 옮겨져서 이제 안 써.
+   - `_sass/minimal-mistakes/`, `_sass/minimal-mistakes.scss`, `assets/css/main.scss`
+   - `assets/js/`: `main.min.js`, `main.min.js.map`, `plugins/`, `vendor/`, `lunr/lunr.js`, `lunr/lunr-en.js`, `lunr/lunr-gr.js`
+   - 루트: `minimal-mistakes-jekyll.gemspec`, `package.json`, `Rakefile`, `staticman.yml`
+
+3. Gemfile
+   - `gemspec` 줄을 지우고, jekyll과 플러그인 5개(jekyll-redirect-from, jekyll-sitemap, jekyll-gist, jekyll-feed, jekyll-include-cache)를 직접 적어. jekyll-paginate는 넣지 마.
+   - `bundle install` 후 `Gemfile.lock` diff를 확인해. 남는 gem은 버전이 하나도 안 바뀌어야 하고, 빠지는 것(jekyll-paginate, rake 등)만 있어야 해. PLATFORMS의 `x86_64-linux`도 남아 있어야 해(Actions 서버가 리눅스).
+   - `BUNDLE_FROZEN=true bundle install`이 통과하는지 확인해. Actions의 bundler-cache는 Gemfile과 lock이 안 맞으면 실패해.
+
+4. `_config.yml`
+   - 테마 전용 키는 남은 파일 어디서도 안 읽는 것만 지워. 테마 키처럼 보여도 새 코드가 읽는 게 있어. 예: `words_per_minute`(읽는 시간), `lunr`·`search_full_content`·`teaser`(lunr-store.js)
+   - Jekyll과 플러그인이 읽는 키(kramdown, sass, defaults, exclude, feed·sitemap 관련 등)는 템플릿에서 안 보여도 남겨.
+   - 애매하면 지우지 말고 목록으로 보고해.
+
+5. 푸터의 "Powered by Jekyll & Minimal Mistakes" 문구는 바꾸기 전에 나한테 물어봐. 7단계에서 "테마 지울 때 다시 물어봄"으로 미뤄 둔 항목이야.
+
+확인 방법:
+- 지운 뒤 같은 명령으로 폴더 B에 빌드해서 A와 비교해.
+  - HTML 45개는 바이트까지 같아야 해. 푸터 문구를 바꿨다면 그 줄만 달라도 돼.
+  - `feed.xml`은 맨 위 `<updated>` 생성 시각만 달라도 돼. 빌드할 때마다 바뀌는 값이야.
+  - 파일 목록은 안 쓰던 파일(`main.css`, `main.min.js`, `lunr-en.js`, `staticman.yml` 등)이 빠진 것 말고는 같아야 해.
+- 빌드 로그에 Sass deprecation 경고가 0건인지 확인해(E01·E02). faraday-retry 안내(E03)는 남아도 돼.
+- `bundle exec jekyll serve`로 홈, 글 하나, 검색 모달을 열어서 콘솔 에러가 없는지 확인해.
+- 이 정리로 해결된 E01·E02·E19는 `00-inventory.md`에 완료 표시를 해줘.
+
+중간에 막히거나 비교에서 예상 밖 차이가 나오면, 고치려 들지 말고 멈춰서 알려줘.
+```
+
+> 8단계 페이지가 다 바뀐 뒤, 9단계 전에. 그래야 10단계 optimize·polish가 안 쓰는 파일까지 분석하지 않고, 11단계 배포에도 안 실려 감. 화면 확인을 스크린샷 대신 빌드 결과 비교로 하는 이유: 연달아 두 번 빌드하면 `feed.xml` 생성 시각 한 줄만 다름. 그래서 HTML이 바이트까지 같으면 화면도 같음.
+
 ## 9. 남은 기능 버그
 
 ```
