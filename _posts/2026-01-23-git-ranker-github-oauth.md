@@ -4,6 +4,7 @@ header:
   og_image: "https://i.imgur.com/94i25FG.png"
 
 title: "[Git Ranker #9] GitHub OAuth를 붙였더니 점수가 흔들렸다"
+series: "Git Ranker"
 excerpt: "사용자 소유권 확인을 위해 OAuth를 도입했지만, 가입/수동 갱신과 배치가 서로 다른 토큰으로 GitHub를 조회하면서 점수 일관성이 깨졌다. 세션 기반 사용자 토큰 설계에서 Token Pool과 쿠키 구조를 정리해간 회고"
 
 categories:

@@ -4,6 +4,7 @@ header:
   og_image: "https://i.imgur.com/Czp68Om.png"
 
 title: "[Git Ranker #2] 작은 서비스에 Spring Batch를 붙여본 이유"
+series: "Git Ranker"
 excerpt: "사용자 수가 많지 않은 GitHub 랭킹 서비스에서, 단순 @Scheduled 대신 Spring Batch를 선택한 이유와 현재 배치 구조를 코드 기준으로 정리한다."
 categories:
   - Git Ranker

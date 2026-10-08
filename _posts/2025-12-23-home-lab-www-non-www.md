@@ -4,6 +4,7 @@ header:
   og_image: "https://i.imgur.com/uAdk7rY.png"
 
 title: "[Home Lab #4] 홈서버 도메인 정규화: Nginx, Certbot, DNS로 www/non-www 불일치 해결하기"
+series: "Home Lab"
 excerpt: "HTTPS를 붙인 뒤에도 `www` 유무에 따라 404와 인증서 범위 문제가 남았고, DNS, 인증서, Nginx 정책을 맞춰 대표 도메인으로 정규화한 과정"
 
 categories:

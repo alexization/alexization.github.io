@@ -4,6 +4,7 @@ header:
   og_image: "https://cdn.imgchest.com/files/4dfac6b76b0f.png"
 
 title: "[Git Ranker #10] 외국인도 참여할 수 있도록. 국제화(i18n) 구축기"
+series: "Git Ranker"
 excerpt: "운영 지표에서 한국어 사용자가 절대다수라는 사실을 확인한 뒤, Git Ranker를 외국인도 이해할 수 있는 서비스로 확장하기 위해 메시지 흐름을 국제화한 기록"
 
 categories:

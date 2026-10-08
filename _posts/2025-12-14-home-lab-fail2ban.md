@@ -4,6 +4,7 @@ header:
   og_image: "https://i.imgur.com/dxsH3Dq.png"
 
 title: "[Home Lab #2] SSH 무차별 대입 공격 방어하기: Fail2ban 설치 및 설정"
+series: "Home Lab"
 excerpt: "SSH 키 인증을 적용한 뒤에도 반복되던 접속 시도를 `auth.log`에서 확인하고, Fail2ban으로 자동 차단까지 구성한 과정을 정리했다."
 categories:
   - Home Lab

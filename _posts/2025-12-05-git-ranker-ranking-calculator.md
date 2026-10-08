@@ -4,6 +4,7 @@ header:
   og_image: "https://i.imgur.com/BwOufrv.png"
 
 title: "[Git Ranker #4] 순위 및 티어 계산 기능 구현"
+series: "Git Ranker"
 excerpt: "가입 직후에는 COUNT 쿼리로 즉시 순위를 계산하고, 전체 분포는 MySQL Window Function과 Spring Batch Tasklet으로 다시 맞췄다. 서비스 초기의 '1등인데도 낮은 티어' 문제를 하이브리드 티어 규칙으로 정리한 구현 기록"
 
 categories:

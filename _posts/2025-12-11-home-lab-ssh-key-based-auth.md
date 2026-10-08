@@ -4,6 +4,7 @@ header:
   og_image: "https://i.imgur.com/IW4hBSN.png"
 
 title: "[Home Lab #1] SSH 비밀번호 인증을 끄고 Ed25519 키 인증으로 전환하기"
+series: "Home Lab"
 excerpt: "인터넷에 노출된 홈서버 SSH를 비밀번호 인증에서 Ed25519 공개키 인증으로 전환하며, 왜 바꿔야 하는지와 Ubuntu 24.04에서 안전하게 적용하는 순서를 정리했다."
 categories:
   - Home Lab

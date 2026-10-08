@@ -31,6 +31,7 @@ logo                     : "/assets/images/logo.png" # path of logo image to dis
 masthead_title           : # overrides the website title displayed in the masthead, use " " for no title
 breadcrumbs              : # true, false (default)
 words_per_minute         : 200
+date_format              : "%Y.%m.%d"
 enable_copy_code_button  : true # true, false (default)
 copyright                : # "copyright" name, defaults to site.title
 copyright_url            : # "copyright" URL, defaults to site.url
@@ -38,16 +39,16 @@ comments:
   provider               : "giscus" # false (default), "disqus", "discourse", "facebook", "staticman", "staticman_v2", "utterances", "giscus", "custom"
   giscus:
     data-repo: "alexization/alexization.github.io"
-    data-repo-id: "R_kgDOPZzCig"
-    data-category: "Announcements"
-    data-category-id: "DIC_kwDOPZzCis4Ct4yS"
-    data-mapping: "pathname"
-    data-strict: "0"
-    data-reactions-enabled: "1"
-    data-emit-metadata: "0"
-    data-input-position: "bottom"
-    data-theme: "light"
-    data-lang: "ko"
+    repo_id: "R_kgDOPZzCig"
+    category_name: "Announcements"
+    category_id: "DIC_kwDOPZzCis4Ct4yS"
+    discussion_term: "pathname"
+    strict: "0"
+    reactions_enabled: "1"
+    emit_metadata: "0"
+    input_position: "bottom"
+    theme: "light"
+    lang: "ko"
     crossorigin: "anonymous"
   disqus:
     shortname            : # https://help.disqus.com/customer/portal/articles/466208-what-s-a-shortname-

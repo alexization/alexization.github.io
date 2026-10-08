@@ -4,6 +4,7 @@ header:
   og_image: "https://i.imgur.com/iUZlf1A.png"
 
 title: "[Git Ranker #5] 멱등성을 지키는 Spring Batch 일일 점수 갱신 설계"
+series: "Git Ranker"
 excerpt: "매일 자정 배치를 설계하면서 '어제 데이터만 더하는 방식'을 버리고, 현재는 기준선 + 올해 데이터 재조회 + GraphQL 비용 제어로 진화한 Git Ranker의 Spring Batch 구조를 정리한다."
 
 categories:

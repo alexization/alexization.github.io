@@ -4,6 +4,7 @@ header:
   og_image: "https://i.imgur.com/RdMrNEY.png"
 
 title: "[Git Ranker #1] 홈랩에서 운영을 배우기 위해, 왜 Git Ranker를 만들었나"
+series: "Git Ranker"
 excerpt: "미니 PC 홈랩에서 실제 운영 부담을 만들기 위해 GitHub 활동 랭킹 서비스 Git Ranker를 기획했다. 초기 아이디어가 OAuth, Spring Batch, GraphQL, 관측성 설계로 구체화된 이유를 정리한다."
 categories:
   - Home Lab

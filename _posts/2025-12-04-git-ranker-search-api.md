@@ -4,6 +4,7 @@ header:
   og_image: "https://i.imgur.com/ZmpV4bv.png"
 
 title: "[Git Ranker #3] GitHub 활동 수집에서 Events API 대신 Search API를 선택한 이유"
+series: "Git Ranker"
 excerpt: "최근 활동 타임라인을 주는 GitHub Events API가 랭킹 서비스에 맞지 않았던 이유와, Search API 기반 count 집계 방식으로 설계를 바꾼 과정"
 categories:
   - Git Ranker

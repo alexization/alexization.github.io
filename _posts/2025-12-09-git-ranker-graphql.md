@@ -4,6 +4,7 @@ header:
   og_image: "https://i.imgur.com/rtnuC2m.png"
 
 title: "[Git Ranker #6] GitHub Search API에서 GraphQL로 전환"
+series: "Git Ranker"
 excerpt: "Search API의 호출 수와 리뷰 데이터 한계를 넘기 위해 Git Ranker가 GraphQL 기반 연도별 병렬 조회 구조로 바뀐 과정과, 현재 구현이 1년 제약·동적 응답·비용 관리를 어떻게 다루는지 정리한다."
 categories:
   - Git Ranker

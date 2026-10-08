@@ -4,6 +4,7 @@ header:
    og_image: "https://cdn.imgchest.com/files/284059f0f012.png"
 
 title: "Redis Stream으로 개선한 선착순 이벤트 시스템 (2편)"
+series: "선착순 이벤트 시스템"
 excerpt: "Spring Boot + MySQL 구조의 성능 병목을 Redis Stream 비동기 처리로 해결하여 1,666 RPS 달성과 66% 성능 향상을 이룬 과정을 다룹니다."
 categories:
   - Backend

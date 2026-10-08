@@ -4,6 +4,7 @@ header:
   og_image: "https://i.imgur.com/LcsQMUX.png"
 
 title: "[Git Ranker #8] GitHub README 배지가 늦게 갱신되던 이유: Camo 프록시와 Cache-Control 설계"
+series: "Git Ranker"
 excerpt: "배지 API는 최신 SVG를 반환하는데 GitHub README는 이전 점수에 머물렀다. 원인은 SVG 렌더링이 아니라 GitHub 프록시 앞에서 비어 있던 캐시 계약이었고, Git Ranker는 `Cache-Control: max-age=3600, must-revalidate`로 지연과 부하의 경계를 다시 설계했다."
 
 categories:

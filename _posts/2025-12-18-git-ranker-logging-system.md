@@ -4,6 +4,7 @@ header:
   og_image: "https://i.imgur.com/Ngh0CIT.png"
 
 title: "[Git Ranker #7] 로그는 텍스트가 아니라 데이터다 : 관측 가능한 시스템 구축기"
+series: "Git Ranker"
 excerpt: "요청 단위 trace_id, 구조화 로그, 배치와 GitHub API 관측, Loki/Grafana 검색까지. Git Ranker가 로그를 운영 데이터로 바꾼 과정을 정리한다."
 categories:
   - Git Ranker

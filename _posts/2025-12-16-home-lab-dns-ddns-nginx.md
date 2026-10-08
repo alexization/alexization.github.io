@@ -4,6 +4,7 @@ header:
   og_image: "https://i.imgur.com/YkXdCAd.png"
 
 title: "[Home Lab #3] DNS, DDNS, Nginx로 홈서버에 도메인과 HTTPS 붙이기"
+series: "Home Lab"
 excerpt: "공인 IP와 포트 번호를 직접 노출하던 홈서버에 DNS, DDNS, Nginx, Let's Encrypt를 조합해 사람이 읽을 수 있는 도메인과 HTTPS 진입점을 만든 과정"
 categories:
   - Home Lab
