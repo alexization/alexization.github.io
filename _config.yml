@@ -186,6 +186,9 @@ exclude:
   - tmp
   - /docs # ignore Minimal Mistakes /docs
   - /test # ignore Minimal Mistakes /test
+  - PRODUCT.md
+  - DESIGN.md
+  - docs/redesign
 keep_files:
   - .git
   - .svn
