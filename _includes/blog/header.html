@@ -1,5 +1,8 @@
 <header class="site-header">
-  <a class="site-logo" href="{{ '/' | relative_url }}">{{ site.title }}</a>
+  <a class="site-logo" href="{{ '/' | relative_url }}">
+    <img class="site-logo__mark" src="{{ '/assets/images/logo.svg' | relative_url }}" width="32" height="32" alt="" aria-hidden="true">
+    <span>{{ site.title }}</span>
+  </a>
   <div class="site-header__nav">
     <nav aria-label="메인 메뉴">
       <ul class="site-nav">

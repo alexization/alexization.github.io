@@ -9,12 +9,21 @@
 }
 
 .site-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   color: var(--text-heading);
   font-size: 20px;
   font-weight: 700;
   line-height: 1.35;
   text-decoration: none;
   white-space: nowrap;
+}
+
+.site-logo__mark {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
 }
 
 .site-header__nav {
