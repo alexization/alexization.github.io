@@ -60,8 +60,10 @@
   margin-top: 48px;
 }
 
+// 열 폭을 칸에 묶음. auto 열이면 띄어쓰기 없는 긴 제목·발췌가 목록 전체를 칸 밖으로 넓힘
 .post-list {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
   margin: 0;
   padding: 0;

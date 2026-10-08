@@ -9,9 +9,8 @@
   color: var(--text-body);
   font-family: var(--font-mono);
   font-size: .85em;
+  // 줄 끝에서 끊긴 조각은 열린 모양(slice). clone은 끊긴 조각의 끝 테두리가 칸 밖으로 3~7px 나감
   overflow-wrap: anywhere;
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
 }
 
 // 표 칸에서 anywhere는 열을 너무 좁힘

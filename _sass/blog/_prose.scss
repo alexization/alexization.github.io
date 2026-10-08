@@ -186,6 +186,8 @@
   .table-scroll {
     margin: 24px 0;
     overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line-table) transparent;
   }
 
   table {
@@ -195,8 +197,10 @@
     font-variant-numeric: tabular-nums;
   }
 
+  // 칸 최소 폭: 없으면 keep-all 한글이 단어마다 줄을 바꿔서 폰에서 칸이 열 줄 넘게 길어짐. 넘치면 표만 가로 스크롤
   th,
   td {
+    min-width: 8em;
     padding: 8px;
     border: 1px solid var(--line-table);
     text-align: left;

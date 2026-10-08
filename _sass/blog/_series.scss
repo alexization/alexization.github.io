@@ -13,6 +13,8 @@
   font-size: 20px;
   font-weight: 700;
   line-height: 1.35;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 .series__list {

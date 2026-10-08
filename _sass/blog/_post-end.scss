@@ -42,6 +42,8 @@
   font-weight: 500;
   line-height: 1.5;
   text-decoration: none;
+  // 칸보다 긴 이름은 칩 안에서 줄바꿈 (anywhere라야 flex 안에서 칩이 줄어듦)
+  overflow-wrap: anywhere;
   transition: border-color .2s ease-out;
 
   &:hover {
