@@ -87,8 +87,8 @@
 
 | ID | 증상 | 재현 방법 | 추정 원인 | 관련 커스텀 | 심각도 |
 |---|---|---|---|---|---|
-| E01 | Sass `@import` deprecation 경고 2건 | `bundle exec jekyll build` | `assets/css/main.scss:25-26`의 `@import`. Dart Sass 3.0에서 `@import`가 없어지면 빌드가 실패함 | C05 | 중간 |
-| E02 | 숨겨진 Sass deprecation 경고 246건 (보이는 2건 포함 248건) | `sass: { quiet_deps: false }`만 적은 파일을 만들어 `bundle exec jekyll build --config _config.yml,<그 파일>` → 23건 출력 + "225 repetitive deprecation warnings omitted" | 대부분 테마에 딸린 susy·breakpoint(`_sass/minimal-mistakes/vendor`)와 `_mixins.scss`. 종류별 건수는 `deploy-migration.md` 표와 같음. f4e40c8의 `quiet_deps: true`로 가려 둔 상태 | 원본 테마 | 중간 |
+| E01 | Sass `@import` deprecation 경고 2건 | `bundle exec jekyll build` | `assets/css/main.scss:25-26`의 `@import`. Dart Sass 3.0에서 `@import`가 없어지면 빌드가 실패함 | C05 | 중간 → 완료 (8.5단계. `main.scss`와 테마 Sass를 지워서 0건) |
+| E02 | 숨겨진 Sass deprecation 경고 246건 (보이는 2건 포함 248건) | `sass: { quiet_deps: false }`만 적은 파일을 만들어 `bundle exec jekyll build --config _config.yml,<그 파일>` → 23건 출력 + "225 repetitive deprecation warnings omitted" | 대부분 테마에 딸린 susy·breakpoint(`_sass/minimal-mistakes/vendor`)와 `_mixins.scss`. 종류별 건수는 `deploy-migration.md` 표와 같음. f4e40c8의 `quiet_deps: true`로 가려 둔 상태 | 원본 테마 | 중간 → 완료 (8.5단계. 테마 Sass를 지워서 같은 재현 방법(`quiet_deps: false`)으로도 0건) |
 | E03 | `To use retry middleware with Faraday v2.0+, install faraday-retry gem` 안내 | 아무 빌드나 | jekyll-gist가 쓰는 octokit이 띄우는 안내. 빌드 결과엔 영향 없음 | — | 낮음 |
 
 ### 2-2. 브라우저 콘솔
@@ -121,7 +121,7 @@
 | E16 | "참고"(관련 글)에 관련 없는 최신 글이 나옴 | 아무 글 하단 "참고" 4개가 사이트 최신 글 4개와 같음 | Jekyll의 `related_posts`는 `--lsi` 없이 돌리면 그냥 최신 글을 줌. 원본 테마 동작 그대로 | 원본 테마 | 낮음 |
 | E17 | 404 페이지가 블로그 화면이 아님 | 실제 사이트 `/no-such-page/` → "Page not found · GitHub Pages" 기본 화면, 블로그 헤더·메뉴 없음 | `404.html`이 없음 | — | 낮음 |
 | E18 | 글 하나에 h1이 5~10개 | 아무 글에서 `document.querySelectorAll('h1').length`. 글 25개 전부 5~10개 | 글 본문 섹션 제목을 `#`(h1)로 씀. 페이지 제목 h1과 같은 단계. TOC도 h1부터 잡음(`single.html`의 `h_min=1`) | 글 본문 | 낮음 |
-| E19 | 안 쓰는 파일이 배포됨 | 빌드 결과에 `staticman.yml`, `assets/js/main.min.js.map`이 있음 | 원본 테마 파일인데 `exclude`에 없음 | 원본 테마 | 낮음 |
+| E19 | 안 쓰는 파일이 배포됨 | 빌드 결과에 `staticman.yml`, `assets/js/main.min.js.map`이 있음 | 원본 테마 파일인데 `exclude`에 없음 | 원본 테마 | 낮음 → 완료 (8.5단계. 두 파일을 지워서 빌드 결과에 없음) |
 
 ### 확인했는데 정상인 것
 
