@@ -1,0 +1,98 @@
+@use "tokens" as *;
+
+// 카테고리·태그 아카이브 (_layouts/taxonomy.html). 글 카드는 홈 가로형 카드(.entry, .post-list) 그대로
+.archive-header {
+  margin-top: 64px;
+}
+
+.archive-title {
+  margin: 0;
+  color: var(--text-heading);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.35;
+  word-break: keep-all;
+}
+
+.archive-count {
+  margin: 8px 0 0;
+  color: var(--text-sub);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+// 묶음 색인: 칩(글 많은 순) + 글 수
+.tax-index {
+  margin-top: 32px;
+}
+
+.tax-index__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip__count {
+  margin-left: 6px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+
+// 지금 보이는 묶음의 칩. 면은 그대로 두고 테두리·굵기로만 (aria-current는 blog.js가 붙임)
+.tax-index .chip[aria-current="true"] {
+  border-color: var(--green);
+  font-weight: 600;
+}
+
+// 고른 묶음 하나만 보임: 주소 #slug가 가리키는 묶음, 없으면 첫 묶음
+.tax-groups {
+  margin-top: 48px;
+}
+
+.tax-group {
+  display: none;
+  scroll-margin-top: 32px;
+
+  &:target {
+    display: block;
+  }
+}
+
+.tax-groups:not(:has(.tax-group:target)) .tax-group:first-child {
+  display: block;
+}
+
+// :has가 없는 브라우저는 첫 묶음을 늘 보여 줌 (해시로 고른 묶음은 그 아래에 같이 보임)
+@supports not selector(:has(*)) {
+  .tax-group:first-child {
+    display: block;
+  }
+}
+
+.tax-group__title {
+  margin: 0 0 16px;
+  color: var(--text-heading);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.35;
+  word-break: keep-all;
+}
+
+.tax-group__count {
+  color: var(--text-sub);
+  font-size: 15px;
+  font-weight: 400;
+}
+
+@media (max-width: $mobile) {
+  .archive-header {
+    margin-top: 40px;
+  }
+
+  .archive-title {
+    font-size: 24px;
+  }
+}

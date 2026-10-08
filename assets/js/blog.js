@@ -228,6 +228,27 @@
     observer.observe(container);
   }
 
+  // 카테고리·태그 색인: 지금 보이는 묶음(주소 해시, 없으면 첫 묶음)의 칩에 aria-current.
+  // 처음 열 때는 이 스크립트가 :target보다 먼저 돌아서 해시를 직접 비교함
+  function initTaxonomy() {
+    var index = document.querySelector('.tax-index');
+    if (!index) return;
+    var chips = index.querySelectorAll('.chip');
+
+    function mark() {
+      var current = Array.prototype.find.call(chips, function (chip) {
+        return chip.hash === window.location.hash;
+      }) || chips[0];
+      chips.forEach(function (chip) {
+        if (chip === current) chip.setAttribute('aria-current', 'true');
+        else chip.removeAttribute('aria-current');
+      });
+    }
+
+    mark();
+    window.addEventListener('hashchange', mark);
+  }
+
   // 검색 모달 (lunr). 처음 열 때만 lunr.min.js → lunr-store.js 순서로 불러옴
   function initSearch() {
     var dialog = document.getElementById('search');
@@ -407,5 +428,6 @@
   initCodeBlocks();
   initToc();
   initComments();
+  initTaxonomy();
   initSearch();
 })();
