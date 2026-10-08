@@ -1,6 +1,6 @@
 ---
 title: "About"
-layout: single
+layout: page
 permalink: /about/
 author_profile: false
 description: "백효석의 기술 블로그 운영 방향과 다루는 주제를 소개합니다."
