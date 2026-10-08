@@ -1,0 +1,24 @@
+{%- if site.comments.provider == "giscus" and page.comments %}
+<section class="comments" aria-labelledby="comments-title">
+  <h2 class="section-title" id="comments-title">댓글</h2>
+  {%- if jekyll.environment == 'production' %}
+  {%- assign giscus = site.comments.giscus %}
+  <div id="giscus-comments"
+    data-repo="{{ site.repository | downcase }}"
+    data-repo-id="{{ giscus.repo_id }}"
+    data-category="{{ giscus.category_name }}"
+    data-category-id="{{ giscus.category_id }}"
+    data-mapping="{{ giscus.discussion_term | default: 'pathname' }}"
+    data-strict="{{ giscus.strict | default: 0 }}"
+    data-reactions-enabled="{{ giscus.reactions_enabled | default: 1 }}"
+    data-emit-metadata="{{ giscus.emit_metadata | default: 0 }}"
+    data-input-position="{{ giscus.input_position | default: 'bottom' }}"
+    data-theme="{{ giscus.theme | default: 'light' }}"
+    data-lang="{{ giscus.lang | default: 'ko' }}">
+    <p class="comments__status">댓글 불러오는 중…</p>
+  </div>
+  {%- else %}
+  <p class="comments__status">댓글은 배포 빌드(<code>JEKYLL_ENV=production</code>)에서만 불러옵니다.</p>
+  {%- endif %}
+</section>
+{%- endif %}

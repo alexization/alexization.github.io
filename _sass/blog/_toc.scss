@@ -1,0 +1,118 @@
+@use "tokens" as *;
+
+// 1401px 이상만. 본문 칸 오른쪽 밖, 본문 첫 줄 높이에서 시작. 본문 위치는 안 바뀜
+.toc {
+  display: none;
+}
+
+@media (min-width: $toc-min) {
+  .toc {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: calc(100% + 20px);
+    width: 250px;
+    height: 100%;
+  }
+}
+
+.toc__inner {
+  position: sticky;
+  top: 32px;
+  max-height: 80vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-table) transparent;
+}
+
+.toc__list,
+.toc__list ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+// 소목차: 왼쪽 1px 선. 위아래 margin을 두면 접혔을 때 틈이 남아서 안 줌
+.toc__list ul {
+  margin-left: 12px;
+  padding-left: 8px;
+  border-left: 1px solid var(--line);
+}
+
+.toc a {
+  display: block;
+  padding: 8px 12px;
+  border-left: 3px solid transparent;
+  border-radius: 4px;
+  color: var(--text-sub);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  text-decoration: none;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+
+  &:hover {
+    color: var(--text-heading);
+  }
+}
+
+// 현재 위치는 li 하나만 (하위 항목으로 번지지 않게 > a)
+.toc li.is-active > a {
+  border-left-color: var(--green);
+  border-radius: 0 4px 4px 0;
+  background: var(--green-mist);
+  color: var(--green);
+  font-weight: 600;
+}
+
+// 접힘은 JS가 클래스를 붙인 뒤에만. JS 없으면 다 펼친 TOC
+.toc--collapsible .toc__list > li.has-children {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto 0fr;
+  transition: grid-template-rows .25s cubic-bezier(.22, 1, .36, 1);
+
+  > ul {
+    grid-column: 1 / -1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  &.is-open {
+    grid-template-rows: auto 1fr;
+  }
+}
+
+.toc__toggle {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 37px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--text-sub);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--text-heading);
+  }
+
+  svg {
+    transition: transform .25s cubic-bezier(.22, 1, .36, 1);
+  }
+
+  &[aria-expanded="true"] svg {
+    transform: rotate(90deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toc--collapsible .toc__list > li.has-children,
+  .toc__toggle svg {
+    transition: none;
+  }
+}

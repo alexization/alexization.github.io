@@ -1,0 +1,13 @@
+{%- comment -%} 썸네일 순서: og_image → image → overlay_image → teaser(사이트 logo면 건너뜀). 없으면 그라데이션 {%- endcomment -%}
+{%- assign card_post = include.post -%}
+{%- assign card_thumb = card_post.header.og_image | default: card_post.header.image | default: card_post.header.overlay_image -%}
+{%- if card_thumb == nil and card_post.header.teaser and card_post.header.teaser != site.logo -%}
+  {%- assign card_thumb = card_post.header.teaser -%}
+{%- endif -%}
+<a class="card" href="{{ card_post.url | relative_url }}">
+  <span class="card__thumb">
+    {%- if card_thumb %}<img src="{{ card_thumb | relative_url }}" alt="" loading="lazy" decoding="async">{% endif -%}
+  </span>
+  <span class="card__title">{{ card_post.title | markdownify | strip_html | strip }}</span>
+  <time class="card__date" datetime="{{ card_post.date | date_to_xmlschema }}">{{ card_post.date | date: site.date_format }}</time>
+</a>

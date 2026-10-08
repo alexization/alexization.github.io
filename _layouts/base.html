@@ -1,0 +1,22 @@
+---
+---
+
+<!doctype html>
+<html lang="{{ site.locale | replace: "_", "-" | default: "en" }}" class="no-js">
+  <head>
+    {% include blog/head.html %}
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main">본문으로 건너뛰기</a>
+    {% include_cached blog/header.html %}
+
+    <main id="main" class="shell">
+      {{ content }}
+    </main>
+
+    {% include_cached blog/footer.html %}
+    {% include_cached blog/search.html %}
+    {% include blog/scripts.html %}
+  </body>
+</html>

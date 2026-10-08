@@ -1,0 +1,87 @@
+@use "tokens" as *;
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 24px;
+  padding-top: 32px;
+}
+
+.site-logo {
+  color: var(--text-heading);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.site-header__nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  // 돋보기 그림을 칸 오른쪽 끝에 맞춤
+  margin-right: -10px;
+}
+
+.site-nav {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  a {
+    display: block;
+    padding: 10px 8px;
+    color: var(--text-sub);
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 24px;
+    text-decoration: none;
+    white-space: nowrap;
+
+    &:hover {
+      color: var(--text-heading);
+    }
+  }
+}
+
+.search-button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--text-sub);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--text-heading);
+  }
+}
+
+// JS 없으면 검색을 못 여니까 버튼도 안 보임
+.no-js .search-button {
+  display: none;
+}
+
+@media (max-width: $mobile) {
+  .site-header {
+    flex-direction: column;
+    align-items: stretch;
+    padding-top: 24px;
+  }
+
+  .site-header__nav {
+    justify-content: space-between;
+  }
+
+  // 첫 메뉴 글자를 칸 왼쪽 끝에 맞춤
+  .site-nav {
+    margin-left: -8px;
+  }
+}

@@ -1,0 +1,161 @@
+@use "tokens" as *;
+
+// 인라인 코드 (코드 블록 안 code는 빼려고 :not(pre) > code)
+.post-content :not(pre) > code {
+  padding: .2em .45em;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface-gray);
+  color: var(--text-body);
+  font-family: var(--font-mono);
+  font-size: .85em;
+  overflow-wrap: anywhere;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+// 표 칸에서 anywhere는 열을 너무 좁힘
+.post-content .table-scroll :not(pre) > code {
+  overflow-wrap: break-word;
+}
+
+// 코드 블록 (인라인 code.highlighter-rouge와 안 섞이게 div만)
+.post-content div.highlighter-rouge {
+  position: relative;
+  width: 95%;
+  margin: 32px auto;
+  padding-top: 34px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  box-shadow: var(--shadow-float);
+  overflow: hidden;
+
+  // 창 머리 띠와 점 3개는 CSS로 미리 그림 → JS가 늦게 돌아도 화면이 안 밀림
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 34px;
+    border-bottom: 1px solid var(--line);
+    background: var(--surface-gray);
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 11px;
+    left: 16px;
+    width: 48px;
+    height: 12px;
+    background:
+      radial-gradient(circle at 6px 6px, #ff5f57 5.5px, transparent 6px),
+      radial-gradient(circle at 24px 6px, #febc2e 5.5px, transparent 6px),
+      radial-gradient(circle at 42px 6px, #28c840 5.5px, transparent 6px);
+  }
+
+  div.highlight {
+    position: relative;
+    margin: 0;
+  }
+
+  pre {
+    margin: 0;
+    padding: 16px 20px;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    // 줄 번호와 같은 px 줄높이 (13px × 1.5)
+    line-height: 19.5px;
+    white-space: pre;
+    word-break: normal;
+    overflow-wrap: normal;
+    tab-size: 4;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line-table) transparent;
+  }
+
+  code {
+    font: inherit;
+  }
+}
+
+.post-content li div.highlighter-rouge {
+  margin-block: 16px;
+}
+
+// 줄 번호 칸 자리는 JS가 돌 때만 비워 둠. 번호 칸은 가로 스크롤되는 pre 바깥
+.js .post-content div.highlighter-rouge div.highlight {
+  padding-left: 48px;
+}
+
+.code-lines {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 48px;
+  padding: 16px 12px 16px 0;
+  overflow: hidden;
+  border-right: 1px solid var(--line);
+  color: var(--text-lineno);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 19.5px;
+  text-align: right;
+  white-space: pre;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.code-head {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 33px;
+  padding-left: 80px;
+}
+
+.code-lang {
+  color: var(--text-sub);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .5px;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.code-copy {
+  min-width: 72px;
+  height: 33px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--text-sub);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--text-heading);
+  }
+
+  &:focus-visible {
+    outline-offset: -3px;
+  }
+}
+
+@media (max-width: $code-narrow) {
+  .post-content div.highlighter-rouge {
+    width: 100%;
+    border-radius: 0;
+  }
+}

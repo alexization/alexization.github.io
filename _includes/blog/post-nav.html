@@ -1,0 +1,41 @@
+{%- comment -%}
+  시리즈 글은 시리즈 안 앞뒤 편, 아니면 날짜순.
+  Liquid에서 arr[-1]은 마지막 항목이라 인덱스는 범위 안일 때만 꺼냄.
+{%- endcomment -%}
+{%- assign prev_post = nil -%}
+{%- assign next_post = nil -%}
+{%- if page.series -%}
+  {%- assign series_posts = site.posts | where: "series", page.series | sort: "date" -%}
+  {%- assign last_index = series_posts.size | minus: 1 -%}
+  {%- for post in series_posts -%}
+    {%- if post.url == page.url -%}
+      {%- if forloop.index0 > 0 -%}
+        {%- assign prev_index = forloop.index0 | minus: 1 -%}
+        {%- assign prev_post = series_posts[prev_index] -%}
+      {%- endif -%}
+      {%- if forloop.index0 < last_index -%}
+        {%- assign next_index = forloop.index0 | plus: 1 -%}
+        {%- assign next_post = series_posts[next_index] -%}
+      {%- endif -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- else -%}
+  {%- assign prev_post = page.previous -%}
+  {%- assign next_post = page.next -%}
+{%- endif -%}
+{%- if prev_post or next_post %}
+<nav class="post-nav" aria-label="이전 글과 다음 글">
+  {%- if prev_post %}
+  <a class="post-nav__link post-nav__link--prev" href="{{ prev_post.url | relative_url }}" rel="prev">
+    <span class="post-nav__label">이전 글</span>
+    <span class="post-nav__title">{{ prev_post.title | markdownify | strip_html | strip }}</span>
+  </a>
+  {%- endif %}
+  {%- if next_post %}
+  <a class="post-nav__link post-nav__link--next" href="{{ next_post.url | relative_url }}" rel="next">
+    <span class="post-nav__label">다음 글</span>
+    <span class="post-nav__title">{{ next_post.title | markdownify | strip_html | strip }}</span>
+  </a>
+  {%- endif %}
+</nav>
+{%- endif %}

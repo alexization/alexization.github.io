@@ -1,0 +1,10 @@
+<dialog class="search" id="search" aria-label="검색" data-lunr="{{ '/assets/js/lunr/lunr.min.js' | relative_url }}" data-store="{{ '/assets/js/lunr/lunr-store.js' | relative_url }}">
+  <div class="search__bar">
+    <svg class="search__icon" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="8.75" cy="8.75" r="5.75" stroke="currentColor" stroke-width="1.75"/><path d="m13.25 13.25 4 4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>
+    <label class="sr-only" for="search-input">검색어</label>
+    <input class="search__input" id="search-input" type="search" placeholder="글 제목, 내용, 태그로 검색" autocomplete="off" spellcheck="false">
+    <button type="button" class="search__close" aria-label="검색 닫기" data-search-close>ESC</button>
+  </div>
+  <p class="search__status" id="search-status" role="status"></p>
+  <ul class="search__results" id="search-results"></ul>
+</dialog>
