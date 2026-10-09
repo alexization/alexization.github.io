@@ -4,6 +4,7 @@ header:
    og_image: "https://i.imgur.com/3iiclCA.png"
 
 title: "SQL 튜닝을 통한 API 성능 최적화 (1편)"
+series: "SQL 튜닝을 통한 API 성능 최적화"
 excerpt: "100만 개 데이터 환경에서 6.57초 걸리던 API를 409ms로 단축시킨 SQL 튜닝 과정입니다. 인덱스 설계 전략, 복합 인덱스 활용, JOIN 최적화를 통해 94% 성능 향상을 달성했습니다."
 categories:
   - Database
@@ -28,11 +29,11 @@ last_modified_at: 2025-01-12
 
 성능 개선 효과를 검증하기 위해 **100만 개의 더미 데이터**를 데이터베이스에 삽입한 후, 서비스의 주요 기능 중 하나인 “일반 진료 대기 견적서 반려동물 정보 반환 API”에 대한 최적화 전후를 비교해보았습니다.
 
-# 일반 진료 대기 견적서 반려동물 정보 반환 API (GET)
+## 일반 진료 대기 견적서 반려동물 정보 반환 API (GET)
 
 > **테스트 환경 :** Local MySQL 8.0 / Local 애플리케이션 서버 / 100만 개 데이터 기준
 
-## 문제 상황
+### 문제 상황
 
 사용자가 요청한 진료 견적서에 대해 병원으로부터 받은 견적서 리스트를 확인하기 전에, 사용자의 반려동물별로 병원에 요청한 견적서가 있는지 확인하기 위한 API로, 사용자가 소유한 모든 반려동물에 대해 견적서 존재 여부를 확인해야 했습니다.
 
@@ -43,7 +44,7 @@ SELECT * FROM care_estimates
 WHERE status = :status AND proposal = :proposal AND pet_id = :pet_id;
 ```
 
-![사진1.png](https://i.imgur.com/3iiclCA.png)
+![터미널 출력: 인덱스 없이 같은 조회 쿼리를 6번 실행해 매번 약 555~612ms가 걸린 결과](https://i.imgur.com/3iiclCA.png)
 
 한 번의 쿼리 실행에 평균 약 **`600ms`가 소요**되었으며, 이는 데이터양이 증가할수록 더 많은 시간이 필요하게 됩니다.
 
@@ -51,15 +52,15 @@ WHERE status = :status AND proposal = :proposal AND pet_id = :pet_id;
 
 웹 사용성 연구에 따르면, 사용자는 일반적으로 **2~3초 이상 기다리면 페이지를 이탈할 확률이 크게 증가**합니다.
 
-# 성능 병목 지점 분석
+## 성능 병목 지점 분석
 
 이렇게 느린 쿼리의 원인을 파악하기 위해 MySQL의 쿼리 분석 도구를 활용했습니다.
 
-## EXPLAIN을 통한 실행 계획 확인
+### EXPLAIN을 통한 실행 계획 확인
 
 `EXPLAIN` 명령을 사용하여 MySQL 옵티마이저가 어떻게 쿼리를 실행하는지 확인했습니다.
 
-![사진2.png](https://i.imgur.com/wwsuUDg.png)
+![실행 계획: care_estimates가 type ALL, possible_keys와 key가 null, rows 986595로 풀 테이블 스캔하는 EXPLAIN 결과](https://i.imgur.com/wwsuUDg.png)
 
 여기서 가장 중요하게 봐야되는 것은 `type = ALL` 입니다.
 
@@ -67,7 +68,7 @@ WHERE status = :status AND proposal = :proposal AND pet_id = :pet_id;
 
 또한, `possible_keys` 와 `key` 컬럼이 `NULL` 인 것을 통해 이 쿼리가 **어떤 인덱스도 활용하지 못하고 있음**을 확인할 수 있습니다.
 
-## EXPLAIN ANALYZE를 통한 상세 실행 시간 분석
+### EXPLAIN ANALYZE를 통한 상세 실행 시간 분석
 
 더 깊이 있는 분석을 위해 MySQL 8.0에서 제공하는 `EXPLAIN ANALYZE` 명령을 사용했습니다.
 
@@ -85,9 +86,9 @@ WHERE status = :status AND proposal = :proposal AND pet_id = :pet_id;
 
 따라서 성능 개선을 위해서는 풀 테이블 스캔을 피하고, 필요한 데이터에 빠르게 접근할 수 있는 방법을 찾아야 했습니다.
 
-# 1. 인덱스 전략을 통한 성능 개선
+## 1. 인덱스 전략을 통한 성능 개선
 
-## 데이터 특성 및 인덱스 선택 전략
+### 데이터 특성 및 인덱스 선택 전략
 
 성능 개선을 위해 먼저 쿼리의 `WHERE` 절에서 사용하는 세 가지 조건(`status`, `proposal`, `pet_id`)의 특성을 비교해봤습니다.
 
@@ -119,7 +120,7 @@ WHERE status = :status AND proposal = :proposal AND pet_id = :pet_id;
 
 인덱스 설계 원칙에 따라 세 컬럼 중 **`pet_id` 가 가장 좋은 인덱스 후보**임을 알 수 있습니다.
 
-## 잘못된 인덱스 선택의 예 : `status` 컬럼 인덱싱
+### 잘못된 인덱스 선택의 예 : `status` 컬럼 인덱싱
 
 처음에는 `status` 컬럼에 단일 인덱스를 생성했습니다.
 
@@ -127,11 +128,11 @@ WHERE status = :status AND proposal = :proposal AND pet_id = :pet_id;
 CREATE INDEX estimate_status ON care_estimates(status);
 ```
 
-![사진3.png](https://i.imgur.com/bAB7bTl.png)
+![터미널 출력: status 인덱스 적용 후 같은 쿼리를 7번 실행해 매번 약 858~974ms로 오히려 느려진 결과](https://i.imgur.com/bAB7bTl.png)
 
 그러나 이 인덱스를 적용한 후 쿼리 실행 시간은 **`900ms` 로 오히려 기존보다 더 느려졌습니다.**
 
-### 상세 실행 시간 분석
+#### 상세 실행 시간 분석
 
 원인을 파악하기 위해 다시 `EXPLAIN ANALYZE` 를 실행했습니다.
 
@@ -152,7 +153,7 @@ CREATE INDEX estimate_status ON care_estimates(status);
 
 `status = 'NEW'` 는 전체 데이터의 25%를 반환하기 때문에 해당 컬럼에 대한 인덱스는 효율적이지 않습니다.
 
-## 최종 인덱스 선택 : `pet_id` 컬럼 인덱싱
+### 최종 인덱스 선택 : `pet_id` 컬럼 인덱싱
 
 앞선 분석을 바탕으로, 카디널리티가 높은 `pet_id` 컬럼에 인덱스를 적용했습니다.
 
@@ -160,11 +161,11 @@ CREATE INDEX estimate_status ON care_estimates(status);
 CREATE INDEX pet_id ON care_estimates(pet_id);
 ```
 
-![사진4.png](https://i.imgur.com/6Ibm1Bn.png)
+![터미널 출력: pet_id 인덱스 적용 후 같은 쿼리가 7번 모두 22~58ms 안에 끝나 크게 빨라진 결과](https://i.imgur.com/6Ibm1Bn.png)
 
 `pet_id` 를 인덱스 컬럼으로 적용한 후 쿼리를 실행하고 성능을 측정한 결과, 조회 수행 시간이 약 **`30ms` 로 기존 수행 시간(`600ms`)보다 약 20배 정도의 성능 향상**을 보였습니다.
 
-### **상세 실행 시간 분석**
+#### **상세 실행 시간 분석**
 
 ```sql
 -> Filter: ((care_estimates.proposal = 'GENERAL') and (care_estimates.`status` = 'NEW')) (cost=4.46 rows=0.875) (actual time=0.0544..0.0578 rows=1 loops=1)
@@ -178,11 +179,11 @@ CREATE INDEX pet_id ON care_estimates(pet_id);
 
 실제 쿼리 실행 결과, 평균 응답 시간이 `30ms` 로 측정되어 기존 `600ms` 대비 **95% 단축된 성능**을 보여주었습니다.
 
-# `EXPLAIN ANALYZE` 와 실제 쿼리 실행 시간의 차이
+## `EXPLAIN ANALYZE` 와 실제 쿼리 실행 시간의 차이
 
 > `EXPALIN ANALYZE` 에서 측정된 실행 시간은 `0.0578ms` 이지만, 실제 쿼리 실행 시간은 `30ms` 입니다. 이 차이는 왜 발생하는 것일까요?
 
-## 실행 계획 측정 시간과 실제 실행 시간의 차이점
+### 실행 계획 측정 시간과 실제 실행 시간의 차이점
 
 1. **`EXPLAIN ANALYZE` 가 측정하는 시간**
 - 순수한 쿼리 실행 엔진 내부의 처리 시간
@@ -207,7 +208,7 @@ CREATE INDEX pet_id ON care_estimates(pet_id);
 
 데이터베이스 쿼리 자체의 성능이 좋아도, 네트워크 지연이나 애플리케이션 처리 과정에서 병목이 발생할 수 있기 때문에 성능 최적화 시 **전체 응답 시간에 영향을 미치는 모든 요소를 고려**해야 합니다.
 
-# 2. JOIN을 활용한 다중 조회 최적화
+## 2. JOIN을 활용한 다중 조회 최적화
 
 지금까지 단일 쿼리의 성능을 개선했지만, 여전히 각 반려동물마다 별도의 쿼리를 실행해야 하는 문제가 있습니다.
 
@@ -217,7 +218,7 @@ CREATE INDEX pet_id ON care_estimates(pet_id);
 
 이 문제를 해결하기 위해 **JOIN을 활용한 단일 쿼리** 접근 방식을 채택했습니다.
 
-## JOIN을 활용한 단일 쿼리 방식
+### JOIN을 활용한 단일 쿼리 방식
 
 ```sql
 SELECT *
@@ -228,17 +229,17 @@ WHERE c.user_id = :user_id
   AND c.proposal = :proposal
 ```
 
-![사진5.png](https://i.imgur.com/4bzLFAm.png)
+![터미널 출력: 인덱스 없이 care_estimates와 pets를 JOIN한 쿼리를 3번 실행해 매번 약 649~663ms가 걸린 결과](https://i.imgur.com/4bzLFAm.png)
 
 JOIN을 적용한 초기 쿼리의 실행 시간은 약 `660ms` 로 측정되었습니다. 이는 앞에서 개별 쿼리(`30ms`) 를 13번 실행하는 것(`390ms`)보다 느립니다.
 
-### 실행 계획 확인
+#### 실행 계획 확인
 
-![사진6.png](https://i.imgur.com/nlsVBDi.png)
+![실행 계획: JOIN 쿼리에서 care_estimates(c)는 key 없이 type ALL로 986595행을 풀 스캔하고 pets(p)는 PRIMARY 키로 eq_ref 조회하는 EXPLAIN 결과](https://i.imgur.com/nlsVBDi.png)
 
 실행 계획을 살펴보니 `care_estimates` 테이블을 풀 스캔하고 있다는 것을 확인했습니다.
 
-### 상세 실행 시간 분석
+#### 상세 실행 시간 분석
 
 조금 더 자세하게 과정별 수행 속도를 분석해 보았습니다.
 
@@ -262,7 +263,7 @@ JOIN을 적용한 초기 쿼리의 실행 시간은 약 `660ms` 로 측정되었
 
 이전에 생성한 `pet_id` 인덱스는 `WHERE c.pet_id = 특정값` 형태의 조건에서만 효과적이며, `WHERE c.user_id = 특정값` 에서는 활용되지 않습니다.
 
-## 복합 인덱스를 활용한 성능 개선
+### 복합 인덱스를 활용한 성능 개선
 
 JOIN 쿼리의 성능을 향상시키기 위해 **`user_id` 와 `pet_id` 를 함께 포함하는 복합 인덱스**를 생성했습니다.
 
@@ -270,11 +271,11 @@ JOIN 쿼리의 성능을 향상시키기 위해 **`user_id` 와 `pet_id` 를 함
 CREATE INDEX idx_care_estimates_user_pet ON care_estimates (user_id, pet_id);
 ```
 
-![사진7.png](https://i.imgur.com/63rxL3p.png)
+![터미널 출력: 복합 인덱스 적용 후 같은 JOIN 쿼리를 3번 실행해 25~41ms로 크게 빨라진 결과](https://i.imgur.com/63rxL3p.png)
 
 복합 인덱스 적용 후 쿼리 실행 시간은 **`30ms` 로 크게 개선**되었습니다.
 
-### **상세 실행 시간 분석**
+#### **상세 실행 시간 분석**
 
 ```sql
 -> Nested loop inner join  (cost=13.9 rows=2) (actual time=0.124..0.142 rows=3 loops=1)
@@ -290,7 +291,7 @@ CREATE INDEX idx_care_estimates_user_pet ON care_estimates (user_id, pet_id);
 
 실제 애플리케이션에서 측정한 응답 시간은 `30ms` 로, 기존 JOIN 방식(`660ms`) 대비 **95% 향상**되었습니다.
 
-# 최종 성능 비교 및 개선 결과
+## 최종 성능 비교 및 개선 결과
 
 다양한 접근법을 통해 쿼리 성능을 개선한 결과를 비교해 보겠습니다.
 
@@ -305,31 +306,31 @@ CREATE INDEX idx_care_estimates_user_pet ON care_estimates (user_id, pet_id);
 
 결과적으로 여러 번의 네트워크 요청을 단일 요청으로 통합하고 적절한 인덱스를 적용하여, **전체 처리 시간을 기존 대비 94% 이상 단축**시켰습니다.
 
-## SQL 튜닝 전 코드 (각 반려동물별 개별 쿼리)
+### SQL 튜닝 전 코드 (각 반려동물별 개별 쿼리)
 
 기존 코드에서는 사용자의 모든 반려동물을 조회한 후, 각 반려동물별로 개별 쿼리를 실행하는 방식을 사용했습니다.
 
-![사진8.png](https://i.imgur.com/6BKmdC9.png)
+![튜닝 전 서비스 코드: 사용자의 반려동물 목록을 for문으로 돌며 반려동물마다 견적서 조회 쿼리를 따로 호출하는 findGeneralCarePets 메서드](https://i.imgur.com/6BKmdC9.png)
 
-![사진9.png](https://i.imgur.com/PociW20.png)
+![튜닝 전 리포지토리 메서드: status, proposal, petId로 견적서 1건을 찾는 findTopByStatusAndProposalAndPetId 선언](https://i.imgur.com/PociW20.png)
 
-![사진10.png](https://i.imgur.com/9rzxo4j.png)
+![Postman 응답: 튜닝 전 API가 반려동물별 견적서 목록 JSON을 돌려주는 데 6.57s가 걸린 결과](https://i.imgur.com/9rzxo4j.png)
 
-![사진11.png](https://i.imgur.com/JYsqKFt.png)
+![Hibernate 쿼리 로그: users와 pets 조회 뒤 care_estimates 조회 쿼리가 반려동물 수만큼 13번 반복 실행된 N+1 모습](https://i.imgur.com/JYsqKFt.png)
 
-## SQL 튜닝 후 코드 (JOIN을 활용한 단일 쿼리)
+### SQL 튜닝 후 코드 (JOIN을 활용한 단일 쿼리)
 
 SQL 튜닝 후에는 **`JOIN` 을 활용한 단일 쿼리**로 변경하여 성능을 크게 개선했습니다.
 
-![사진12.png](https://i.imgur.com/uD9nYPj.png)
+![튜닝 후 서비스 코드: 반복문 없이 findByStatusAndProposalAndUserId 한 번으로 반려동물별 견적서를 가져오는 findGeneralCarePets 메서드](https://i.imgur.com/uD9nYPj.png)
 
-![사진13.png](https://i.imgur.com/QHE6zY0.png)
+![튜닝 후 리포지토리 메서드: CareEstimates와 Pets를 petId로 JOIN하고 userId, status, proposal로 거르는 @Query 선언](https://i.imgur.com/QHE6zY0.png)
 
-![사진14.png](https://i.imgur.com/9oOT18a.png)
+![Postman 응답: 튜닝 후 같은 API가 반려동물별 견적서 목록 JSON을 409ms 만에 돌려준 결과](https://i.imgur.com/9oOT18a.png)
 
-![사진16.png](https://i.imgur.com/3XRsQtG.png)
+![Hibernate 쿼리 로그: users와 pets 조회 뒤 care_estimates와 pets를 JOIN한 쿼리가 단 한 번만 실행된 모습](https://i.imgur.com/3XRsQtG.png)
 
-# 마무리
+## 마무리
 
 이번 SQL 튜닝을 통해 기존 `6.57s` 에서 `409ms` 로 단축되어 사용자 경험이 크게 향상되었으며, 향후 데이터가 더 증가하더라도 안정적인 성능을 유지할 수 있게 되었습니다.
 

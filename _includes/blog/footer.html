@@ -1,0 +1,13 @@
+<footer class="site-footer">
+  <ul class="site-footer__links">
+    {%- for link in site.footer.links %}
+      {%- if link.label and link.url %}
+    <li><a href="{{ link.url }}" rel="nofollow noopener noreferrer">{{ link.label | escape_once | strip }}</a></li>
+      {%- endif %}
+    {%- endfor %}
+    {%- unless site.atom_feed.hide %}
+    <li><a href="{% if site.atom_feed.path %}{{ site.atom_feed.path }}{% else %}{{ '/feed.xml' | relative_url }}{% endif %}">{{ site.data.ui-text[site.locale].feed_label | default: "Feed" }}</a></li>
+    {%- endunless %}
+  </ul>
+  <p class="site-footer__copyright">&copy; {% assign site_time = site.time | date: '%Y' %}{% if site.footer.since and site_time != site.footer.since %}{{ site.footer.since }} - {% endif %}{{ site_time }} <a href="{{ site.copyright_url | default: site.url }}">{{ site.copyright | default: site.title | escape_once | strip }}</a>. {{ site.data.ui-text[site.locale].powered_by | default: "Powered by" }} <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a>.</p>
+</footer>

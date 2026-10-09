@@ -4,6 +4,7 @@ header:
   og_image: "https://i.imgur.com/dxsH3Dq.png"
 
 title: "[Home Lab #2] SSH 무차별 대입 공격 방어하기: Fail2ban 설치 및 설정"
+series: "Home Lab"
 excerpt: "SSH 키 인증을 적용한 뒤에도 반복되던 접속 시도를 `auth.log`에서 확인하고, Fail2ban으로 자동 차단까지 구성한 과정을 정리했다."
 categories:
   - Home Lab
@@ -26,7 +27,7 @@ date: 2025-12-14
 last_modified_at: 2026-03-30
 ---
 
-![mainImage](https://i.imgur.com/dxsH3Dq.png)
+![](https://i.imgur.com/dxsH3Dq.png)
 
 [앞선 글](/home-lab/home-lab-ssh-key-based-auth/)에서 SSH 비밀번호 인증을 끄고 공개키 인증만 남겼습니다. 그때는 "이제 SSH 보안은 어느 정도 정리됐다"라고 생각했습니다. 하지만 실제 서버의 `auth.log`를 열어보니, **로그인 성공 여부와 별개로 SSH 포트 자체는 계속해서 자동화된 스캔 대상**이 되고 있었습니다.
 
@@ -41,9 +42,9 @@ last_modified_at: 2026-03-30
 </ul>
 </aside>
 
-# 1. SSH 키 인증을 켰는데도 로그는 계속 시끄러웠다
+## 1. SSH 키 인증을 켰는데도 로그는 계속 시끄러웠다
 
-![authLog](https://i.imgur.com/TPqlHh8.png)
+![터미널 출력: auth.log에 00:01부터 00:17까지 여러 외부 IP의 Invalid user 시도와 root 계정 인증 전(preauth) 연결 종료 기록이 수십 줄 반복된 모습](https://i.imgur.com/TPqlHh8.png)
 
 보안을 강화한 뒤 가장 먼저 확인한 것은 `/var/log/auth.log`였습니다.
 
@@ -75,7 +76,7 @@ Connection reset by authenticating user ubuntu 203.0.113.10 port 49844 [preauth]
 - **불필요한 자원 사용**: 시도 하나하나는 작아 보여도, SSH 데몬은 매번 연결을 받아들이고 인증 전 과정을 일부 수행해야 합니다.
 - **단일 방어선 의존**: 공개키 인증이 첫 번째 방어선이라면, 그 앞단에서 반복 시도를 정리하는 두 번째 방어선도 필요합니다.
 
-# 2. Fail2ban은 방화벽을 자동으로 움직이는 대응 계층이다
+## 2. Fail2ban은 방화벽을 자동으로 움직이는 대응 계층이다
 
 이 지점에서 선택한 도구가 **Fail2ban**이었습니다. Fail2ban은 직접 패킷을 검사하는 방화벽이 아니라, **로그를 읽고 임계치를 넘긴 IP에 대해 방화벽 규칙을 추가하는 자동화 계층**에 가깝습니다.
 
@@ -95,9 +96,9 @@ Connection reset by authenticating user ubuntu 203.0.113.10 port 49844 [preauth]
 Fail2ban은 반복 시도를 줄이고 로그를 정리하는 데 매우 효과적이지만, SSH를 인터넷에 그대로 노출해도 된다는 뜻은 아닙니다. 가능하다면 공개키 인증, 방화벽, 포트 접근 제어, 업데이트 관리를 함께 가져가는 편이 안전합니다.
 </aside>
 
-# 3. Ubuntu 홈서버에 `sshd` jail을 적용한 방법
+## 3. Ubuntu 홈서버에 `sshd` jail을 적용한 방법
 
-## 3.1 패키지 설치
+### 3.1 패키지 설치
 
 먼저 Fail2ban을 설치하고 서비스가 부팅 시 자동으로 올라오도록 설정했습니다.
 
@@ -107,7 +108,7 @@ sudo apt install fail2ban -y
 sudo systemctl enable --now fail2ban
 ```
 
-## 3.2 `jail.local`에 필요한 값만 정의
+### 3.2 `jail.local`에 필요한 값만 정의
 
 Fail2ban의 기본 파일인 `/etc/fail2ban/jail.conf`는 패키지 업데이트 과정에서 바뀔 수 있습니다. 그래서 **기본 파일을 직접 수정하기보다, `jail.local`에 필요한 값만 오버라이드하는 방식**이 유지보수에 더 안전합니다.
 
@@ -146,7 +147,7 @@ logpath = /var/log/auth.log
 예시는 `/var/log/auth.log`를 읽는 환경 기준입니다. 시스템이 `journald`만 사용한다면 `logpath` 대신 `systemd` 백엔드를 쓰는 구성이 더 맞을 수 있습니다. 먼저 내 서버에서 SSH 로그가 실제로 어디에 남는지 확인하는 것이 우선입니다.
 </aside>
 
-## 3.3 설정 적용
+### 3.3 설정 적용
 
 설정을 저장한 뒤 서비스를 다시 읽히고, `sshd` jail이 정상적으로 활성화됐는지 확인했습니다.
 
@@ -158,7 +159,7 @@ sudo fail2ban-client status sshd
 
 정상이라면 `sshd`가 jail 목록에 나타나고, 세부 상태도 조회됩니다.
 
-# 4. 적용 후에는 상태값을 이렇게 읽었다
+## 4. 적용 후에는 상태값을 이렇게 읽었다
 
 제가 가장 자주 확인한 명령은 아래 하나였습니다.
 
@@ -183,7 +184,7 @@ sudo fail2ban-client status sshd
 sudo fail2ban-client status sshd | grep "Banned IP list"
 ```
 
-## 4.1 실수로 내 IP를 막았을 때
+### 4.1 실수로 내 IP를 막았을 때
 
 운영 중에는 나 자신의 IP를 실수로 차단할 가능성도 있습니다. 이럴 때는 **별도 진입 경로**가 있어야 합니다. 예를 들어 집 안 콘솔, 다른 네트워크, 모바일 핫스팟, VPN 같은 경로로 다시 접속한 뒤 차단을 풀 수 있습니다.
 
@@ -193,7 +194,7 @@ sudo fail2ban-client set sshd unbanip <내 IP 주소>
 
 `ignoreip`를 넓게 잡아 실수를 피하려 하기보다, **복구 경로를 미리 확보하고 필요한 주소만 정확히 예외 처리하는 편**이 더 안전하다고 느꼈습니다.
 
-# 5. 마무리
+## 5. 마무리
 
 SSH 키 인증이 **"올바른 열쇠가 없는 사용자는 들어오지 못하게 하는 장치"**라면, Fail2ban은 **"같은 문을 반복해서 두드리는 대상을 일정 시간 격리하는 장치"**에 가깝습니다.
 

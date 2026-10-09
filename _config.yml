@@ -5,19 +5,9 @@
 # For technical reasons, this file is *NOT* reloaded automatically when you use
 # `jekyll serve`. If you change this file, please restart the server process.
 
-# Theme Settings
-#
-# Review documentation to determine if you should use `theme` or `remote_theme`
-# https://mmistakes.github.io/minimal-mistakes/docs/quick-start-guide/#installing-the-theme
-
-# theme                  : "minimal-mistakes-jekyll"
-# remote_theme           : "mmistakes/minimal-mistakes"
-minimal_mistakes_skin    : "default" # "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum", "sunrise"
-
 # Site Settings
 locale                   : "ko-KR"
-rtl                      : # true, false (default) # turns direction of the page into right to left for RTL languages
-title                    : "효석의 기술 블로그"
+title                   : "효석의 기술 블로그"
 title_separator          : "-"
 subtitle                 : "내 기억력을 믿지 않는다. 꾸준히 기록하자."
 name                     : "백효석"
@@ -28,63 +18,33 @@ baseurl                  : # the subpath of your site, e.g. "/blog"
 repository               : "alexization/alexization.github.io"  # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
 teaser                   : "/assets/images/author.png" # path of fallback teaser image, e.g. "/assets/images/500x300.png"
 logo                     : "/assets/images/logo.png" # path of logo image to display in the masthead, e.g. "/assets/images/88x88.png"
-masthead_title           : # overrides the website title displayed in the masthead, use " " for no title
-breadcrumbs              : # true, false (default)
 words_per_minute         : 200
-enable_copy_code_button  : true # true, false (default)
-copyright                : # "copyright" name, defaults to site.title
+date_format              : "%Y.%m.%d"
+copyright               : # "copyright" name, defaults to site.title
 copyright_url            : # "copyright" URL, defaults to site.url
 comments:
   provider               : "giscus" # false (default), "disqus", "discourse", "facebook", "staticman", "staticman_v2", "utterances", "giscus", "custom"
   giscus:
     data-repo: "alexization/alexization.github.io"
-    data-repo-id: "R_kgDOPZzCig"
-    data-category: "Announcements"
-    data-category-id: "DIC_kwDOPZzCis4Ct4yS"
-    data-mapping: "pathname"
-    data-strict: "0"
-    data-reactions-enabled: "1"
-    data-emit-metadata: "0"
-    data-input-position: "bottom"
-    data-theme: "light"
-    data-lang: "ko"
+    repo_id: "R_kgDOPZzCig"
+    category_name: "Announcements"
+    category_id: "DIC_kwDOPZzCis4Ct4yS"
+    discussion_term: "pathname"
+    strict: "0"
+    reactions_enabled: "1"
+    emit_metadata: "0"
+    input_position: "bottom"
+    theme: "light"
+    lang: "ko"
     crossorigin: "anonymous"
-  disqus:
-    shortname            : # https://help.disqus.com/customer/portal/articles/466208-what-s-a-shortname-
-  discourse:
-    server               : # https://meta.discourse.org/t/embedding-discourse-comments-via-javascript/31963 , e.g.: meta.discourse.org
-  facebook:
-    # https://developers.facebook.com/docs/plugins/comments
-    appid                : 
-    num_posts            : # 5 (default)
-    colorscheme          : # "light" (default), "dark"
-  utterances:
-    theme                : # "github-light" (default), "github-dark"
-    issue_term           : # "pathname" (default)
-  staticman:
-    branch               : # "master"
-    endpoint             : # "https://{your Staticman v3 API}/v3/entry/github/"
-reCaptcha:
-  siteKey                :
-  secret                 :
 atom_feed:
   path                   : # blank (default) uses feed.xml
   hide                   : # true, false (default)
-search                   : true # true, false (default)
 search_full_content      : # true, false (default)
-search_provider          : # lunr (default), algolia, google
 lunr:
   search_within_pages    : # true, false (default)
-algolia:
-  application_id         : # YOUR_APPLICATION_ID
-  index_name             : # YOUR_INDEX_NAME
-  search_only_api_key    : # YOUR_SEARCH_ONLY_API_KEY
-  powered_by             : # true (default), false
-google:
-  search_engine_id       : # YOUR_SEARCH_ENGINE_ID
-  instant_search         : # false (default), true
 # SEO Related
-google_site_verification : "google167226cfabb37bdd.html"
+google_site_verification :
 bing_site_verification   :
 naver_site_verification  :
 yandex_site_verification :
@@ -94,7 +54,6 @@ baidu_site_verification  :
 twitter:
   username               :
 facebook:
-  username               :
   app_id                 :
   publisher              :
 og_image                 : "/assets/images/author.png" # Open Graph/Twitter default site image
@@ -102,8 +61,7 @@ og_image_alt             : "효석의 기술 블로그 대표 이미지"
 # For specifying social profiles
 # - https://developers.google.com/structured-data/customize/social-profiles
 social:
-  type                   : "Person"
-  name                   : "백효석"
+  name                  : "백효석"
   links: # An array of links to social media profiles
     - "https://github.com/alexization"
 
@@ -120,36 +78,29 @@ author:
   name             : "백효석"
   home             : "/about/"
   avatar           : "/assets/images/author.png"  # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
+  avatar_small     : "/assets/images/author-avatar.webp" # 화면에 찍는 96·72px 아바타용 288px. avatar는 구조화 데이터가 그대로 씀
   bio              : "내 기억력을 믿지 않는다. 꾸준히 기록하자." # "I am an **amazing** person."
   location         : "Seoul, Korea"
   email            : # "alexization@gmail.com"
   links:
     - label: "GitHub"
-      icon: "fab fa-fw fa-github"
       url: "https://github.com/alexization"
     - label: "Email"
-      icon: "fas fa-fw fa-envelope-square"
       url: "mailto:alexization@gmail.com"
 # Site Footer
 footer:
   links:
     - label: "Twitter"
-      icon: "fab fa-fw fa-twitter-square"
       # url:
     - label: "Facebook"
-      icon: "fab fa-fw fa-facebook-square"
       # url:
     - label: "GitHub"
-      icon: "fab fa-fw fa-github"
       url: "https://github.com/alexization"
     - label: "GitLab"
-      icon: "fab fa-fw fa-gitlab"
       # url:
     - label: "Bitbucket"
-      icon: "fab fa-fw fa-bitbucket"
       # url:
     - label: "Instagram"
-      icon: "fab fa-fw fa-instagram"
       # url:
   since: "2025"
 
@@ -186,6 +137,9 @@ exclude:
   - tmp
   - /docs # ignore Minimal Mistakes /docs
   - /test # ignore Minimal Mistakes /test
+  - PRODUCT.md
+  - DESIGN.md
+  - docs/redesign
 keep_files:
   - .git
   - .svn
@@ -227,31 +181,6 @@ permalink: /:categories/:title/
 timezone: Asia/Seoul # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
 
-# Pagination with jekyll-paginate
-paginate: 10 # amount of posts to show
-paginate_path: /page:num/
-
-# Pagination with jekyll-paginate-v2
-# See https://github.com/sverrirs/jekyll-paginate-v2/blob/master/README-GENERATOR.md#site-configuration
-#   for configuration details
-pagination:
-  # Set enabled to true to use paginate v2
-  # enabled: true
-  debug: false
-  collection: 'posts'
-  per_page: 10
-  permalink: '/page/:num/'
-  title: ':title - page :num'
-  limit: 0
-  sort_field: 'date'
-  sort_reverse: true
-  category: 'posts'
-  tag: ''
-  locale: ''
-  trail:
-    before: 2
-    after: 2
-
 redirect_from:
   json: false
 
@@ -260,7 +189,6 @@ redirect_from:
 plugins:
   - jekyll-redirect-from
   - jekyll-sitemap
-  - jekyll-paginate
   - jekyll-gist
   - jekyll-feed
   - jekyll-include-cache
@@ -268,47 +196,16 @@ plugins:
 # mimic GitHub Pages with --safe
 whitelist:
   - jekyll-sitemap
-  - jekyll-paginate
   - jekyll-gist
   - jekyll-feed
   - jekyll-include-cache
 
 
 # Archives
-#  Type
-#  - GitHub Pages compatible archive pages built with Liquid ~> type: liquid (default)
-#  - Jekyll Archives plugin archive pages ~> type: jekyll-archives
-#  Path (examples)
-#  - Archive page should exist at path when using Liquid method or you can
-#    expect broken links (especially with breadcrumbs enabled)
-#  - <base_path>/tags/my-awesome-tag/index.html ~> path: /tags/
-#  - <base_path>/categories/my-awesome-category/index.html ~> path: /categories/
-#  - <base_path>/my-awesome-category/index.html ~> path: /
 category_archive:
-  type: liquid
   path: /categories/
 tag_archive:
-  type: liquid
   path: /tags/
-# https://github.com/jekyll/jekyll-archives
-# jekyll-archives:
-#   enabled:
-#     - categories
-#     - tags
-#   layouts:
-#     category: archive-taxonomy
-#     tag: archive-taxonomy
-#   permalinks:
-#     category: /categories/:name/
-#     tag: /tags/:name/
-
-
-# HTML Compression
-# - https://jch.penibelst.de/
-compress_html:
-  clippings: all
-  ignore:
-    envs: development
 
 
 # Defaults
@@ -330,7 +227,7 @@ defaults:
       path: ""
       type: posts
     values:
-      layout: single
+      layout: post
       author_profile: true
       read_time: true
       comments: true

@@ -4,6 +4,7 @@ header:
    og_image: "https://cdn.imgchest.com/files/284059f0f012.png"
 
 title: "Redis Stream으로 개선한 선착순 이벤트 시스템 (2편)"
+series: "선착순 이벤트 시스템"
 excerpt: "Spring Boot + MySQL 구조의 성능 병목을 Redis Stream 비동기 처리로 해결하여 1,666 RPS 달성과 66% 성능 향상을 이룬 과정을 다룹니다."
 categories:
   - Backend
@@ -22,13 +23,13 @@ date: 2025-03-23
 last_modified_at: 2025-03-23 
 ---
 
-![mainImage](https://cdn.imgchest.com/files/284059f0f012.png)
+![](https://cdn.imgchest.com/files/284059f0f012.png)
 
 1편에서는 Spring Boot와 MySQL만으로 선착순 이벤트 시스템을 구현하고 그 한계점을 분석했습니다.
 
 이번 글에서는 Redis Stream을 활용하여 시스템을 어떻게 개선했는지 그리고 그 결과로 성능이 어떻게 향상 되었는지 공유하고자 합니다.
 
-# Spring + MySQL 구조에서의 문제점
+## Spring + MySQL 구조에서의 문제점
 
 단일 서버 환경의 Spring Boot + MySQL 구조로 시스템을 구현했을 때 심각한 병목 현상들이 발견되었습니다.
 
@@ -48,7 +49,7 @@ last_modified_at: 2025-03-23
 
 시스템의 핵심적인 병목은 **데이터베이스**였습니다. MySQL의 락 메커니즘은 데이터 정확성은 보장했지만 고부하 환경에서 심각한 성능 문제를 발생시켰습니다.
 
-# Redis 도입을 결정한 이유
+## Redis 도입을 결정한 이유
 
 1. **메모리 기반 처리**
     - Redis는 인메모리 데이터 저장소로서 디스크 기반의 MySQL보다 훨씬 빠른 처리 속도를 제공합니다.
@@ -64,7 +65,7 @@ last_modified_at: 2025-03-23
 
 이러한 이유들로 **Redis를 활용한 비동기 처리 방식**이 가장 적합하다고 판단했습니다.
 
-## Redis 메시징 솔루션 비교
+### Redis 메시징 솔루션 비교
 
 Redis에서 메시징을 구현할 수 있는 방법은 여러 가지가 있었습니다.
 
@@ -81,7 +82,7 @@ Redis에서 메시징을 구현할 수 있는 방법은 여러 가지가 있었�
     - **장점**: 로그 기반 데이터 구조로 설계되어 메시지 지속성, 컨슈머 그룹, 장애 복구 등 메시징 시스템에 필요한 기능을 제공합니다.
     - **단점**: Redis 5.0 이상에서만 사용 가능하며 다른 방식보다 상대적으로 복잡한 API를 가지고 있습니다.
 
-## Redis Stream을 선택한 이유
+### Redis Stream을 선택한 이유
 
 1. **메시지 지속성 보장**
     - Stream에 저장된 메시지는 명시적으로 삭제하지 않는 한 Redis 서버에 계속 유지됩니다.
@@ -104,11 +105,11 @@ Redis에서 메시징을 구현할 수 있는 방법은 여러 가지가 있었�
 
 (추가적으로 그냥 Redis Pub/Sub이나 List 자료형을 사용하지 않는 이유는 DB에 저장된 applyTime이 오름차순으로 들어가지 않기 때문에 서버가 처리한 그 순서대로 DB에 저장할 수 있도록 하기 위해 Redis Stream을 적용하기로 생각했다.)
 
-# Redis Stream을 활용한 선착순 이벤트 시스템
+## Redis Stream을 활용한 선착순 이벤트 시스템
 
 Redis Stream을 선착순 이벤트 시스템에 적용해보겠습니다.
 
-## 1. 메시지 구성 (Entry)
+### 1. 메시지 구성 (Entry)
 
 사용자가 이벤트에 응모하면 아래와 같은 정보를 포함한 메시지가 생성됩니다.
 
@@ -119,7 +120,7 @@ Redis Stream을 선착순 이벤트 시스템에 적용해보겠습니다.
 - `1742648840457-0` 은 메시지 ID (타임스탬프-시퀀스)
 - `name`, `phoneNumber`, `applyTime` 은 응모 정보를 담고 있는 필드들
 
-## 2. 스트림 (Stream)
+### 2. 스트림 (Stream)
 
 모든 응모 정보는 `apply:stream` 이라는 스트림에 시간순으로 저장됩니다.
 
@@ -132,7 +133,7 @@ Redis Stream을 선착순 이벤트 시스템에 적용해보겠습니다.
 
 이벤트 시작 직후의 스트림 상태는 위와 같이 들어갈 것입니다.
 
-## 3. 컨슈머 그룹과 컨슈머
+### 3. 컨슈머 그룹과 컨슈머
 
 이 응모 데이터를 처리하기 위해 `apply-processors` 라는 컨슈머 그룹을 생성하고 여러 컨슈머 인스턴스를 실행합니다.
 
@@ -144,9 +145,9 @@ XGROUP CREATE apply:stream apply-processors 0
 - `consumer2` : 백업용 컨슈머로 장애 발생 시 대체 역할 **(예시로 해당 컨슈머는 생성하지 않음)**
 - `consumer3` : 실시간 통계 집계 담당 **(예시로 해당 컨슈머는 생성하지 않음)**
 
-# Redis Stream 구현
+## Redis Stream 구현
 
-## 1. Redis 설정 및 Stream 초기화
+### 1. Redis 설정 및 Stream 초기화
 
 먼저 Redis 연결 및 Stream을 초기화하는 설정 코드를 작성했습니다.
 
@@ -221,7 +222,7 @@ public class StreamConfig {
 }
 ```
 
-## 2. 메시지 리스너 구현
+### 2. 메시지 리스너 구현
 
 Redis Stream에서 메시지를 소비하고 데이터베이스에 저장하는 리스너를 구현했습니다.
 
@@ -268,7 +269,7 @@ public class ApplyStreamListener implements StreamListener<String, MapRecord<Str
 }
 ```
 
-## 3. 응모 서비스 구현
+### 3. 응모 서비스 구현
 
 긱존의 직접 DB로 접근하는 방식에서 Redis Stream을 활용한 비동기 처리 방식으로 변경했습니다.
 
@@ -321,13 +322,13 @@ public class ApplyService {
 }
 ```
 
-# Redis Stream 적용 프로세스 흐름
+## Redis Stream 적용 프로세스 흐름
 
 Redis Stream을 적용한 선착순 이벤트 시스템의 전체 프로세스 흐름은 크게 **클라이언트 요청 처리**와 **비동기 메시지 처리** 두 부분으로 나눌 수 있습니다.
 
-![redis-stream-architecture-revised.svg](https://i.imgur.com/vz4o0WK.png)
+![구조도: 요청이 ApplyController와 ApplyService를 거쳐 Redis Stream에 저장되면 바로 성공 응답하고, ApplyStreamListener가 비동기로 메시지를 받아 MySQL에 저장한 뒤 ACK하는 흐름](https://i.imgur.com/vz4o0WK.png)
 
-## 클라이언트 요청 처리 과정
+### 클라이언트 요청 처리 과정
 
 1. **중복 응모 체크 (Redis)**
     - `phoneNumber` 를 key로 사용해 Redis에 값을 저장(`SETIFABSENT`)
@@ -343,7 +344,7 @@ Redis Stream을 적용한 선착순 이벤트 시스템의 전체 프로세스 �
     - Redis Stream에 메시지 추가(`XADD`)
     - 클라이언트에게 성공 응답 반환 **(DB 저장 완료를 기다리지 않음)**
 
-## 비동기 메시지 처리 과정
+### 비동기 메시지 처리 과정
 
 1. **메시지 리스닝 (Redis → 애플리케이션)**
     - Spring의 `StreamMessageListenerContainer` 가 Redis Stream으로부터 새 메시지를 지속적으로 폴링
@@ -374,7 +375,7 @@ Redis Stream을 적용한 선착순 이벤트 시스템의 전체 프로세스 �
 
 이를 통해 클라이언트는 DB 저장 여부와 상관없이 빠르게 응답을 받을 수 있고, 서버는 부하를 효과적으로 분산시킬 수 있습니다.
 
-# 성능 테스트 및 모니터링 결과
+## 성능 테스트 및 모니터링 결과
 
 새로운 아키텍처의 성능을 검증하기 위해 이전과 동일한 환경에서 테스트를 진행했습니다.
 
@@ -382,11 +383,11 @@ Redis Stream을 적용한 선착순 이벤트 시스템의 전체 프로세스 �
 - **모니터링 :** Prometheus, Grafana
 - **테스트 시나리오 :** 초당 **1,666건**의 요청을 10분간 전송
 
-## JVM 메모리 및 GC 분석
+### JVM 메모리 및 GC 분석
 
-![스크린샷 2025-03-22 오전 12.34.08.png](https://i.imgur.com/ZINn961.png)
+![Grafana JVM 힙 그래프(개선 후): G1 Eden Space 사용량이 최대 약 115MB까지 오르내리며 반복해서 비워지고, Old Gen과 Survivor Space는 낮게 안정된 모습](https://i.imgur.com/ZINn961.png)
 
-![스크린샷 2025-03-22 오전 12.34.26.png](https://i.imgur.com/BOpqyjg.png)
+![Grafana GC 그래프(개선 후): Minor GC가 초당 평균 1.733회, Stop-the-World 시간은 평균 2.89ms, 최대 6.20ms인 결과](https://i.imgur.com/BOpqyjg.png)
 
 **기존 시스템 (1,000 RPS)**
 
@@ -404,13 +405,13 @@ Redis Stream 도입으로 객체 생성 패턴이 최적화되었습니다. 처�
 
 비동기 처리 방식은 DB 연결에 필요한 임시 객체 생성을 크게 줄이는 효과를 가져왔으며 전체적인 메모리 사용 패턴을 안정적으로 만들었습니다.
 
-## Thread Pool 분석
+### Thread Pool 분석
 
-![스크린샷 2025-03-22 오전 12.34.51.png](https://i.imgur.com/nj044tz.png)
+![Grafana 스레드 그래프(개선 후): 현재 스레드 수가 200대에 머물다 테스트 중반 400까지 올라 끝까지 유지되고, 평균 334개인 결과](https://i.imgur.com/nj044tz.png)
 
-![스크린샷 2025-03-22 오전 12.34.18.png](https://i.imgur.com/RcvPPXz.png)
+![Grafana JVM 스레드와 메모리 할당 그래프(개선 후): Daemon 평균 360개, Live 평균 366개이고, 할당량은 약 192MiB 안팎으로 꾸준하며 승격(promoted)은 거의 0인 모습](https://i.imgur.com/RcvPPXz.png)
 
-![스크린샷 2025-03-22 오전 12.35.01.png](https://i.imgur.com/9cQ3INS.png)
+![Grafana Tomcat 통계(개선 후): 스레드 최대 설정 400개, HTTP 응답은 초당 약 1.67K건 대부분이 4xx이고 2xx는 0.200 ops/s인 결과](https://i.imgur.com/9cQ3INS.png)
 
 **기존 시스템 (1,000 RPS)**
 
@@ -427,11 +428,11 @@ Redis Stream을 도입함으로써 스레드 활용도가 향상되었습니다.
 
 특히 Redis의 비동기 메시지 처리 방식으로 인해 스레드가 DB 커넥션을 기다리는 시간이 최소화되어 동일한 스레드 풀로 66% 더 많은 요청을 처리할 수 있게 되었습니다.
 
-## DB Connection Pool 분석
+### DB Connection Pool 분석
 
-![스크린샷 2025-03-22 오전 12.34.33.png](https://i.imgur.com/m6Pz809.png)
+![Grafana HikariCP 통계(개선 후): 커넥션 50개 중 평균 49개가 idle이고 대기와 타임아웃은 0, 사용 시간 약 1.6ms, 획득 시간 1.2ms 이하로 유지된 결과](https://i.imgur.com/m6Pz809.png)
 
-![스크린샷 2025-03-22 오전 12.34.44.png](https://i.imgur.com/TKZcO1H.png)
+![Grafana 요청 처리 시간 그래프(개선 후): 평균은 0.00161 수준으로 바닥에 붙어 있고, 최댓값만 계단식으로 올라 0.529에 이른 모습](https://i.imgur.com/TKZcO1H.png)
 
 **기존 시스템 (1,000 RPS)**
 
@@ -450,11 +451,11 @@ HikariCP 통계를 보면 환성 커넥션이 평균 1개로 기존 대비 현�
 
 특히 커넥션 획득 시간이 180ms에서 1.2ms로 99% 감소하고 커넥션 사용 시간도 40ms에서 1.6ms로 96% 단축됐습니다.
 
-## CPU 사용률 분석
+### CPU 사용률 분석
 
-![스크린샷 2025-03-22 오전 12.33.50.png](https://i.imgur.com/Z9lfzkQ.png)
+![Grafana CPU 사용률 그래프(개선 후): 시스템 CPU 평균 42%, 프로세스 CPU 평균 11.7%로 큰 튐 없이 고르게 유지된 결과](https://i.imgur.com/Z9lfzkQ.png)
 
-![스크린샷 2025-03-22 오전 12.33.55.png](https://i.imgur.com/5uLFNuv.png)
+![Grafana Load Average 그래프(개선 후): 1분 부하가 평균 6.07이고, 00:30 직후 13.1까지 튀어 CPU 코어 수 8을 잠시 넘었다가 다시 4대로 내려온 모습](https://i.imgur.com/5uLFNuv.png)
 
 **기존 시스템 (1,000 RPS)**
 
@@ -471,7 +472,7 @@ CPU 활용도 측면에서도 큰 개선이 이루어졌습니다. 기존 시스
 
 프로세스 CPU 사용률 11.7%는 애플리케이션이 효율적으로 CPU를 활용하고 있음을 보여주며 I/O bound 상태에서 균형 잡인 상태로 전환되었음을 나타내는 지표입니다.
 
-# 결과
+## 결과
 
 Redis Stream을 활용한 비동기 처리 방식으로 전환한 결과 동일한 하드웨어 환경에서 처리량이 66% 증가했음에도 시스템의 안정성과 확장성이 크게 향상되었습니다. 특히 DB 커넥션 관리와 스레드 활용 효율성이 극적으로 개선되어 목표했던 1,666 RPS의 이벤트 처리를 안정적으로 달성할 수 있게 되었습니다.
 

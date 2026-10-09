@@ -1,0 +1,27 @@
+<meta charset="utf-8">
+
+{% include seo.html %}
+
+{% unless site.atom_feed.hide %}
+  <link href="{% if site.atom_feed.path %}{{ site.atom_feed.path }}{% else %}{{ '/feed.xml' | relative_url }}{% endif %}" type="application/atom+xml" rel="alternate" title="{{ site.title }} Feed">
+{% endunless %}
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+{%- comment -%} 다크모드 없음(브리프 3-3). 브라우저가 색을 강제로 뒤집지 않게 밝은 화면 전용이라고 알림 {%- endcomment %}
+<meta name="color-scheme" content="only light">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+{%- comment -%} 본문 글꼴 A 조각은 모든 페이지가 씀. CSS를 다 읽기 전에 받기 시작 {%- endcomment %}
+<link rel="preload" href="{{ '/assets/fonts/blog-sans-a.woff2' | relative_url }}" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="{{ '/assets/css/blog.css' | relative_url }}">
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-title" content="효석의 기술 블로그" />
+<link rel="manifest" href="/site.webmanifest" />

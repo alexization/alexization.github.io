@@ -1,0 +1,33 @@
+// 값은 docs/redesign/02-brief.md 1절(고정)
+
+// 화면 구분: 모바일 = 768px 이하, 코드 블록 480px 이하, TOC 1401px 이상
+$mobile: 768px;
+$code-narrow: 480px;
+$toc-min: 1401px;
+
+$column: 715px;
+$gutter: 20px;
+
+:root {
+  --green: #2F5D50;
+  --green-dark: #244A40;
+  --green-mist: #EDF3EF;
+  --green-leaf: #C8D9CE;
+  --green-soft: #83A799;
+
+  --text-heading: #191F28;
+  --text-body: #333D4B;
+  --text-sub: #4E5968;
+  --text-lineno: #8B95A1;
+
+  --line: #E5E8EB;
+  --line-table: #D1D6DB;
+  --surface-gray: #F2F4F6;
+  --bg: #FFFFFF;
+
+  // Blog Sans = Pretendard Variable 서브셋(_fonts.scss). 서브셋에 없는 글자는 설치된 Pretendard → 시스템 글꼴로
+  --font-sans: "Blog Sans", "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  --font-mono: "Source Code Pro", "Blog Sans", "Pretendard Variable", Pretendard, ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --shadow-float: 0 5px 20px rgba(0, 0, 0, .12);
+}

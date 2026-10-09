@@ -30,7 +30,7 @@ last_modified_at: 2025-01-24
 
 댕글 서비스 검색 화면
 
-# 데이터베이스 구조
+## 데이터베이스 구조
 
 문제를 이해하기 위해 먼저 관련 테이블의 구조를 살펴보겠습니다. 미용사 테이블 `groomers` 은 뱃지 테이블 `grooming_badges` 과 자격증 테이블 `groomer_business_licenses` 과 1:N 관계를 가지고 있습니다.
 
@@ -86,7 +86,7 @@ public class GroomerJpaEntity {
 }
 ```
 
-# 기존 검색 API 구현과 N+1 문제 발견
+## 기존 검색 API 구현과 N+1 문제 발견
 
 *아래는 미용실 기준으로 분석했으며, 미용실과 병원 모두 같은 방식으로 동작합니다.*
 
@@ -110,7 +110,7 @@ Page<GroomerJpaEntity> findGroomersByKeywords(
 
 *위 코드의 `MEMBER OF` 는 Hibernate 에서 컬렉션 필드에 특정 값이 포함되어 있는지 확인하는 목적으로 사용했습니다.*
 
-## N+1 문제 발생 원인 분석
+### N+1 문제 발생 원인 분석
 
 > 댕글 프로젝트는 도메인 주도 설계(DDD) 원칙을 따르는 멀티 모듈 구조로 구성되어 있습니다.
 >
@@ -182,9 +182,9 @@ Hibernate: select b1_0.groomer_id,b1_0.grooming_badge from grooming_badges b1_0 
 
 이러한 N+1 문제는 데이터가 많아질수록 성능 저하가 심각해지며, 데이터베이스와 애플리케이션 서버에 불필요한 부하를 주기 때문에 이 문제를 해결할 필요가 있었습니다.
 
-# 해결 접근법 탐색
+## 해결 접근법 탐색
 
-## Fetch Join 시도
+### Fetch Join 시도
 
 > Fetch Join이란 JPQL로 특정 엔티티를 조회할 때 연관된 엔티티 혹은 컬렉션을 즉시 로딩과 같이 한 번에 함께 조회하는 기능입니다.
 >
@@ -231,7 +231,7 @@ firstResult/maxResults specified with collection fetch; applying in memory!
    즉, `1:N, N:N` 관계의 컬렉션을 Fetch Join하면서 동시에 페이징을 사용하게 된다면, 데이터가 많은 경우 `OutOfMemoryError` 가 발생할 가능성이 높습니다.
 
 
-## 데이터 단계적 로드 시도
+### 데이터 단계적 로드 시도
 
 > Fetch Join 문제를 해결하기 위해 쿼리를 두 단계로 나눠 **데이터를 단계적으로 로드하는 방식으로 변경**했습니다.
 >
@@ -309,7 +309,7 @@ Hibernate: select l1_0.account_id,l1_0.license_id,l1_0.acquisition_date,l1_0.ima
 
 다시 말해, 굳이 `Groomers` 엔티티 객체를 모두 가져올 필요 없이 **결과에 필요한 데이터만 로드**한다면, 메모리와 네트워크 사용량을 줄이고 Hibernate의 Fetch Join 제한을 완전히 피할 수 있습니다.
 
-## Native Query를 활용한 해결책
+### Native Query를 활용한 해결책
 
 `Groomers` 엔티티를 전부 가져오는 대신 **검색 결과에 필요한 데이터만을 가져오도록** 변경하였습니다.
 
@@ -420,7 +420,7 @@ Hibernate:
 
 N+1문제를 해결함으로써 추가적인 쿼리가 발생하지 않아 **데이터베이스 쿼리 성능 향상**을 기대할 수 있었으며, 데이터 양이 많아질수록 쿼리 횟수와 실행 시간이 기하급수적으로 증가하는 문제를 해결하며 **데이터 증가에 따라 발생하는 성능 문제를 사전에 방지**할 수 있었습니다.
 
-# 참고 자료
+## 참고 자료
 
 ---
 

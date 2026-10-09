@@ -4,6 +4,7 @@ header:
   og_image: "https://cdn.imgchest.com/files/4dfac6b76b0f.png"
 
 title: "[Git Ranker #10] 외국인도 참여할 수 있도록. 국제화(i18n) 구축기"
+series: "Git Ranker"
 excerpt: "운영 지표에서 한국어 사용자가 절대다수라는 사실을 확인한 뒤, Git Ranker를 외국인도 이해할 수 있는 서비스로 확장하기 위해 메시지 흐름을 국제화한 기록"
 
 categories:
@@ -26,7 +27,7 @@ date: 2026-02-24
 last_modified_at: 2026-03-30
 ---
 
-![mainImage](https://cdn.imgchest.com/files/4dfac6b76b0f.png)
+![](https://cdn.imgchest.com/files/4dfac6b76b0f.png)
 
 Git Ranker를 처음 만들 때는 사실상 **한국인 사용자만 떠올리고** 있었습니다. 실제 운영 지표도 그렇게 보였습니다. Search Console과 Analytics를 확인해 보니 한국어 사용자 비중이 압도적으로 높았고, 체감상도 외국인 유입은 거의 없었습니다.
 
@@ -39,9 +40,9 @@ Git Ranker를 처음 만들 때는 사실상 **한국인 사용자만 떠올리�
 이번 국제화 작업은 화면 전체 번역이 아니라, <strong>백엔드 응답 메시지의 국제화 기반</strong>을 만드는 데 집중합니다. 즉, `Accept-Language`에 따라 예외와 검증 메시지를 안정적으로 바꿔 내려주는 구조를 정리하는 작업입니다.
 </aside>
 
-# 1. 96% 한국인이라는 숫자의 의미
+## 1. 96% 한국인이라는 숫자의 의미
 
-![google search console](https://i.imgur.com/mIanPUL.png)
+![Search Console 상위 국가 클릭 비율: 한국 96%, 일본 4%, 알제리·프랑스·미국은 각각 1% 미만](https://i.imgur.com/mIanPUL.png)
 
 처음에는 이 지표를 보고 이렇게 생각했습니다.
 
@@ -55,7 +56,7 @@ Git Ranker를 처음 만들 때는 사실상 **한국인 사용자만 떠올리�
 
 즉, **외국인 사용자가 적다**는 사실만으로 **외국인 사용자가 필요 없다**고 결론 내릴 수는 없었습니다. 오히려 지금 구조가 외국인에게 불리하게 설계되어 있을 가능성을 먼저 의심해야 했습니다.
 
-![google search console2](https://i.imgur.com/T7nyw1n.png)
+![Search Console 국가별 클릭수와 노출: 한국은 클릭 72회에 노출 147회, 일본은 클릭 3회이고, 미국·멕시코·알제리·프랑스·사우디아라비아는 노출만 있고 클릭은 0회](https://i.imgur.com/T7nyw1n.png)
 
 그래서 이번 작업의 목표를 이렇게 잡았습니다.
 
@@ -63,7 +64,7 @@ Git Ranker를 처음 만들 때는 사실상 **한국인 사용자만 떠올리�
 2. 비즈니스 예외와 검증 실패가 같은 규칙으로 동작해야 한다.
 3. 이후 언어가 늘어나도 비즈니스 코드 수정은 최소화되어야 한다.
 
-# 2. 번역 파일보다 먼저 드러난 구조 문제
+## 2. 번역 파일보다 먼저 드러난 구조 문제
 
 국제화(i18n)를 처음 생각하면 흔히 `messages_en.properties`부터 떠올리게 됩니다. 저도 처음에는 그랬습니다. 하지만 코드를 뜯어보니, Git Ranker에는 아직 **번역을 얹을 수 있는 구조 자체가 충분히 준비되어 있지 않았습니다.**
 
@@ -94,7 +95,7 @@ Git Ranker를 처음 만들 때는 사실상 **한국인 사용자만 떠올리�
 
 프론트 전체 문구, 배치 로그, 관리자 전용 메시지까지 한 번에 건드리지는 않았습니다. **이번 목표는 "영어 지원 완료"가 아니라 "확장 가능한 메시지 레이어 구축"** 이었습니다.
 
-# 3. `Accept-Language` 기반 언어 협상 인프라
+## 3. `Accept-Language` 기반 언어 협상 인프라
 
 첫 단계는 `MessageSource`와 `LocaleResolver`를 붙여, 요청이 들어왔을 때 **어떤 언어를 선택할지 결정하는 경로**를 만드는 일이었습니다.
 
@@ -137,7 +138,7 @@ Accept-Language: en-US,en;q=0.9,ko;q=0.8
 
 이 방식이 좋았던 이유는 API 특성 때문이었습니다. 세션에 언어 상태를 따로 저장하지 않아도 되고, 요청마다 헤더만 보면 어떤 언어로 응답할지 결정할 수 있어서 동작이 단순합니다. **국제화된 API는 결국 "문장을 어디에 둘 것인가"뿐 아니라, "요청마다 어떤 언어를 선택할 것인가"를 함께 정의해야 합니다.**
 
-# 4. `ErrorType`의 역할 재정의
+## 4. `ErrorType`의 역할 재정의
 
 국제화에서 가장 먼저 손을 대야 했던 곳은 `ErrorType`이었습니다. 기존 구조에서는 enum이 사용자 문장을 직접 들고 있었습니다.
 
@@ -161,7 +162,7 @@ INVALID_REQUEST(HttpStatus.BAD_REQUEST, "error.common.invalid-request", LogLevel
 
 이렇게 분리해두면 도메인 로직은 "이 상황은 `INVALID_REQUEST`다"까지만 알면 됩니다. **어떤 언어로, 어떤 어조로 사용자에게 보여줄지는 응답 레이어에서 늦게 결정할 수 있습니다.**
 
-# 5. 예외 메시지의 해석 시점
+## 5. 예외 메시지의 해석 시점
 
 메시지 key를 도입했다면, 결국 어딘가에서는 그 key를 실제 문장으로 바꿔야 합니다. Git Ranker에서는 그 책임을 `GlobalExceptionHandler`에 두었습니다.
 
@@ -192,7 +193,7 @@ error.github.rate-limit-retry-after=Please try again after {0}.
 
 이렇게 해두면 문자열을 코드에서 이어 붙이지 않아도 되고, 언어마다 어순이 달라져도 메시지 파일에서 자연스럽게 조정할 수 있습니다.
 
-# 6. 정적 응답 구조와 `MessageSource` 연결
+## 6. 정적 응답 구조와 `MessageSource` 연결
 
 문제는 여기서 끝나지 않았습니다. Git Ranker의 응답 구조는 `ApiResponse.error(...)` 같은 **정적 팩토리**를 중심으로 돌아가고 있었고, 내부에서 `ErrorMessage` 객체를 바로 생성하고 있었습니다.
 
@@ -235,7 +236,7 @@ public ErrorMessage(ErrorType errorType, Object data) {
 
 이 지점이 이번 작업에서 개인적으로 가장 "국제화는 설계"라고 느껴졌던 부분이었습니다. **번역 파일을 추가하는 것보다, 기존 구조의 어느 지점에서 locale을 해석할지를 정하는 일이 더 어려웠기 때문입니다.**
 
-# 7. 검증 메시지까지 국제화해야 하는 이유
+## 7. 검증 메시지까지 국제화해야 하는 이유
 
 예외 메시지만 국제화하고 검증 메시지를 그대로 두면 경험이 어색해집니다. 사용자는 성공 응답보다 **입력 검증 실패**를 더 자주 먼저 만나기 때문입니다.
 
@@ -275,7 +276,7 @@ validation.ranking.page.min=Page number must be 0 or greater.
 
 이렇게 해두면 사용자가 `Accept-Language: en`으로 요청했을 때, 비즈니스 예외뿐 아니라 validation error도 같은 방식으로 영어로 내려갑니다. **국제화는 일부 메시지만 바꾸는 작업이 아니라, 사용자가 만나는 실패 경험 전체를 같은 규칙으로 맞추는 작업**에 가깝습니다.
 
-# 8. 언어별 응답 변화
+## 8. 언어별 응답 변화
 
 예를 들어 `/api/v1/ranking?page=-1` 요청은 `RankingController`의 `@Min` 검증에 걸립니다.
 
@@ -311,7 +312,7 @@ validation.ranking.page.min=Page number must be 0 or greater.
 
 여기서 중요한 점은 `type` 자체는 그대로 유지된다는 것입니다. 즉, **클라이언트는 안정적인 에러 코드를 기준으로 처리하고**, 사용자에게 보여줄 문구만 locale에 따라 바뀝니다. 이 분리가 있어야 국제화가 들어가도 API 계약이 흔들리지 않습니다.
 
-# 9. 이번 작업의 성과와 남은 과제
+## 9. 이번 작업의 성과와 남은 과제
 
 이번 변경으로 얻은 것은 단순히 영어 문장 몇 줄이 아니었습니다.
 

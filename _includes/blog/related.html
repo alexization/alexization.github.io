@@ -1,0 +1,29 @@
+{%- comment -%}
+  최신순으로 훑어서 자기 자신·같은 시리즈 글은 빼고, 카테고리가 하나라도 겹치면 담음. 4개에서 멈춤.
+{%- endcomment -%}
+{%- assign related_posts = "" | split: "" -%}
+{%- for post in site.posts -%}
+  {%- if related_posts.size >= 4 %}{% break %}{% endif -%}
+  {%- if post.url == page.url %}{% continue %}{% endif -%}
+  {%- if page.series and post.series == page.series %}{% continue %}{% endif -%}
+  {%- assign shares_category = false -%}
+  {%- for category in post.categories -%}
+    {%- if page.categories contains category -%}
+      {%- assign shares_category = true -%}
+      {%- break -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {%- if shares_category -%}
+    {%- assign related_posts = related_posts | push: post -%}
+  {%- endif -%}
+{%- endfor -%}
+{%- if related_posts.size > 0 %}
+<section class="related" aria-labelledby="related-title">
+  <h2 class="section-title" id="related-title">관련 글</h2>
+  <ul class="card-grid">
+    {%- for post in related_posts %}
+    <li>{% include blog/post-card.html post=post %}</li>
+    {%- endfor %}
+  </ul>
+</section>
+{%- endif %}

@@ -1,0 +1,7 @@
+{%- comment -%} include 인자에는 필터를 못 써서 먼저 assign {%- endcomment -%}
+{%- assign toc_max = page.toc_max | default: 3 -%}
+<nav class="toc" aria-label="목차">
+  <div class="toc__inner">
+    {% include toc.html html=content sanitize=true h_min=2 h_max=toc_max skip_no_ids=true class="toc__list" %}
+  </div>
+</nav>

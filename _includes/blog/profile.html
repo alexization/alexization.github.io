@@ -1,0 +1,14 @@
+<section class="profile" aria-label="소개">
+  <img class="profile__avatar" src="{{ site.author.avatar_small | default: site.author.avatar | relative_url }}" alt="" width="96" height="96">
+  <p class="profile__name">{{ site.author.name }}</p>
+  {%- if site.author.bio %}
+  <p class="profile__bio">{{ site.author.bio }}</p>
+  {%- endif %}
+  <ul class="profile__links">
+    {%- for link in site.author.links %}
+      {%- if link.url %}
+    <li><a href="{{ link.url }}"{% unless link.url contains 'mailto:' %} rel="me"{% endunless %}>{{ link.label }}</a></li>
+      {%- endif %}
+    {%- endfor %}
+  </ul>
+</section>

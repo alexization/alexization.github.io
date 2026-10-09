@@ -1,0 +1,18 @@
+<header class="site-header">
+  <a class="site-logo" href="{{ '/' | relative_url }}">
+    <img class="site-logo__mark" src="{{ '/assets/images/logo.svg' | relative_url }}" width="32" height="32" alt="" aria-hidden="true">
+    <span>{{ site.title }}</span>
+  </a>
+  <div class="site-header__nav">
+    <nav aria-label="메인 메뉴">
+      <ul class="site-nav">
+        {%- for link in site.data.navigation.main %}
+        <li><a href="{{ link.url | relative_url }}"{% if page.url == link.url %} aria-current="page"{% endif %}>{{ link.title }}</a></li>
+        {%- endfor %}
+      </ul>
+    </nav>
+    <button type="button" class="search-button" aria-label="검색" aria-haspopup="dialog" data-search-open>
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="8.75" cy="8.75" r="5.75" stroke="currentColor" stroke-width="1.75"/><path d="m13.25 13.25 4 4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>

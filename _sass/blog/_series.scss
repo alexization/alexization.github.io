@@ -1,0 +1,49 @@
+@use "tokens" as *;
+
+.series {
+  margin-top: 24px;
+  padding: 16px;
+  border-radius: 8px;
+  background: var(--surface-gray);
+}
+
+.series__title {
+  margin: 0 0 8px;
+  color: var(--text-heading);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.35;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+.series__list {
+  margin: 0;
+  padding-left: 1.25em;
+  color: var(--text-body);
+  font-size: 15px;
+  line-height: 1.6;
+  list-style: disc;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+
+  li + li {
+    margin-top: 4px;
+  }
+
+  a {
+    color: var(--text-body);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--text-heading);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+  }
+
+  strong {
+    color: var(--text-heading);
+    font-weight: 700;
+  }
+}

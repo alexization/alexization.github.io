@@ -29,3 +29,6 @@ codekit-config.json
 .sass-cache
 _asset_bundler_cache
 _site
+
+# Python (_tools 스크립트용 가상환경)
+.venv

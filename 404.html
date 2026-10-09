@@ -1,0 +1,18 @@
+---
+layout: base
+title: "페이지를 찾을 수 없습니다"
+permalink: /404.html
+seo_noindex: true
+---
+
+{%- comment -%} 없는 주소마다 GitHub Pages가 보여 주는 화면(E17). /a/b/c/ 같은 깊은 주소에서도 열리니 링크는 relative_url로 루트부터. 머리·본문은 글 페이지 규칙 그대로 {%- endcomment -%}
+<header class="post-header">
+  <h1 class="post-title">{{ page.title }}</h1>
+</header>
+
+<div class="post-body">
+  <div class="post-content">
+    <p>주소가 잘못되었거나 지금은 없는 페이지입니다. 모든 글은 홈에 있습니다.</p>
+    <p><a href="{{ '/' | relative_url }}">홈으로 가기</a></p>
+  </div>
+</div>

@@ -1,9 +1,16 @@
 <!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id={{ site.analytics.google.tracking_id }}"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
   gtag('config', '{{ site.analytics.google.tracking_id }}', { 'anonymize_ip': {{ site.analytics.google.anonymize_ip | default: false }}});
+
+  // gtag.js(약 180KB)는 페이지를 다 받은 뒤에 불러옴. 첫 화면 그림·글꼴과 대역폭을 나눠 쓰지 않게. 위 기록은 불러온 뒤 그대로 보내짐
+  addEventListener('load', function () {
+    var script = document.createElement('script');
+    script.async = true;
+    script.src = 'https://www.googletagmanager.com/gtag/js?id={{ site.analytics.google.tracking_id }}';
+    document.head.appendChild(script);
+  });
 </script>

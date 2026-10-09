@@ -1,0 +1,33 @@
+{%- comment -%}
+  홈 글 카드 하나. featured면 최신 글 큰 카드(이미지 위, 칩 없음), 아니면 가로형 카드.
+  카드 안에 칩 링크가 있어서 카드 전체를 <a>로 감싸지 않고, 제목 링크를 카드 전체로 늘림.
+{%- endcomment -%}
+{%- assign entry_post = include.post -%}
+{%- if include.featured -%}
+  {%- assign entry_loading = "eager" -%}
+  {%- assign entry_sizes = "(max-width: 755px) calc(100vw - 40px), 715px" -%}
+{%- else -%}
+  {%- assign entry_loading = "lazy" -%}
+  {%- assign entry_sizes = "(max-width: 755px) calc(100vw - 40px), (max-width: 768px) 715px, 200px" -%}
+{%- endif -%}
+<article class="entry{% if include.featured %} entry--featured{% endif %}">
+  <div class="entry__thumb">
+    {%- include blog/post-thumb.html post=entry_post loading=entry_loading sizes=entry_sizes -%}
+  </div>
+  <div class="entry__body">
+    <h3 class="entry__title"><a class="entry__link" href="{{ entry_post.url | relative_url }}">{{ entry_post.title | markdownify | strip_html | strip }}</a></h3>
+    {%- if entry_post.excerpt %}
+    <p class="entry__excerpt">{{ entry_post.excerpt | markdownify | strip_html | strip_newlines }}</p>
+    {%- endif %}
+    <div class="entry__foot">
+      <p class="entry__meta"><time datetime="{{ entry_post.date | date_to_xmlschema }}">{{ entry_post.date | date: site.date_format }}</time><span aria-hidden="true"> · </span>{% include blog/read-time.html post=entry_post %}</p>
+      {%- unless include.featured or entry_post.categories.size == 0 %}
+      <span class="entry__chips">
+        {%- for category_word in entry_post.categories %}
+        <a class="chip" href="{{ category_word | slugify | prepend: '#' | prepend: site.category_archive.path | relative_url }}" rel="tag">{{ category_word }}</a>
+        {%- endfor %}
+      </span>
+      {%- endunless %}
+    </div>
+  </div>
+</article>

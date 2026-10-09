@@ -1,0 +1,23 @@
+{%- assign published_day = page.date | date: "%Y%m%d" -%}
+{%- assign modified_day = page.last_modified_at | date: "%Y%m%d" -%}
+<div class="post-meta">
+  {%- if site.tag_archive.path and page.tags[0] %}
+  {%- assign tags_sorted = page.tags | sort_natural %}
+  <span class="chips" itemprop="keywords">
+    {%- for tag_word in tags_sorted -%}
+    <a class="chip" href="{{ tag_word | slugify | prepend: '#' | prepend: site.tag_archive.path | relative_url }}" rel="tag">{{ tag_word }}</a>{% unless forloop.last %}<span class="chips__sep">, </span>{% endunless %}
+    {%- endfor -%}
+  </span>
+  {%- endif %}
+  {%- if site.category_archive.path and page.categories[0] %}
+  {%- assign categories_sorted = page.categories | sort_natural %}
+  <span class="chips" itemprop="keywords">
+    {%- for category_word in categories_sorted -%}
+    <a class="chip" href="{{ category_word | slugify | prepend: '#' | prepend: site.category_archive.path | relative_url }}" rel="tag">{{ category_word }}</a>{% unless forloop.last %}<span class="chips__sep">, </span>{% endunless %}
+    {%- endfor -%}
+  </span>
+  {%- endif %}
+  {%- if page.last_modified_at and modified_day != published_day %}
+  <p class="post-meta__modified">수정 <time datetime="{{ page.last_modified_at | date: "%Y-%m-%d" }}">{{ page.last_modified_at | date: site.date_format }}</time></p>
+  {%- endif %}
+</div>

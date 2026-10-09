@@ -1,0 +1,245 @@
+@use "tokens" as *;
+
+// 제목 블록
+.post-header {
+  margin-top: 64px;
+}
+
+.post-title {
+  margin: 0;
+  color: var(--text-heading);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.35;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+.post-date {
+  margin: 8px 0 0;
+  color: var(--text-sub);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.post-body {
+  position: relative;
+  margin-top: 40px;
+}
+
+// 본문
+.post-content {
+  font-size: 16px;
+  line-height: 1.75;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+
+  > :first-child {
+    margin-top: 0;
+  }
+
+  p {
+    margin: 16px 0;
+  }
+
+  a {
+    color: var(--green);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    overflow-wrap: anywhere;
+
+    &:hover {
+      color: var(--green-dark);
+    }
+  }
+
+  strong,
+  b {
+    color: inherit;
+    font-weight: 700;
+  }
+
+  h2,
+  h3,
+  h4 {
+    margin: 48px 0 16px;
+    color: var(--text-heading);
+    font-weight: 700;
+    line-height: 1.35;
+    scroll-margin-top: 24px;
+  }
+
+  h2,
+  h3 {
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  h2 {
+    font-size: 32px;
+  }
+
+  h3 {
+    font-size: 25.6px;
+  }
+
+  h4 {
+    font-size: 20.8px;
+  }
+
+  // 목록: 점은 칸 안, 항목 사이는 문단 사이보다 좁게
+  ul,
+  ol {
+    margin: 16px 0;
+    padding-left: 1.5em;
+  }
+
+  ul ul,
+  ul ol,
+  ol ul,
+  ol ol {
+    margin: 4px 0;
+  }
+
+  li {
+    margin: 0;
+
+    + li {
+      margin-top: 6px;
+    }
+
+    > p {
+      margin: 0;
+
+      + p {
+        margin-top: 8px;
+      }
+    }
+  }
+
+  blockquote {
+    margin: 24px 0;
+    padding: 16px;
+    border-left: 3px solid var(--green);
+    border-radius: 0 6px 6px 0;
+    background: var(--green-mist);
+  }
+
+  // 글 속 <aside> 강조 상자 (TOC는 <nav>라 안 겹침)
+  aside {
+    margin: 24px 0;
+    padding: 16px 20px;
+    border-radius: 8px;
+    background: var(--green-mist);
+  }
+
+  blockquote,
+  aside {
+    > :first-child {
+      margin-top: 0;
+    }
+
+    > :last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  hr {
+    height: 0;
+    margin: 48px 0;
+    border: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  img {
+    display: block;
+    margin-inline: auto;
+    border-radius: 8px;
+  }
+
+  figure {
+    margin: 32px 0;
+  }
+
+  figcaption {
+    margin-top: 8px;
+    color: var(--text-sub);
+    font-size: 12px;
+    line-height: 1.6;
+    text-align: center;
+  }
+
+  // 각주
+  .footnotes {
+    margin-top: 48px;
+    color: var(--text-sub);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  sup {
+    line-height: 0;
+  }
+
+  // 표: 감싼 상자만 가로 스크롤
+  .table-scroll {
+    margin: 24px 0;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line-table) transparent;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 16px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  // 칸 최소 폭: 없으면 keep-all 한글이 단어마다 줄을 바꿔서 폰에서 칸이 열 줄 넘게 길어짐. 넘치면 표만 가로 스크롤
+  th,
+  td {
+    min-width: 8em;
+    padding: 8px;
+    border: 1px solid var(--line-table);
+    text-align: left;
+    vertical-align: top;
+    overflow-wrap: break-word;
+  }
+
+  th {
+    color: var(--text-heading);
+    font-weight: 700;
+  }
+}
+
+@media (max-width: $mobile) {
+  .post-header {
+    margin-top: 40px;
+  }
+
+  .post-title {
+    font-size: 24px;
+  }
+
+  .post-body {
+    margin-top: 32px;
+  }
+
+  .post-content {
+    line-height: 1.8;
+
+    h2 {
+      font-size: 24px;
+    }
+
+    h3 {
+      font-size: 22.4px;
+    }
+
+    h4 {
+      font-size: 18.2px;
+    }
+  }
+}

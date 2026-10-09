@@ -1,0 +1,57 @@
+---
+layout: base
+---
+
+{%- comment -%}
+  카테고리·태그 아카이브. categories.html, tags.html이 이 레이아웃을 같이 씀.
+  위에 묶음 전체를 칩 색인으로(글 많은 순, 같으면 이름순), 아래엔 고른 묶음 하나만.
+  어느 묶음을 보일지는 CSS :target이 정함(JS 없어도 동작). 해시가 없거나 안 맞으면 첫 묶음.
+  묶음 id는 이름을 slugify한 값. 글 끝 칩(post-meta.html)과 홈 카드 칩이 이 주소로 옴.
+{%- endcomment -%}
+{%- if page.layout == "tags" -%}
+  {%- assign taxonomies = site.tags | sort -%}
+  {%- assign taxonomy_name = "태그" -%}
+{%- else -%}
+  {%- assign taxonomies = site.categories | sort -%}
+  {%- assign taxonomy_name = "카테고리" -%}
+{%- endif -%}
+{%- assign items_max = 0 -%}
+{%- for item in taxonomies -%}
+  {%- if item[1].size > items_max %}{% assign items_max = item[1].size %}{% endif -%}
+{%- endfor %}
+
+<header class="archive-header">
+  <h1 class="archive-title">{{ page.title }}</h1>
+  <p class="archive-count">{{ taxonomy_name }} {{ taxonomies.size }}개 · 글 {{ site.posts.size }}개</p>
+</header>
+
+{{ content }}
+
+<nav class="tax-index" aria-label="{{ taxonomy_name }} 목록">
+  <ul class="tax-index__list">
+    {%- for i in (1..items_max) reversed %}
+    {%- for item in taxonomies %}
+    {%- if item[1].size == i %}
+    <li><a class="chip" href="#{{ item[0] | slugify }}">{{ item[0] }}<span class="chip__count"><span class="sr-only">, 글 </span>{{ i }}<span class="sr-only">개</span></span></a></li>
+    {%- endif %}
+    {%- endfor %}
+    {%- endfor %}
+  </ul>
+</nav>
+
+<div class="tax-groups">
+  {%- for i in (1..items_max) reversed %}
+  {%- for item in taxonomies %}
+  {%- if item[1].size == i %}
+  <section class="tax-group" id="{{ item[0] | slugify }}">
+    <h2 class="tax-group__title">{{ item[0] }} <span class="tax-group__count">글 {{ i }}개</span></h2>
+    <ol class="post-list">
+      {%- for post in item[1] %}
+      <li>{% include blog/post-entry.html post=post %}</li>
+      {%- endfor %}
+    </ol>
+  </section>
+  {%- endif %}
+  {%- endfor %}
+  {%- endfor %}
+</div>
