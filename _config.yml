@@ -78,6 +78,7 @@ author:
   name             : "백효석"
   home             : "/about/"
   avatar           : "/assets/images/author.png"  # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
+  avatar_small     : "/assets/images/author-avatar.webp" # 화면에 찍는 96·72px 아바타용 288px. avatar는 구조화 데이터가 그대로 씀
   bio              : "내 기억력을 믿지 않는다. 꾸준히 기록하자." # "I am an **amazing** person."
   location         : "Seoul, Korea"
   email            : # "alexization@gmail.com"

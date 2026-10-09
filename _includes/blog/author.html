@@ -1,5 +1,5 @@
 <section class="author" aria-label="작성자">
-  <img class="author__avatar" src="{{ site.author.avatar | relative_url }}" alt="" width="72" height="72">
+  <img class="author__avatar" src="{{ site.author.avatar_small | default: site.author.avatar | relative_url }}" alt="" width="72" height="72" loading="lazy" decoding="async">
   <div class="author__body">
     <p class="author__name">{{ site.author.name }}</p>
     {%- if site.author.bio %}

@@ -17,8 +17,41 @@
       if (link.hostname !== window.location.hostname) {
         link.target = '_blank';
         link.relList.add('noopener', 'noreferrer');
+        // 화면 읽기 프로그램에만 새 탭으로 열린다고 알림
+        var note = document.createElement('span');
+        note.className = 'sr-only';
+        note.textContent = ' (새 탭)';
+        link.appendChild(note);
       }
     });
+  }
+
+  // 가로로 넘치는 표·코드 블록만 Tab으로 들어가서 화살표로 스크롤 (Safari는 스스로 안 해 줌).
+  // 안 넘치면 Tab 멈춤을 늘리지 않게 뺌. 화면 폭이 바뀌면 다시 잼
+  function initScrollers() {
+    var boxes = document.querySelectorAll('.post-content .table-scroll, .post-content div.highlighter-rouge pre');
+    if (!boxes.length) return;
+
+    function update(box) {
+      if (box.scrollWidth > box.clientWidth) {
+        box.tabIndex = 0;
+        box.setAttribute('role', 'group');
+        box.setAttribute('aria-label', box.tagName === 'PRE' ? '코드 (가로 스크롤)' : '표 (가로 스크롤)');
+      } else {
+        box.removeAttribute('tabindex');
+        box.removeAttribute('role');
+        box.removeAttribute('aria-label');
+      }
+    }
+
+    boxes.forEach(update);
+    // 웹폰트가 늦게 오면 글자 폭이 바뀜
+    if (document.fonts) document.fonts.ready.then(function () { boxes.forEach(update); });
+    if (!('ResizeObserver' in window)) return;
+    var observer = new ResizeObserver(function (items) {
+      items.forEach(function (item) { update(item.target); });
+    });
+    boxes.forEach(function (box) { observer.observe(box); });
   }
 
   // 코드 창: CSS가 그려 둔 띠 위에 언어 이름·복사 버튼을 얹고, 줄 번호를 pre 바깥 칸에 채움
@@ -256,6 +289,7 @@
     if (!dialog || !opener || typeof dialog.showModal !== 'function') return;
     var input = dialog.querySelector('#search-input');
     var status = dialog.querySelector('#search-status');
+    var count = dialog.querySelector('#search-count');
     var results = dialog.querySelector('#search-results');
     var index = null;
     var loading = null;
@@ -365,6 +399,7 @@
     function search() {
       var text = input.value.trim();
       results.innerHTML = '';
+      count.textContent = '';
       if (!text) {
         status.textContent = '';
         return;
@@ -376,7 +411,7 @@
         return;
       }
       status.textContent = '';
-      announce('검색 결과 ' + found.length + '개');
+      count.textContent = '검색 결과 ' + found.length + '개';
       found.forEach(function (result) {
         var doc = store[result.ref];
         var li = document.createElement('li');
@@ -426,6 +461,7 @@
 
   initExternalLinks();
   initCodeBlocks();
+  initScrollers();
   initToc();
   initComments();
   initTaxonomy();

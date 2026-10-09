@@ -50,7 +50,8 @@
     text-decoration: none;
     white-space: nowrap;
 
-    &:hover {
+    &:hover,
+    &[aria-current="page"] {
       color: var(--text-heading);
     }
   }

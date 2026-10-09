@@ -7,7 +7,7 @@
     <nav aria-label="메인 메뉴">
       <ul class="site-nav">
         {%- for link in site.data.navigation.main %}
-        <li><a href="{{ link.url | relative_url }}">{{ link.title }}</a></li>
+        <li><a href="{{ link.url | relative_url }}"{% if page.url == link.url %} aria-current="page"{% endif %}>{{ link.title }}</a></li>
         {%- endfor %}
       </ul>
     </nav>

@@ -1,5 +1,5 @@
 <section class="profile" aria-label="소개">
-  <img class="profile__avatar" src="{{ site.author.avatar | relative_url }}" alt="" width="96" height="96">
+  <img class="profile__avatar" src="{{ site.author.avatar_small | default: site.author.avatar | relative_url }}" alt="" width="96" height="96">
   <p class="profile__name">{{ site.author.name }}</p>
   {%- if site.author.bio %}
   <p class="profile__bio">{{ site.author.bio }}</p>

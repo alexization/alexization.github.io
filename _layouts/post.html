@@ -2,8 +2,12 @@
 layout: base
 ---
 
-{%- comment -%} 본문 표만 가로 스크롤 상자로 감쌈. 화면에 찍는 본문에서만 바꾸고 TOC·feed·검색 데이터는 원본 그대로 {%- endcomment -%}
-{%- assign post_html = content | replace: '<table>', '<div class="table-scroll" tabindex="0"><table>' | replace: '</table>', '</table></div>' -%}
+{%- comment -%}
+  화면에 찍는 본문에서만 바꾸고 TOC·feed·검색 데이터는 원본 그대로.
+  표는 가로 스크롤 상자로 감쌈(넘칠 때만 blog.js가 Tab을 받게 함).
+  이미지는 첫 장만 바로, 나머지는 화면 가까이 오면 불러옴.
+{%- endcomment -%}
+{%- assign post_html = content | replace: '<table>', '<div class="table-scroll"><table>' | replace: '</table>', '</table></div>' | replace: '<img ', '<img loading="lazy" decoding="async" ' | replace_first: 'loading="lazy"', 'loading="eager"' -%}
 
 <article class="post" itemscope itemtype="https://schema.org/BlogPosting">
   {% if page.title %}<meta itemprop="headline" content="{{ page.title | replace: '|', '&#124;' | markdownify | strip_html | strip_newlines | escape_once }}">{% endif %}

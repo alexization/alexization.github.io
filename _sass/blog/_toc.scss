@@ -56,6 +56,11 @@
   &:hover {
     color: var(--text-heading);
   }
+
+  // 스크롤 칸(.toc__inner)이 바깥 테두리를 잘라서 안으로 당김
+  &:focus-visible {
+    outline-offset: -2px;
+  }
 }
 
 // 현재 위치는 li 하나만 (하위 항목으로 번지지 않게 > a)

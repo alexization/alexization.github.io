@@ -28,10 +28,18 @@
   list-style: none;
 
   a {
+    position: relative;
     display: inline-block;
     padding: 4px 0;
     font-weight: 500;
     text-decoration: none;
+
+    // 누르는 자리만 높이 44px로 넓힘 (보이는 크기·간격은 그대로)
+    &::after {
+      content: "";
+      position: absolute;
+      inset: -7px -8px;
+    }
   }
 }
 

@@ -74,6 +74,11 @@
     tab-size: 4;
     scrollbar-width: thin;
     scrollbar-color: var(--line-table) transparent;
+
+    // 넘치는 코드는 Tab이 들어옴. 창(overflow: hidden)이 바깥 테두리를 잘라서 안으로 당김
+    &:focus-visible {
+      outline-offset: -2px;
+    }
   }
 
   code {
