@@ -25,8 +25,9 @@ $gutter: 20px;
   --surface-gray: #F2F4F6;
   --bg: #FFFFFF;
 
-  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
-  --font-mono: "Source Code Pro", "Pretendard Variable", Pretendard, ui-monospace, SFMono-Regular, Menlo, monospace;
+  // Blog Sans = Pretendard Variable 서브셋(_fonts.scss). 서브셋에 없는 글자는 설치된 Pretendard → 시스템 글꼴로
+  --font-sans: "Blog Sans", "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  --font-mono: "Source Code Pro", "Blog Sans", "Pretendard Variable", Pretendard, ui-monospace, SFMono-Regular, Menlo, monospace;
 
   --shadow-float: 0 5px 20px rgba(0, 0, 0, .12);
 }

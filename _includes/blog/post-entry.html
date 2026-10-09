@@ -3,10 +3,16 @@
   카드 안에 칩 링크가 있어서 카드 전체를 <a>로 감싸지 않고, 제목 링크를 카드 전체로 늘림.
 {%- endcomment -%}
 {%- assign entry_post = include.post -%}
-{%- if include.featured %}{% assign entry_loading = "eager" %}{% else %}{% assign entry_loading = "lazy" %}{% endif -%}
+{%- if include.featured -%}
+  {%- assign entry_loading = "eager" -%}
+  {%- assign entry_sizes = "(max-width: 755px) calc(100vw - 40px), 715px" -%}
+{%- else -%}
+  {%- assign entry_loading = "lazy" -%}
+  {%- assign entry_sizes = "(max-width: 755px) calc(100vw - 40px), (max-width: 768px) 715px, 200px" -%}
+{%- endif -%}
 <article class="entry{% if include.featured %} entry--featured{% endif %}">
   <div class="entry__thumb">
-    {%- include blog/post-thumb.html post=entry_post loading=entry_loading -%}
+    {%- include blog/post-thumb.html post=entry_post loading=entry_loading sizes=entry_sizes -%}
   </div>
   <div class="entry__body">
     <h3 class="entry__title"><a class="entry__link" href="{{ entry_post.url | relative_url }}">{{ entry_post.title | markdownify | strip_html | strip }}</a></h3>

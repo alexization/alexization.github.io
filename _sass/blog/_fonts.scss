@@ -1,0 +1,13 @@
+// 글꼴은 전부 사이트에 둠 (외부 CSS가 첫 화면을 막지 않게). 라이선스는 assets/fonts/OFL-*.txt
+
+// 본문: Blog Sans(Pretendard Variable 서브셋 두 조각). _tools/subset-fonts.py가 만듦
+@use "font-subset";
+
+// 코드: Source Code Pro 400, Google Fonts의 latin 조각 그대로. 코드 블록이 있는 페이지만 받음
+@font-face {
+  font-family: "Source Code Pro";
+  font-weight: 400;
+  font-display: swap;
+  src: url("/assets/fonts/source-code-pro-400-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}

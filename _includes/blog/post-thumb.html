@@ -1,7 +1,10 @@
-{%- comment -%} 썸네일 순서: og_image → image → overlay_image → teaser(사이트 logo면 건너뜀). 없으면 아무것도 안 찍음(감싼 칸의 그라데이션이 보임) {%- endcomment -%}
+{%- comment -%}
+  썸네일 순서: og_image → image → overlay_image → teaser(사이트 logo면 건너뜀). 없으면 아무것도 안 찍음(감싼 칸의 그라데이션이 보임)
+  include.sizes: 썸네일이 차지하는 폭(크기별 주소 고르기용). include.loading이 eager면 먼저 받음(첫 화면 큰 그림)
+{%- endcomment -%}
 {%- assign thumb_post = include.post -%}
 {%- assign thumb_src = thumb_post.header.og_image | default: thumb_post.header.image | default: thumb_post.header.overlay_image -%}
 {%- if thumb_src == nil and thumb_post.header.teaser and thumb_post.header.teaser != site.logo -%}
   {%- assign thumb_src = thumb_post.header.teaser -%}
 {%- endif -%}
-{%- if thumb_src %}<img src="{{ thumb_src | relative_url }}" alt="" loading="{{ include.loading | default: 'lazy' }}" decoding="async">{% endif -%}
+{%- if thumb_src %}<img {% include blog/img-attrs.html src=thumb_src cover="1" sizes=include.sizes %} alt="" loading="{{ include.loading | default: 'lazy' }}"{% if include.loading == 'eager' %} fetchpriority="high"{% endif %} decoding="async">{% endif -%}

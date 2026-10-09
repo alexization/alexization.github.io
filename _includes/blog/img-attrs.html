@@ -1,0 +1,43 @@
+{%- comment -%}
+  그림 주소 하나 → 그림 태그의 src·srcset·sizes·width·height 속성 한 줄.
+  - 크기 목록(_data/images.yml, _tools/image-sizes.py가 만듦)에 있으면 width·height를 붙여서 그림이 늦게 와도 글이 안 밀림
+  - imgur는 크기별 주소를 WebP로: l = 가로 640, h = 가로 1024, 확장자만 .webp = 원본 크기.
+    l·h는 원본이 더 작아도 키워서 주니까 원본 크기를 아는 그림만, 원본보다 작은 것만 씀
+  - copy가 있는 그림은 사이트에 둔 사본(assets/images/posts/<파일 이름>-<가로>.webp)
+  - 목록에 없는 본문 그림은 원본 주소 그대로
+  include.cover: 칸을 꽉 채워 잘라 보여 주는 썸네일. 원본 크기와 상관없이 가로 1024까지만
+  include.sizes: 그림이 차지하는 폭. 없으면 본문 칸(최대 715px, 원본이 더 작으면 원본 폭)
+{%- endcomment -%}
+{%- assign ia_url = include.src -%}
+{%- assign ia_info = site.data.images[ia_url] -%}
+{%- assign ia_src = ia_url | relative_url -%}
+{%- assign ia_set = "" -%}
+{%- if ia_info.copy -%}
+  {%- assign ia_stem = ia_url | split: "/" | last | split: "." | first -%}
+  {%- for ia_w in ia_info.copy -%}
+    {%- if include.cover and ia_w > 1024 %}{% continue %}{% endif -%}
+    {%- capture ia_src %}{{ "/assets/images/posts/" | append: ia_stem | relative_url }}-{{ ia_w }}.webp{% endcapture -%}
+    {%- capture ia_set %}{{ ia_set }}, {{ ia_src }} {{ ia_w }}w{% endcapture -%}
+  {%- endfor -%}
+{%- elsif ia_url contains "//i.imgur.com/" -%}
+  {%- assign ia_ext = ia_url | split: "." | last -%}
+  {%- assign ia_cut = ia_url.size | minus: ia_ext.size | minus: 1 -%}
+  {%- assign ia_base = ia_url | slice: 0, ia_cut -%}
+  {%- if include.cover -%}
+    {%- assign ia_src = ia_base | append: "h.webp" -%}
+    {%- capture ia_set %}, {{ ia_base }}l.webp 640w, {{ ia_src }} 1024w{% endcapture -%}
+  {%- elsif ia_info -%}
+    {%- assign ia_src = ia_base | append: ".webp" -%}
+    {%- if ia_info.w > 640 -%}
+      {%- capture ia_set %}, {{ ia_base }}l.webp 640w{% if ia_info.w > 1024 %}, {{ ia_base }}h.webp 1024w{% endif %}, {{ ia_src }} {{ ia_info.w }}w{% endcapture -%}
+    {%- endif -%}
+  {%- endif -%}
+{%- endif -%}
+{%- assign ia_sizes = include.sizes -%}
+{%- if ia_sizes == nil and ia_info -%}
+  {%- assign ia_slot = ia_info.w | at_most: 715 -%}
+  {%- capture ia_sizes %}(max-width: {{ ia_slot | plus: 40 }}px) calc(100vw - 40px), {{ ia_slot }}px{% endcapture -%}
+{%- endif -%}
+src="{{ ia_src }}"
+{%- if ia_set != "" and ia_sizes %} srcset="{{ ia_set | remove_first: ', ' }}" sizes="{{ ia_sizes }}"{% endif -%}
+{%- if ia_info and include.cover == nil %} width="{{ ia_info.w }}" height="{{ ia_info.h }}"{% endif -%}
