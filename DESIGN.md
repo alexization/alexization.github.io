@@ -15,6 +15,9 @@ colors:
   line-table: "#D1D6DB"
   surface-gray: "#F2F4F6"
   bg: "#FFFFFF"
+  dot-red: "#FF5F57"
+  dot-yellow: "#FEBC2E"
+  dot-green: "#28C840"
 typography:
   headline:
     fontFamily: "Blog Sans, Pretendard Variable, Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Apple SD Gothic Neo, Noto Sans KR, sans-serif"
@@ -33,9 +36,19 @@ typography:
     fontSize: "25.6px"
     fontWeight: 700
     lineHeight: 1.35
+  title-lg-mobile:
+    fontFamily: "Blog Sans, Pretendard Variable, Pretendard, sans-serif"
+    fontSize: "22.4px"
+    fontWeight: 700
+    lineHeight: 1.35
   title-md:
     fontFamily: "Blog Sans, Pretendard Variable, Pretendard, sans-serif"
     fontSize: "20.8px"
+    fontWeight: 700
+    lineHeight: 1.35
+  title-md-mobile:
+    fontFamily: "Blog Sans, Pretendard Variable, Pretendard, sans-serif"
+    fontSize: "18.2px"
     fontWeight: 700
     lineHeight: 1.35
   title-sm:
@@ -65,6 +78,11 @@ typography:
     fontWeight: 400
     lineHeight: 1.6
   meta:
+    fontFamily: "Blog Sans, Pretendard Variable, Pretendard, sans-serif"
+    fontSize: "13px"
+    fontWeight: 400
+    lineHeight: 1.5
+  meta-strong:
     fontFamily: "Blog Sans, Pretendard Variable, Pretendard, sans-serif"
     fontSize: "13px"
     fontWeight: 500
@@ -116,7 +134,7 @@ components:
   chip:
     backgroundColor: "{colors.green-mist}"
     textColor: "{colors.green}"
-    typography: "{typography.meta}"
+    typography: "{typography.meta-strong}"
     rounded: "{rounded.pill}"
     padding: "2px 10px"
     height: "28px"
@@ -258,10 +276,13 @@ components:
 - **본문 회색** (text-body): 본문, 목록, 굵은 글씨, 인용문 글자, 인라인 코드 글자. 흰 바탕 대비 약 11:1.
 - **보조 회색** (text-sub): 날짜, 메뉴, TOC 링크, 캡션, 각주, 코드 언어 이름, 작성자 소개, 카드 날짜. 보조 글자색은 이것 하나뿐(대비 약 7.1:1).
 - **눈금 회색** (text-lineno): 코드 줄 번호만. 대비 약 3:1이라 다른 글자에는 쓰지 않습니다.
-- **연선** (line): 1px 선 전부. h2·h3 아래 구분선, 코드 창 테두리와 머리 띠 아래 선, 줄 번호 구분선, 인라인 코드 테두리, TOC 소목차 선, 이전/다음 카드 테두리, 푸터 위 선, 검색 바 아래 선.
-- **표 선** (line-table): 표 칸 테두리. 이전/다음 카드 hover 테두리와 얇은 스크롤바 색에도 쓰입니다.
+- **연선** (line): 1px 선 전부. h2·h3 아래 구분선, 코드 창 테두리와 머리 띠 아래 선, 줄 번호 구분선, 인라인 코드 테두리, TOC 소목차 선, 홈·아카이브 글 카드와 이전/다음 카드 테두리, 푸터 위 선, 검색 바 아래 선.
+- **표 선** (line-table): 표 칸 테두리. 홈·아카이브 글 카드와 이전/다음 카드의 hover 테두리, 얇은 스크롤바 색에도 쓰입니다.
 - **회색 면** (surface-gray): 코드 창 머리 띠, 인라인 코드 바탕, 시리즈 상자, 검색 결과 hover, 아바타 자리.
 - **종이 흰색** (bg): 페이지와 코드 창, 검색 창 바탕. 단색, 그림 없음.
+
+### Window Dots
+- **창 머리 점** (dot-red, dot-yellow, dot-green): 코드 창 머리 띠 왼쪽의 점 3개만. 장식 전용이라 글자, 면, 선에는 쓰지 않습니다.
 
 ### Named Rules
 **The One Bookmark Rule.** 녹색은 "누를 수 있음, 지금 여기, 포커스"에만 씁니다. 제목, 본문, 굵은 글씨, 코드 하이라이트, 헤더 메뉴와 아이콘은 녹색이 아닙니다.
@@ -286,9 +307,10 @@ components:
 - **Title Small** (700, 20px, 1.35): 로고 글자, 시리즈 이름, 글 끝 섹션 제목("댓글", "관련 글"), 아카이브 묶음 이름.
 - **Body** (400, 16px, 1.75 / 모바일 1.8): 본문, 표(16px). 모바일에서도 16px. 문단 위아래 16px.
 - **Label** (500, 15px): 헤더 메뉴, 날짜(400), 시리즈 목록(400), 아카이브 글 수(400). 이전/다음 카드 제목은 15px/600.
-- **Small** (400, 14px): TOC 링크, 작성자 소개와 링크, 푸터, 각주, 검색 발췌.
-- **Meta** (500, 13px, 1.5): 칩, 이전/다음 라벨, 카드 날짜, 수정일.
-- **Caption** (400, 12px): figcaption, 코드 복사 버튼, 줄 번호(mono).
+- **Small** (400, 14px): TOC 링크, 작성자 소개, 푸터 저작권 줄, 각주, 검색 발췌. 프로필·작성자·푸터 링크는 14px/500.
+- **Meta** (400, 13px, 1.5): 이전/다음 라벨, 카드 날짜·"N분 소요", 수정일. 사이트의 날짜는 크기와 상관없이 모두 400입니다.
+- **Meta Strong** (500, 13px, 1.5): 칩. 칩 안 글 수는 400.
+- **Caption** (400, 12px): figcaption, 줄 번호(mono). 코드 복사 버튼은 12px/500.
 - **Code** (Source Code Pro 13px, 줄높이 19.5px): 코드 블록. 인라인 코드는 0.85em.
 - **Code Label** (Source Code Pro 11px, 대문자, 자간 0.5px): 코드 창의 언어 이름과 검색 창 ESC 버튼.
 
@@ -328,11 +350,12 @@ components:
 
 부드럽지만 작은 둥글기입니다. 크기가 클수록 조금 더 둥급니다.
 
+- **2px:** 검색 일치 부분(`mark`) 하나뿐인 예외.
 - **4px:** 인라인 코드, TOC 링크, 복사 버튼, 건너뛰기 링크. TOC 현재 위치는 왼쪽 선이 붙어서 `0 4px 4px 0`.
 - **6px:** 인용문 오른쪽 모서리(`0 6px 6px 0`), 검색 ESC 버튼.
 - **8px:** 코드 창, 강조 상자, 시리즈 상자, 본문 이미지, 카드 썸네일, 헤더 돋보기 버튼.
-- **12px:** 이전/다음 카드, 검색 창.
-- **알약(999px):** 칩. **원(50%):** 작성자 아바타.
+- **12px:** 홈·아카이브 글 카드, 이전/다음 카드, 검색 창.
+- **알약(999px):** 칩. **원(50%):** 홈 프로필과 작성자 아바타.
 - **선:** 모든 테두리는 1px. 굵은 선은 인용문과 TOC 현재 위치의 왼쪽 3px 녹색 선 둘뿐입니다.
 
 ## Components
@@ -381,7 +404,7 @@ components:
 - **소목차:** 왼쪽 12px 들여서 1px 연선. 접혀 있다가 그 h2 섹션에 들어가면 펼쳐집니다(grid 행 높이 0.25초, `cubic-bezier(.22, 1, .36, 1)`). 화살표(32×37px, 펼치면 90도 회전)로 직접 열 수도 있습니다. OS 동작 줄이기면 애니메이션 없음. JS가 없으면 다 펼친 채로 보입니다.
 
 ### 내비게이션
-- **헤더:** 흰 바탕, 715px 칸 안, 고정 안 함, 아래 선 없음. 로고는 20px/700 먹색 글자. 메뉴는 15px/500 보조 회색, 안쪽 10px 8px, hover 먹색. 지금 페이지 메뉴는 `aria-current="page"` + 먹색(그래서 헤더는 `include_cached` 대신 `include`). 돋보기는 44×44px 버튼 안 20px SVG(선 1.75).
+- **헤더:** 흰 바탕, 715px 칸 안, 고정 안 함, 아래 선 없음. 로고는 32px 브랜치 h 그림(`logo.svg`, 먹색 선) + 8px 띄워 20px/700 먹색 글자. 그림은 장식이라 화면 읽기 프로그램엔 글자만 읽힙니다. 메뉴는 15px/500 보조 회색, 안쪽 10px 8px, hover 먹색. 지금 페이지 메뉴는 `aria-current="page"` + 먹색(그래서 헤더는 `include_cached` 대신 `include`). 돋보기는 44×44px 버튼 안 20px SVG(선 1.75).
 - **푸터:** 위 1px 연선, 안쪽 32px 0 48px, 가운데 정렬 14px 보조 회색. GitHub·피드 링크(500) + 저작권 줄.
 
 ### 카드
