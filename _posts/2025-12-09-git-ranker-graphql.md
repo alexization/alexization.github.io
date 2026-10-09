@@ -24,7 +24,7 @@ date: 2025-12-09
 last_modified_at: 2026-03-30
 ---
 
-![mainImage](https://i.imgur.com/rtnuC2m.png)
+![](https://i.imgur.com/rtnuC2m.png)
 
 Git Ranker에서 GitHub 활동 수집은 점수, 순위, 티어 계산의 출발점입니다. 사용자의 현재 GitHub 상태를 최대한 안정적으로 읽어와야 하고, 그 결과는 신규 가입 시 전체 스캔에도 쓰이고 매일 자정 배치에도 다시 쓰입니다. 그래서 이 수집기는 단순한 API 클라이언트가 아니라, 서비스의 핵심 도메인 로직과 운영 비용이 만나는 지점이었습니다.
 
@@ -215,7 +215,7 @@ GitHubAllActivitiesResponse aggregatedResponse = queries
 
 ## 4. 동적 응답 매핑도 중요한 설계 포인트였다
 
-![mapping](https://i.imgur.com/sr3qYNf.png)
+![구조도: GraphQL 쿼리의 연도별 별칭 블록과 mergedPRs 검색 블록이 GitHub JSON 응답의 year2025, year2024, mergedPRs 필드로 각각 대응되는 모습](https://i.imgur.com/sr3qYNf.png)
 
 연도별 쿼리로 나누면 응답 필드가 `year2023`, `year2024`, `year2025`처럼 동적으로 바뀝니다. 정적 타입 언어인 Java에서는 이 부분을 어떻게 받을지가 꽤 중요합니다.
 

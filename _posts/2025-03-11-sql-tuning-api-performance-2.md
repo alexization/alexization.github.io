@@ -48,7 +48,7 @@ FROM pets
 WHERE pet_id = :pet_id;
 ```
 
-![사진18.png](https://i.imgur.com/3YTm4ev.png)
+![터미널 출력: 견적서·수의사·반려동물을 쿼리 3개로 따로 조회한 결과, vets 조회만 487ms와 504ms로 다른 쿼리(35~62ms)보다 훨씬 느린 모습](https://i.imgur.com/3YTm4ev.png)
 
 실제 API 호출 과정을 로그에서 살펴보면
 
@@ -62,7 +62,7 @@ WHERE pet_id = :pet_id;
 
 현재 코드는 아래와 같이 3번의 개별 데이터베이스 조회를 순차적으로 실행하고 있었습니다.
 
-![사진17.png](https://i.imgur.com/vo2speV.png)
+![튜닝 전 서비스 코드: getCareEstimateDetail이 견적서, 수의사, 반려동물을 findByEstimateId, findByAccountId, findByPetId로 차례로 따로 조회하는 모습](https://i.imgur.com/vo2speV.png)
 
 이는 **각각의 조회마다 별도의 데이터베이스 연결을 필요로 하며, 네트워크 지연이 발생**할 수 있습니다.
 
@@ -78,7 +78,7 @@ JOIN pets p ON p.pet_id = c.pet_id
 WHERE c.estimate_id = :estimate_id
 ```
 
-![사진19.png](https://i.imgur.com/nwPUiOK.png)
+![터미널 출력: care_estimates에 vets와 pets를 LEFT JOIN한 단일 쿼리를 2번 실행해 540ms, 533ms가 걸린 결과](https://i.imgur.com/nwPUiOK.png)
 
 `JOIN` 쿼리로 변경한 결과, 응답 시간이 약 `540ms` 로 측정되었습니다. 이는 기존 방식(`569ms`)에 비해 약간의 개선을 보였지만, 예상보다 크게 향상되지는 않았습니다.
 
@@ -88,7 +88,7 @@ WHERE c.estimate_id = :estimate_id
 
 `JOIN` 쿼리의 성능을 더 자세히 분석하기 위해 **`EXPLAIN` 을 사용하여 실행 계획**을 확인했습니다.
 
-![사진20.png](https://i.imgur.com/na8jTNi.png)
+![실행 계획: care_estimates(c)와 pets(p)는 PRIMARY 키로 type const지만 vets(v)는 type ALL로 987105행을 풀 스캔하는 EXPLAIN 결과](https://i.imgur.com/na8jTNi.png)
 
 1. `care_estimates` 와 `pets` 테이블은 모두 `type = const` 로, PK를 사용하여 매우 효율적으로 조회되고 있습니다.
 2. 그러나 **`vets` 테이블은 `type = ALL` 로, 풀 테이블 스캔**을 수행하고 있습니다. 즉, 테이블의 모든 레코드를 검사하고 있습니다.
@@ -128,7 +128,7 @@ WHERE c.estimate_id = :estimate_id
 CREATE INDEX idx_vets_account_id ON vets(account_id);
 ```
 
-![사진21.png](https://i.imgur.com/G7vgi64.png)
+![터미널 출력: vets.account_id 인덱스 추가 후 같은 LEFT JOIN 쿼리를 2번 실행해 60ms, 39ms로 빨라진 결과](https://i.imgur.com/G7vgi64.png)
 
 인덱스를 생성한 후 동일한 `JOIN` 쿼리를 실행한 결과, **응답 시간이 `50ms` 로 크게 개선**되었습니다. 이는 기존 방식(`569ms`) 대비 약 91%, `JOIN` 만 적용했을 때(`540ms`) 대비 약 90%의 성능 향상을 달성했습니다.
 
@@ -136,7 +136,7 @@ CREATE INDEX idx_vets_account_id ON vets(account_id);
 
 인덱스 추가 후의 실행 계획을 다시 확인했습니다.
 
-![사진22.png](https://i.imgur.com/GHJhXek.png)
+![실행 계획: 인덱스 추가 후 vets(v)가 idx_vets_account_id를 쓰는 type ref로 바뀌어 세 테이블 모두 rows 1인 EXPLAIN 결과](https://i.imgur.com/GHJhXek.png)
 
 이제 **`vets` 테이블의 접근 방식이 `type = ALL` 에서 `type = ref` 인덱스 참조로 변경**되었습니다.
 

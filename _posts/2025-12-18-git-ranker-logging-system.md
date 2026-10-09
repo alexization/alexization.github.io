@@ -24,7 +24,7 @@ date: 2025-12-18
 last_modified_at: 2026-03-30
 ---
 
-![mainImage](https://i.imgur.com/Ngh0CIT.png)
+![](https://i.imgur.com/Ngh0CIT.png)
 
 서비스를 배포할 때 가장 불안한 순간은 기능이 깨지는 순간이 아니라, **문제가 생겼을 때 어디서부터 봐야 하는지 모르는 상태**입니다. 요청은 들어오는데 왜 느린지 모르고, 401이나 404가 늘어나는데 어떤 경로에서 막히는지 모르고, 배치가 실패했는데 어느 사용자에서 터졌는지 모르면 서비스는 사실상 눈을 감고 운영하는 것과 다르지 않습니다.
 
@@ -74,7 +74,7 @@ log.info("회원가입 성공, ID: {}", user.getId());
 
 ## 2. 요청 진입점은 `Controller`가 아니라 `Filter`였다
 
-![filter](https://i.imgur.com/izwcCPF.png)
+![구조도: Client 요청이 Web Context의 Filter를 가장 먼저 지난 뒤 Spring Context의 DispatcherServlet, Interceptor, Controller 순으로 전달되는 흐름(Filter 강조)](https://i.imgur.com/izwcCPF.png)
 
 처음에는 `AOP`가 가장 자연스러워 보였습니다. 로깅은 전형적인 횡단 관심사이고, 컨트롤러나 서비스 메서드 진입과 종료를 감싸면 중복을 크게 줄일 수 있기 때문입니다.
 

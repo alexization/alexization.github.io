@@ -27,7 +27,7 @@ date: 2026-02-24
 last_modified_at: 2026-03-30
 ---
 
-![mainImage](https://cdn.imgchest.com/files/4dfac6b76b0f.png)
+![](https://cdn.imgchest.com/files/4dfac6b76b0f.png)
 
 Git Ranker를 처음 만들 때는 사실상 **한국인 사용자만 떠올리고** 있었습니다. 실제 운영 지표도 그렇게 보였습니다. Search Console과 Analytics를 확인해 보니 한국어 사용자 비중이 압도적으로 높았고, 체감상도 외국인 유입은 거의 없었습니다.
 
@@ -42,7 +42,7 @@ Git Ranker를 처음 만들 때는 사실상 **한국인 사용자만 떠올리�
 
 ## 1. 96% 한국인이라는 숫자의 의미
 
-![google search console](https://i.imgur.com/mIanPUL.png)
+![Search Console 상위 국가 클릭 비율: 한국 96%, 일본 4%, 알제리·프랑스·미국은 각각 1% 미만](https://i.imgur.com/mIanPUL.png)
 
 처음에는 이 지표를 보고 이렇게 생각했습니다.
 
@@ -56,7 +56,7 @@ Git Ranker를 처음 만들 때는 사실상 **한국인 사용자만 떠올리�
 
 즉, **외국인 사용자가 적다**는 사실만으로 **외국인 사용자가 필요 없다**고 결론 내릴 수는 없었습니다. 오히려 지금 구조가 외국인에게 불리하게 설계되어 있을 가능성을 먼저 의심해야 했습니다.
 
-![google search console2](https://i.imgur.com/T7nyw1n.png)
+![Search Console 국가별 클릭수와 노출: 한국은 클릭 72회에 노출 147회, 일본은 클릭 3회이고, 미국·멕시코·알제리·프랑스·사우디아라비아는 노출만 있고 클릭은 0회](https://i.imgur.com/T7nyw1n.png)
 
 그래서 이번 작업의 목표를 이렇게 잡았습니다.
 

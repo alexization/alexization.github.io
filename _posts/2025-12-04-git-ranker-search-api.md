@@ -23,7 +23,7 @@ date: 2025-12-04
 last_modified_at: 2026-03-29
 ---
 
-![mainImage](https://i.imgur.com/ZmpV4bv.png)
+![](https://i.imgur.com/ZmpV4bv.png)
 
 Git Ranker를 만들면서 가장 먼저 부딪힌 문제는 "사용자의 GitHub 활동을 어디서, 어떻게 읽어올 것인가"였습니다. 점수와 티어를 계산하려면 사용자 한 명의 최근 상태가 아니라, 그 사람이 GitHub에서 어떤 기여를 얼마나 했는지를 비교적 안정적으로 집계할 수 있어야 했습니다.
 

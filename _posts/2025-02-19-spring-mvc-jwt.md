@@ -21,7 +21,7 @@ date: 2025-02-19
 last_modified_at: 2025-02-19 
 ---
 
-![mainImage](https://cdn.imgchest.com/files/4291300b4fb9.png)
+![](https://cdn.imgchest.com/files/4291300b4fb9.png)
 
 ## 시작은 불편함에서
 

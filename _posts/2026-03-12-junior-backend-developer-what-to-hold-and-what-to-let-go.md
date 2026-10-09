@@ -22,7 +22,7 @@ date: 2026-03-12
 last_modified_at: 2026-03-12
 ---
 
-![main](https://i.imgur.com/I6lQGdf.png)
+![](https://i.imgur.com/I6lQGdf.png)
 
 <aside>
 이 글은 토스의 [개발자는 AI에게 대체될 것인가](https://toss.tech/article/will-ai-replace-developers), teo님의 [AI 시대의 개발자: 현업 개발자의 솔직한 이야기](https://velog.io/@teo/ai-and-developer)와 [우리, 프로그래머들 - .md로 코딩하는 시대](https://velog.io/@teo/we-programmer)를 읽고, AI 시대를 살아가는 주니어 백엔드 개발자로서 제가 무엇을 붙잡고 무엇을 내려놓아야 하는지에 대한 생각을 다시 정리해 본 글입니다.

@@ -44,7 +44,7 @@ SELECT * FROM care_estimates
 WHERE status = :status AND proposal = :proposal AND pet_id = :pet_id;
 ```
 
-![사진1.png](https://i.imgur.com/3iiclCA.png)
+![터미널 출력: 인덱스 없이 같은 조회 쿼리를 6번 실행해 매번 약 555~612ms가 걸린 결과](https://i.imgur.com/3iiclCA.png)
 
 한 번의 쿼리 실행에 평균 약 **`600ms`가 소요**되었으며, 이는 데이터양이 증가할수록 더 많은 시간이 필요하게 됩니다.
 
@@ -60,7 +60,7 @@ WHERE status = :status AND proposal = :proposal AND pet_id = :pet_id;
 
 `EXPLAIN` 명령을 사용하여 MySQL 옵티마이저가 어떻게 쿼리를 실행하는지 확인했습니다.
 
-![사진2.png](https://i.imgur.com/wwsuUDg.png)
+![실행 계획: care_estimates가 type ALL, possible_keys와 key가 null, rows 986595로 풀 테이블 스캔하는 EXPLAIN 결과](https://i.imgur.com/wwsuUDg.png)
 
 여기서 가장 중요하게 봐야되는 것은 `type = ALL` 입니다.
 
@@ -128,7 +128,7 @@ WHERE status = :status AND proposal = :proposal AND pet_id = :pet_id;
 CREATE INDEX estimate_status ON care_estimates(status);
 ```
 
-![사진3.png](https://i.imgur.com/bAB7bTl.png)
+![터미널 출력: status 인덱스 적용 후 같은 쿼리를 7번 실행해 매번 약 858~974ms로 오히려 느려진 결과](https://i.imgur.com/bAB7bTl.png)
 
 그러나 이 인덱스를 적용한 후 쿼리 실행 시간은 **`900ms` 로 오히려 기존보다 더 느려졌습니다.**
 
@@ -161,7 +161,7 @@ CREATE INDEX estimate_status ON care_estimates(status);
 CREATE INDEX pet_id ON care_estimates(pet_id);
 ```
 
-![사진4.png](https://i.imgur.com/6Ibm1Bn.png)
+![터미널 출력: pet_id 인덱스 적용 후 같은 쿼리가 7번 모두 22~58ms 안에 끝나 크게 빨라진 결과](https://i.imgur.com/6Ibm1Bn.png)
 
 `pet_id` 를 인덱스 컬럼으로 적용한 후 쿼리를 실행하고 성능을 측정한 결과, 조회 수행 시간이 약 **`30ms` 로 기존 수행 시간(`600ms`)보다 약 20배 정도의 성능 향상**을 보였습니다.
 
@@ -229,13 +229,13 @@ WHERE c.user_id = :user_id
   AND c.proposal = :proposal
 ```
 
-![사진5.png](https://i.imgur.com/4bzLFAm.png)
+![터미널 출력: 인덱스 없이 care_estimates와 pets를 JOIN한 쿼리를 3번 실행해 매번 약 649~663ms가 걸린 결과](https://i.imgur.com/4bzLFAm.png)
 
 JOIN을 적용한 초기 쿼리의 실행 시간은 약 `660ms` 로 측정되었습니다. 이는 앞에서 개별 쿼리(`30ms`) 를 13번 실행하는 것(`390ms`)보다 느립니다.
 
 #### 실행 계획 확인
 
-![사진6.png](https://i.imgur.com/nlsVBDi.png)
+![실행 계획: JOIN 쿼리에서 care_estimates(c)는 key 없이 type ALL로 986595행을 풀 스캔하고 pets(p)는 PRIMARY 키로 eq_ref 조회하는 EXPLAIN 결과](https://i.imgur.com/nlsVBDi.png)
 
 실행 계획을 살펴보니 `care_estimates` 테이블을 풀 스캔하고 있다는 것을 확인했습니다.
 
@@ -271,7 +271,7 @@ JOIN 쿼리의 성능을 향상시키기 위해 **`user_id` 와 `pet_id` 를 함
 CREATE INDEX idx_care_estimates_user_pet ON care_estimates (user_id, pet_id);
 ```
 
-![사진7.png](https://i.imgur.com/63rxL3p.png)
+![터미널 출력: 복합 인덱스 적용 후 같은 JOIN 쿼리를 3번 실행해 25~41ms로 크게 빨라진 결과](https://i.imgur.com/63rxL3p.png)
 
 복합 인덱스 적용 후 쿼리 실행 시간은 **`30ms` 로 크게 개선**되었습니다.
 
@@ -310,25 +310,25 @@ CREATE INDEX idx_care_estimates_user_pet ON care_estimates (user_id, pet_id);
 
 기존 코드에서는 사용자의 모든 반려동물을 조회한 후, 각 반려동물별로 개별 쿼리를 실행하는 방식을 사용했습니다.
 
-![사진8.png](https://i.imgur.com/6BKmdC9.png)
+![튜닝 전 서비스 코드: 사용자의 반려동물 목록을 for문으로 돌며 반려동물마다 견적서 조회 쿼리를 따로 호출하는 findGeneralCarePets 메서드](https://i.imgur.com/6BKmdC9.png)
 
-![사진9.png](https://i.imgur.com/PociW20.png)
+![튜닝 전 리포지토리 메서드: status, proposal, petId로 견적서 1건을 찾는 findTopByStatusAndProposalAndPetId 선언](https://i.imgur.com/PociW20.png)
 
-![사진10.png](https://i.imgur.com/9rzxo4j.png)
+![Postman 응답: 튜닝 전 API가 반려동물별 견적서 목록 JSON을 돌려주는 데 6.57s가 걸린 결과](https://i.imgur.com/9rzxo4j.png)
 
-![사진11.png](https://i.imgur.com/JYsqKFt.png)
+![Hibernate 쿼리 로그: users와 pets 조회 뒤 care_estimates 조회 쿼리가 반려동물 수만큼 13번 반복 실행된 N+1 모습](https://i.imgur.com/JYsqKFt.png)
 
 ### SQL 튜닝 후 코드 (JOIN을 활용한 단일 쿼리)
 
 SQL 튜닝 후에는 **`JOIN` 을 활용한 단일 쿼리**로 변경하여 성능을 크게 개선했습니다.
 
-![사진12.png](https://i.imgur.com/uD9nYPj.png)
+![튜닝 후 서비스 코드: 반복문 없이 findByStatusAndProposalAndUserId 한 번으로 반려동물별 견적서를 가져오는 findGeneralCarePets 메서드](https://i.imgur.com/uD9nYPj.png)
 
-![사진13.png](https://i.imgur.com/QHE6zY0.png)
+![튜닝 후 리포지토리 메서드: CareEstimates와 Pets를 petId로 JOIN하고 userId, status, proposal로 거르는 @Query 선언](https://i.imgur.com/QHE6zY0.png)
 
-![사진14.png](https://i.imgur.com/9oOT18a.png)
+![Postman 응답: 튜닝 후 같은 API가 반려동물별 견적서 목록 JSON을 409ms 만에 돌려준 결과](https://i.imgur.com/9oOT18a.png)
 
-![사진16.png](https://i.imgur.com/3XRsQtG.png)
+![Hibernate 쿼리 로그: users와 pets 조회 뒤 care_estimates와 pets를 JOIN한 쿼리가 단 한 번만 실행된 모습](https://i.imgur.com/3XRsQtG.png)
 
 ## 마무리
 

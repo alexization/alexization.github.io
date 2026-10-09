@@ -26,7 +26,7 @@ date: 2025-12-03
 last_modified_at: 2026-03-29
 ---
 
-![mainImage](https://i.imgur.com/Czp68Om.png)
+![](https://i.imgur.com/Czp68Om.png)
 
 Git Ranker는 GitHub 활동 데이터를 바탕으로 개발자의 점수와 순위를 계산하는 서비스입니다. 사용자 한 명을 등록할 때는 가입일부터 현재까지의 활동을 한 번에 읽고, 그 이후에는 매일 자정에 전체 사용자의 점수를 다시 계산합니다.
 

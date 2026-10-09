@@ -27,7 +27,7 @@ date: 2025-12-05
 last_modified_at: 2026-03-29
 ---
 
-![mainImage](https://i.imgur.com/BwOufrv.png)
+![](https://i.imgur.com/BwOufrv.png)
 
 [앞선 글](/git-ranker/git-ranker-search-api/)에서 GitHub 활동을 집계해 총점을 만들었다면, 그 다음 단계는 이 점수가 전체 사용자 안에서 어떤 위치를 가지는지 계산하는 일입니다. Git Ranker에서는 이 문제를 한 번에 풀지 않고, **가입 직후 보여줄 즉시 계산**과 **전체 분포를 다시 맞추는 일괄 재산정**으로 나눠 접근했습니다.
 

@@ -28,7 +28,7 @@ date: 2025-12-23
 last_modified_at: 2026-03-30
 ---
 
-![mainImage](https://i.imgur.com/uAdk7rY.png)
+![](https://i.imgur.com/uAdk7rY.png)
 
 [지난 글](/home-lab/home-lab-dns-ddns-nginx/)에서 Nginx와 Certbot으로 `https://www.git-ranker.com`까지 붙였을 때만 해도, 외부 진입점 정리는 거의 끝났다고 생각했습니다. 브라우저 경고도 사라졌고, 주소도 그럴듯해 보였기 때문입니다.
 
@@ -174,7 +174,7 @@ Cloudflare 같은 외부 플랫폼으로 옮기면 DNS 운영과 보안 옵션 �
 
 ### 5.1 DNS: 도달 가능성 보장
 
-![record](https://i.imgur.com/r7NHaAV.png)
+![DNS 관리 화면: git-ranker.com의 최종 레코드 2개로, @는 A 레코드(IP는 가림), www는 hyoserver.iptime.org를 가리키는 CNAME인 설정](https://i.imgur.com/r7NHaAV.png)
 
 최종 DNS는 아래처럼 정리했습니다.
 
@@ -271,7 +271,7 @@ curl -I https://www.git-ranker.com
 
 제가 기대한 최종 상태는 아래와 같았습니다.
 
-![redirects](https://i.imgur.com/ONBqxne.png)
+![흐름도: http 요청(루트, www)은 nginx 80에서, https 루트 요청은 nginx 443 루트 도메인에서 https://www로 308 리다이렉트되고, https www 요청만 리버스 프록시를 거쳐 Application에 닿는 구조](https://i.imgur.com/ONBqxne.png)
 
 | URL | 기대 결과 |
 | --- | --- |

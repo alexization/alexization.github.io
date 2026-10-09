@@ -25,7 +25,7 @@ redirect_from:
 date: 2025-11-29
 last_modified_at: 2026-03-29
 ---
-![mainImage](https://i.imgur.com/RdMrNEY.png)
+![](https://i.imgur.com/RdMrNEY.png)
 
 미니 PC에 운영체제만 올려둔 서버를 바라보고 있으면 늘 비슷한 생각이 들었습니다. Docker도 올릴 수 있고, CI/CD도 붙일 수 있고, 모니터링 스택도 깔 수 있습니다. 그런데 정작 그 위에서 의미 있는 부하가 발생하지 않으면, 시스템을 운영한다는 감각은 좀처럼 생기지 않습니다.
 

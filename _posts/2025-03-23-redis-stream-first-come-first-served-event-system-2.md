@@ -23,7 +23,7 @@ date: 2025-03-23
 last_modified_at: 2025-03-23 
 ---
 
-![mainImage](https://cdn.imgchest.com/files/284059f0f012.png)
+![](https://cdn.imgchest.com/files/284059f0f012.png)
 
 1편에서는 Spring Boot와 MySQL만으로 선착순 이벤트 시스템을 구현하고 그 한계점을 분석했습니다.
 
@@ -326,7 +326,7 @@ public class ApplyService {
 
 Redis Stream을 적용한 선착순 이벤트 시스템의 전체 프로세스 흐름은 크게 **클라이언트 요청 처리**와 **비동기 메시지 처리** 두 부분으로 나눌 수 있습니다.
 
-![redis-stream-architecture-revised.svg](https://i.imgur.com/vz4o0WK.png)
+![구조도: 요청이 ApplyController와 ApplyService를 거쳐 Redis Stream에 저장되면 바로 성공 응답하고, ApplyStreamListener가 비동기로 메시지를 받아 MySQL에 저장한 뒤 ACK하는 흐름](https://i.imgur.com/vz4o0WK.png)
 
 ### 클라이언트 요청 처리 과정
 
@@ -385,9 +385,9 @@ Redis Stream을 적용한 선착순 이벤트 시스템의 전체 프로세스 �
 
 ### JVM 메모리 및 GC 분석
 
-![스크린샷 2025-03-22 오전 12.34.08.png](https://i.imgur.com/ZINn961.png)
+![Grafana JVM 힙 그래프(개선 후): G1 Eden Space 사용량이 최대 약 115MB까지 오르내리며 반복해서 비워지고, Old Gen과 Survivor Space는 낮게 안정된 모습](https://i.imgur.com/ZINn961.png)
 
-![스크린샷 2025-03-22 오전 12.34.26.png](https://i.imgur.com/BOpqyjg.png)
+![Grafana GC 그래프(개선 후): Minor GC가 초당 평균 1.733회, Stop-the-World 시간은 평균 2.89ms, 최대 6.20ms인 결과](https://i.imgur.com/BOpqyjg.png)
 
 **기존 시스템 (1,000 RPS)**
 
@@ -407,11 +407,11 @@ Redis Stream 도입으로 객체 생성 패턴이 최적화되었습니다. 처�
 
 ### Thread Pool 분석
 
-![스크린샷 2025-03-22 오전 12.34.51.png](https://i.imgur.com/nj044tz.png)
+![Grafana 스레드 그래프(개선 후): 현재 스레드 수가 200대에 머물다 테스트 중반 400까지 올라 끝까지 유지되고, 평균 334개인 결과](https://i.imgur.com/nj044tz.png)
 
-![스크린샷 2025-03-22 오전 12.34.18.png](https://i.imgur.com/RcvPPXz.png)
+![Grafana JVM 스레드와 메모리 할당 그래프(개선 후): Daemon 평균 360개, Live 평균 366개이고, 할당량은 약 192MiB 안팎으로 꾸준하며 승격(promoted)은 거의 0인 모습](https://i.imgur.com/RcvPPXz.png)
 
-![스크린샷 2025-03-22 오전 12.35.01.png](https://i.imgur.com/9cQ3INS.png)
+![Grafana Tomcat 통계(개선 후): 스레드 최대 설정 400개, HTTP 응답은 초당 약 1.67K건 대부분이 4xx이고 2xx는 0.200 ops/s인 결과](https://i.imgur.com/9cQ3INS.png)
 
 **기존 시스템 (1,000 RPS)**
 
@@ -430,9 +430,9 @@ Redis Stream을 도입함으로써 스레드 활용도가 향상되었습니다.
 
 ### DB Connection Pool 분석
 
-![스크린샷 2025-03-22 오전 12.34.33.png](https://i.imgur.com/m6Pz809.png)
+![Grafana HikariCP 통계(개선 후): 커넥션 50개 중 평균 49개가 idle이고 대기와 타임아웃은 0, 사용 시간 약 1.6ms, 획득 시간 1.2ms 이하로 유지된 결과](https://i.imgur.com/m6Pz809.png)
 
-![스크린샷 2025-03-22 오전 12.34.44.png](https://i.imgur.com/TKZcO1H.png)
+![Grafana 요청 처리 시간 그래프(개선 후): 평균은 0.00161 수준으로 바닥에 붙어 있고, 최댓값만 계단식으로 올라 0.529에 이른 모습](https://i.imgur.com/TKZcO1H.png)
 
 **기존 시스템 (1,000 RPS)**
 
@@ -453,9 +453,9 @@ HikariCP 통계를 보면 환성 커넥션이 평균 1개로 기존 대비 현�
 
 ### CPU 사용률 분석
 
-![스크린샷 2025-03-22 오전 12.33.50.png](https://i.imgur.com/Z9lfzkQ.png)
+![Grafana CPU 사용률 그래프(개선 후): 시스템 CPU 평균 42%, 프로세스 CPU 평균 11.7%로 큰 튐 없이 고르게 유지된 결과](https://i.imgur.com/Z9lfzkQ.png)
 
-![스크린샷 2025-03-22 오전 12.33.55.png](https://i.imgur.com/5uLFNuv.png)
+![Grafana Load Average 그래프(개선 후): 1분 부하가 평균 6.07이고, 00:30 직후 13.1까지 튀어 CPU 코어 수 8을 잠시 넘었다가 다시 4대로 내려온 모습](https://i.imgur.com/5uLFNuv.png)
 
 **기존 시스템 (1,000 RPS)**
 

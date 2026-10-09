@@ -51,9 +51,10 @@ Jekyll은 유지하고 레이아웃·스타일을 새로 작성 (원본은 Minim
 ### 바꾸면 안 되는 것
 
 - **URL은 한 글자도 안 바꿈** (`permalink`, `redirect_from`). giscus가 `pathname`으로 댓글을 찾음. 예외는 `/page2/`·`/page3/` 하나뿐(일부러 없앰, 리다이렉트 없이 404).
-- **글 내용·front matter는 그대로.** 예외는 둘뿐:
+- **글 내용·front matter는 그대로.** 예외는 셋뿐:
   - E18 제목 단계 내림(`#`→`##`, `##`→`###`, `###`→`####`). b828ce5에서 적용 완료.
   - 시리즈 글 front matter에 `series:` 한 줄 추가. 기존 값은 안 건드림.
+  - 이미지 대체 텍스트(`![…]` 안 글자). 파일 이름이던 65개는 그림 설명으로 바꾸고, 글 머리 장식 그림 16개는 비움(`![]`). 2026-10-09 사용자 확정.
 - **플러그인 5개:** sitemap, feed, redirect-from, gist, include-cache. paginate는 뺌.
 - **`JEKYLL_ENV=production` 빌드 유지.**
 - **`_config.yml`의 `exclude`에 `PRODUCT.md`, `DESIGN.md`, `docs/redesign` 유지.** 배포 사이트에 나가면 안 됨.

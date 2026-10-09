@@ -23,7 +23,7 @@ toc_sticky: true
 date: 2025-02-09
 last_modified_at: 2025-02-09 
 ---
-![이벤트 응모 페이지.png](https://i.imgur.com/v6JGz86.png)
+![선착순 도서 선물 이벤트 응모 페이지: 응모기간은 매일 오후 1시부터 10분간이고, 이름과 전화번호를 넣어 참여하는 폼이 있는 화면](https://i.imgur.com/v6JGz86.png)
 
 **“매일 오후 1시에 선착순 100명에게 도서를 증정하는 이벤트 시스템”** 을 개발하게 되었습니다.
 
@@ -118,7 +118,7 @@ Spring Boot의 멀티스레드 환경에서는 서버에 도착한 요청 순서
 
 이는 선착순 이벤트의 본질적 공정성에 문제를 가져왔습니다.
 
-![request-processing-diagram.svg](https://i.imgur.com/KHtfQnX.png)
+![타임라인 구조도: 요청 A가 B보다 먼저 도착했지만 B가 먼저 DB 커넥션을 얻어 B, A 순서로 저장되는 흐름](https://i.imgur.com/KHtfQnX.png)
 
 1. 요청 A가 요청 B보다 먼저 서버에 도착 (A: 13:00:01.235, B: 13:00:01.458)
 2. 서버의 멀티스레드 환경에서 스레드 스케줄링에 따라 요청 B가 먼저 처리를 시작
@@ -175,9 +175,9 @@ Apply apply = Apply.builder()
 
 초당 1,666개의 요청이 발생하는 환경에서 중복 체크 로직에 동시성 문제가 발생했습니다.
 
-![Screenshot 2025-03-20.png](https://i.imgur.com/lmBkNkj.png)
+![DB 조회 결과: 같은 전화번호 01012345678로 응모 행이 26번부터 50번까지 중복 저장된 모습](https://i.imgur.com/lmBkNkj.png)
 
-![concurrency-issue-diagram.svg](https://i.imgur.com/BhPgaND.png)
+![타임라인 구조도: 스레드 A와 B가 둘 다 중복 체크에서 없음을 확인한 뒤 각자 저장해 같은 번호의 레코드가 2개 생기는 흐름](https://i.imgur.com/BhPgaND.png)
 
 1. 스레드 A : 전화번호 “010-1234-5678” 중복 체크 → DB에 해당 전화번호 없음 확인
 2. 스레드 B : 같은 시점에 동일 전화번호 중복 체크 → DB에 없음 (아직 A가 저장하지 않았으므로)
@@ -211,7 +211,7 @@ Apply apply = Apply.builder()
 boolean existsByPhoneNumber(String phoneNumber);
 ```
 
-![Screenshot 2025-03-20 at 11.42.02 AM.png](https://i.imgur.com/J8sjmAc.png)
+![DB 조회 결과: 비관적 락 적용 뒤 전화번호 01012345678 응모 행이 1건만 저장된 모습](https://i.imgur.com/J8sjmAc.png)
 
 #### MySQL InnoDB의 트랜잭션 락 메커니즘 이해
 
@@ -252,7 +252,7 @@ SELECT * FROM Apply WHERE phoneNumber = '010-1234-5678' FOR UPDATE
 
 이 쿼리가 실행되면, 다음과 같은 단계로 중복 방지가 이루어집니다.
 
-![pessimistic-lock-transaction.svg](https://i.imgur.com/KWsatZY.png)
+![타임라인 구조도: 트랜잭션 A가 Next-Key 락을 쥔 동안 B의 SELECT FOR UPDATE가 대기하다가, A 커밋 뒤 실행되어 이미 존재함을 확인하는 흐름](https://i.imgur.com/KWsatZY.png)
 
 ```
 트랜잭션 A 시작
@@ -358,7 +358,7 @@ JVM 메모리와 GC 패턴 분석으로 Java 애플리케이션의 성능 병목
 
 #### Eden Space 사용 패턴
 
-![image.png](https://i.imgur.com/m4tBjRk.png)
+![Grafana 힙 메모리 그래프: G1 Eden과 Survivor 사용량은 크게 오르내리고 Old Gen 사용량은 낮게 유지되는 모습](https://i.imgur.com/m4tBjRk.png)
 
 메모리 모니터링 결과, Eden Space 사용량이 10MB~40MB 사이에서 불안정하게 변동했습니다.
 
@@ -370,7 +370,7 @@ JVM 메모리와 GC 패턴 분석으로 Java 애플리케이션의 성능 병목
 
 #### G1 GC 동작 패턴
 
-![image.png](https://i.imgur.com/Wx18yYP.png)
+![Grafana GC 그래프: Minor GC 횟수와 Stop the World 시간, STW는 평균 4.57ms에 최대 11.6ms까지 튀는 모습](https://i.imgur.com/Wx18yYP.png)
 
 G1 GC 로그 분석 결과
 
@@ -395,7 +395,7 @@ STW(11.6ms)동안 처리되지 못하는 요청 = 11.6/0.6 ≈ 19.3개
 
 Tomcat의 기본 스레드 풀 크기는 400개로 설정되어 있었습니다.
 
-![image.png](https://i.imgur.com/XqvWYPH.png)
+![Grafana 그래프: 요청 처리 시간 최대값이 계단식으로 3.44까지 오르고, 스레드 수는 내내 400개로 꽉 찬 모습](https://i.imgur.com/XqvWYPH.png)
 
 - **스레드 상태 :** 대부분의 스레드가 WAITING 또는 BLOCKED 상태에 있음
 - **스레드 포화 영향 :** 400개 스레드가 모두 사용 중일 때 추가 요청은 Tomcat의 요청 큐에서 대기하게 되며, 큐 포화 시 connection refused 오류 발생
@@ -421,9 +421,9 @@ Tomcat의 기본 스레드 풀 크기는 400개로 설정되어 있었습니다.
 
 HikariCP의 기본 커넥션 풀 크기는 50개로 설정되어 있습니다.
 
-![image.png](https://i.imgur.com/6ZRwReB.png)
+![Grafana HikariCP 그래프: 커넥션 50개가 모두 Active로 차고 Pending이 최대 349까지 쌓이는 모습](https://i.imgur.com/6ZRwReB.png)
 
-![image.png](https://i.imgur.com/BcsDNsP.png)
+![Grafana 그래프: 커넥션 사용 시간은 약 32ms에서 40ms 가까이, 획득 시간은 약 90ms에서 170ms 넘게 꾸준히 오르는 모습](https://i.imgur.com/BcsDNsP.png)
 
 - **활성 커넥션 수 :** 최대값인 50개에 도달하여 완전히 포화 상태 유지
 - **Pending 커넥션 수 :** 최대 349개까지 증가 (400개 스레드 중 349개가 DB 커넥션을 기다리고 있다는 의미)
@@ -468,7 +468,7 @@ SELECT * FROM Apply WHERE phoneNumber = ? FOR UPDATE
 
 ### CPU 사용률 분석
 
-![image.png](https://i.imgur.com/YI3Nxlr.png)
+![Grafana CPU 그래프: 시스템 CPU는 1 가까이지만 프로세스 CPU 사용률은 0.2 안팎으로 낮고, Load Average는 8코어 대비 62.8까지 오른 모습](https://i.imgur.com/YI3Nxlr.png)
 
 CPU 사용률이 현저히 낮음에도 불구하고 시스템 성능이 저하되는 것은 CPU가 대부분의 시간을 I/O 작업(주로 DB 커넥션 획득과 락 획득)을 기다리며 유휴 상태로 보내고 있기 때문입니다.
 

@@ -26,7 +26,7 @@ date: 2026-03-19
 last_modified_at: 2026-03-19
 ---
 
-![mainImage](https://i.imgur.com/o2NmFSa.png)
+![](https://i.imgur.com/o2NmFSa.png)
 
 지난 글인 [AI 시대의 주니어 백엔드 개발자는 무엇을 붙잡고 무엇을 내려놓아야 할까](/ai/junior-backend-developer-what-to-hold-and-what-to-let-go/)를 쓰고 나서도 한 가지 질문이 남아 있었습니다.
 
@@ -96,7 +96,7 @@ OpenAI의 글을 읽으며 저는 하네스가 대략 네 개의 기술 레이�
 
 #### 1. Knowledge Layer: 지식 저장소
 
-![knowldege layer](https://i.imgur.com/Z119cUL.png)
+![OpenAI 다이어그램: Google doc, Slack 메시지, 암묵지처럼 Codex가 볼 수 없는 지식은 없는 것과 같아서, 마크다운으로 코드베이스에 기록해야 Codex의 지식이 된다는 구조](https://i.imgur.com/Z119cUL.png)
 
 OpenAI는 에이전트가 실행 중에 접근할 수 없는 정보는 사실상 존재하지 않는 것처럼 취급했습니다. 그래서 `AGENTS.md`는 짧은 진입점만 두고 실제 규칙과 맥락은 문서 트리, 스키마, 실행 계획, 설계 기록 안에 분산하지 않고 구조화해 넣습니다.
 
@@ -133,7 +133,7 @@ OpenAI가 Chrome DevTools Protocol, 로컬 로그/메트릭 스택, 구조화된
 
 #### 4. Governance Layer: 규칙과 가드레일
 
-![governance layer](https://i.imgur.com/umQUL5V.png)
+![OpenAI 다이어그램: 비즈니스 로직 도메인 안에서 Types, Config, Repo, Service, Runtime, UI 순으로 의존이 한 방향으로만 흐르고, 도메인 밖 Utils는 Providers로만 연결되는 계층 구조](https://i.imgur.com/umQUL5V.png)
 
 OpenAI는 맞춤형 린터, 구조적 테스트, 명명 규칙, 파일 크기 제한, 구조화된 로깅 규칙 같은 제약을 기계적으로 적용했다고 설명합니다. 그리고 문서가 부족하면 규칙을 코드로 승격합니다.
 

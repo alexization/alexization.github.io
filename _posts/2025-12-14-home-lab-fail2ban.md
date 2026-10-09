@@ -27,7 +27,7 @@ date: 2025-12-14
 last_modified_at: 2026-03-30
 ---
 
-![mainImage](https://i.imgur.com/dxsH3Dq.png)
+![](https://i.imgur.com/dxsH3Dq.png)
 
 [앞선 글](/home-lab/home-lab-ssh-key-based-auth/)에서 SSH 비밀번호 인증을 끄고 공개키 인증만 남겼습니다. 그때는 "이제 SSH 보안은 어느 정도 정리됐다"라고 생각했습니다. 하지만 실제 서버의 `auth.log`를 열어보니, **로그인 성공 여부와 별개로 SSH 포트 자체는 계속해서 자동화된 스캔 대상**이 되고 있었습니다.
 
@@ -44,7 +44,7 @@ last_modified_at: 2026-03-30
 
 ## 1. SSH 키 인증을 켰는데도 로그는 계속 시끄러웠다
 
-![authLog](https://i.imgur.com/TPqlHh8.png)
+![터미널 출력: auth.log에 00:01부터 00:17까지 여러 외부 IP의 Invalid user 시도와 root 계정 인증 전(preauth) 연결 종료 기록이 수십 줄 반복된 모습](https://i.imgur.com/TPqlHh8.png)
 
 보안을 강화한 뒤 가장 먼저 확인한 것은 `/var/log/auth.log`였습니다.
 

@@ -110,7 +110,7 @@ daengle-server/
 - **API 모듈(daengle-xxx-api) :** 각 사용자 유형별, 기능별 API 엔드포인트와 애플리케이션 서비스
 - **영속성 모듈(daengle-persistence-xxx) :** 외부 저장소(RDB, NoSQL 등)와의 통신을 담당하는 어댑터 구현체
 
-![댕글 멀티모듈.png](https://i.imgur.com/vNDQ3RB.png)
+![멀티 모듈 구조도: Persistence와 API 모듈의 화살표가 가운데 Domain으로 모이고 Domain에서 나가는 화살표는 없는 모습, API 모듈 5개는 Runnable로 표시](https://i.imgur.com/vNDQ3RB.png)
 
 이 구조에서 `daengle-domain` **모듈은 시스템의 핵심으로, 모든 비즈니스 규칙과 도메인 객체를 포함합니다.** 도메인 모듈은 다른 모든 모듈에서 의존할 수 있지만, 역으로 도메인 모듈은 어떤 외부 모듈에도 의존하지 않는 의존성 역전 원칙을 철저히 준수하도록 설계했습니다.
 
@@ -394,11 +394,11 @@ export function businessLogic() {
 }
 ```
 
-![image.png](https://i.imgur.com/P0pHrE3.png)
+![모놀리식 장애 테스트 Grafana 대시보드: 결제 API 호출이 늘어나는 동안 비즈니스 API 성공 응답 수가 약 40에서 0 가까이 떨어지는 모습](https://i.imgur.com/P0pHrE3.png)
 
 테스트 결과, 모놀리식 구조에서는 **결제 API에 장애가 발생하면 톰캣의 작업 쓰레드 풀이 빠르게 포화 상태에 이르렀습니다.** 이로 인해 시스템 전체의 처리 능력이 급격히 저하되어, 결제와 무관한 비즈니스 API까지 지연 시간이 크게 증가하고 오류율이 높아지는 현상을 관찰할 수 있었습니다.
 
-![image.png](https://i.imgur.com/a3ssLaE.png)
+![멀티 모듈 장애 테스트 Grafana 대시보드: 결제 API 실패 응답이 4 넘게 늘어도 비즈니스 API 성공 응답 수는 5 근처로 그대로 유지되는 모습](https://i.imgur.com/a3ssLaE.png)
 
 반면, 멀티 모듈 구조에서는 **결제 API에 동일한 장애가 발생하더라도 다른 비즈니스 API는 정상적인 응답 시간을 유지했습니다.**
 

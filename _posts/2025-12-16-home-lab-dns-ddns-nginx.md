@@ -27,7 +27,7 @@ date: 2025-12-16
 last_modified_at: 2026-03-30
 ---
 
-![mainImage](https://i.imgur.com/YkXdCAd.png)
+![](https://i.imgur.com/YkXdCAd.png)
 
 미니 PC에 **Git Ranker**를 올린 뒤 가장 먼저 부딪힌 문제는 성능이 아니라 **주소**였습니다. 서비스를 보여주려면 `http://175.xxx.xxx.xxx:8080` 같은 형태를 그대로 전달해야 했고, 주소만 봐도 "개인 서버를 임시로 열어 둔 것 같은 느낌"이 강했습니다.
 
@@ -80,7 +80,7 @@ last_modified_at: 2026-03-30
 
 이번 구성에서는 이미 ipTIME DDNS로 `hyoserver.iptime.org`를 사용하고 있었기 때문에, **서비스 진입점으로 쓸 서브도메인**을 이 DDNS 호스트에 연결하는 편이 가장 자연스러웠습니다.
 
-![record](https://i.imgur.com/r7NHaAV.png)
+![DNS 관리 화면: git-ranker.com의 www 호스트를 CNAME으로 DDNS 주소 hyoserver.iptime.org에 연결하고, @ 호스트는 A 레코드(IP는 가림)로 둔 설정](https://i.imgur.com/r7NHaAV.png)
 
 <aside>
 <strong>구성하면서 헷갈렸던 지점</strong><br>
@@ -139,7 +139,7 @@ Nginx를 이해하려면 먼저 **프록시**와 **리버스 프록시**를 구�
 
 반대로 리버스 프록시는 **서버 앞단**에 있습니다. 클라이언트는 실제 애플리케이션을 직접 보지 못하고, 먼저 리버스 프록시에 요청을 보냅니다. 그리고 리버스 프록시가 적절한 내부 서비스로 전달합니다.
 
-![image.png](https://i.imgur.com/KbdgQ7u.png)
+![구조도: 노트북과 휴대폰 클라이언트가 인터넷을 거쳐 Nginx 리버스 프록시로 들어오고, Nginx가 Git Ranker(8080 포트)와 Grafana 모니터링(3000 포트)으로 요청을 나눠 전달하는 흐름](https://i.imgur.com/KbdgQ7u.png)
 
 홈서버 운영에서 제가 원했던 것은 바로 이 구조였습니다.
 

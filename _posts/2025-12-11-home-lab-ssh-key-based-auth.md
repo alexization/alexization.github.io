@@ -26,7 +26,7 @@ date: 2025-12-11
 last_modified_at: 2026-03-30
 ---
 
-![mainImage](https://i.imgur.com/IW4hBSN.png)
+![](https://i.imgur.com/IW4hBSN.png)
 
 미니 PC에 Ubuntu를 설치하고 홈서버로 운영하기 시작했을 때, 가장 먼저 필요했던 것은 **원격 접속 경로**였습니다. 키보드와 모니터를 계속 연결해 둘 수는 없었고, 집 밖에서도 노트북 하나로 서버를 관리하고 싶었습니다. 그래서 가장 먼저 연 것이 SSH였습니다.
 
