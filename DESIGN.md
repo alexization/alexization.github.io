@@ -17,70 +17,70 @@ colors:
   bg: "#FFFFFF"
 typography:
   headline:
-    fontFamily: "Pretendard Variable, Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Apple SD Gothic Neo, Noto Sans KR, sans-serif"
+    fontFamily: "Blog Sans, Pretendard Variable, Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Apple SD Gothic Neo, Noto Sans KR, sans-serif"
     fontSize: "32px"
     fontWeight: 700
     lineHeight: 1.35
     letterSpacing: "normal"
   headline-mobile:
-    fontFamily: "Pretendard Variable, Pretendard, sans-serif"
+    fontFamily: "Blog Sans, Pretendard Variable, Pretendard, sans-serif"
     fontSize: "24px"
     fontWeight: 700
     lineHeight: 1.35
     letterSpacing: "normal"
   title-lg:
-    fontFamily: "Pretendard Variable, Pretendard, sans-serif"
+    fontFamily: "Blog Sans, Pretendard Variable, Pretendard, sans-serif"
     fontSize: "25.6px"
     fontWeight: 700
     lineHeight: 1.35
   title-md:
-    fontFamily: "Pretendard Variable, Pretendard, sans-serif"
+    fontFamily: "Blog Sans, Pretendard Variable, Pretendard, sans-serif"
     fontSize: "20.8px"
     fontWeight: 700
     lineHeight: 1.35
   title-sm:
-    fontFamily: "Pretendard Variable, Pretendard, sans-serif"
+    fontFamily: "Blog Sans, Pretendard Variable, Pretendard, sans-serif"
     fontSize: "20px"
     fontWeight: 700
     lineHeight: 1.35
   body:
-    fontFamily: "Pretendard Variable, Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Apple SD Gothic Neo, Noto Sans KR, sans-serif"
+    fontFamily: "Blog Sans, Pretendard Variable, Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Apple SD Gothic Neo, Noto Sans KR, sans-serif"
     fontSize: "16px"
     fontWeight: 400
     lineHeight: 1.75
     letterSpacing: "normal"
   body-mobile:
-    fontFamily: "Pretendard Variable, Pretendard, sans-serif"
+    fontFamily: "Blog Sans, Pretendard Variable, Pretendard, sans-serif"
     fontSize: "16px"
     fontWeight: 400
     lineHeight: 1.8
   label:
-    fontFamily: "Pretendard Variable, Pretendard, sans-serif"
+    fontFamily: "Blog Sans, Pretendard Variable, Pretendard, sans-serif"
     fontSize: "15px"
     fontWeight: 500
     lineHeight: 1.6
   small:
-    fontFamily: "Pretendard Variable, Pretendard, sans-serif"
+    fontFamily: "Blog Sans, Pretendard Variable, Pretendard, sans-serif"
     fontSize: "14px"
     fontWeight: 400
     lineHeight: 1.6
   meta:
-    fontFamily: "Pretendard Variable, Pretendard, sans-serif"
+    fontFamily: "Blog Sans, Pretendard Variable, Pretendard, sans-serif"
     fontSize: "13px"
     fontWeight: 500
     lineHeight: 1.5
   caption:
-    fontFamily: "Pretendard Variable, Pretendard, sans-serif"
+    fontFamily: "Blog Sans, Pretendard Variable, Pretendard, sans-serif"
     fontSize: "12px"
     fontWeight: 400
     lineHeight: 1.6
   code:
-    fontFamily: "Source Code Pro, Pretendard Variable, Pretendard, ui-monospace, SFMono-Regular, Menlo, monospace"
+    fontFamily: "Source Code Pro, Blog Sans, Pretendard Variable, Pretendard, ui-monospace, SFMono-Regular, Menlo, monospace"
     fontSize: "13px"
     fontWeight: 400
     lineHeight: "19.5px"
   code-label:
-    fontFamily: "Source Code Pro, Pretendard Variable, Pretendard, ui-monospace, monospace"
+    fontFamily: "Source Code Pro, Blog Sans, Pretendard Variable, Pretendard, ui-monospace, monospace"
     fontSize: "11px"
     fontWeight: 400
     lineHeight: 1
@@ -272,8 +272,10 @@ components:
 
 ## Typography
 
-**Body Font:** Pretendard Variable (jsDelivr 동적 서브셋, 실패하면 시스템 산세리프와 Apple SD Gothic Neo)
-**Label/Mono Font:** Source Code Pro 400 (Google Fonts, 한글은 Pretendard로 넘김)
+**Body Font:** Pretendard Variable. 사이트에 둔 서브셋 "Blog Sans"로 씀(OFL 예약 이름 규칙 때문에 이름만 다르고 모양은 같음). 굵기 축은 400~700만. 서브셋에 없는 글자는 시스템 산세리프와 Apple SD Gothic Neo로
+**Label/Mono Font:** Source Code Pro 400 (Google Fonts의 latin 조각을 사이트에 둠, 한글은 Blog Sans로 넘김)
+
+**Loading:** 글꼴은 전부 사이트 파일이고 외부 CSS가 없습니다. Blog Sans는 두 조각입니다. A(사이트에 쓰인 글자 + 영문·문장 부호, 약 130KB)는 모든 페이지가 head에서 미리 받고, B(A에 없는 상용 한글 KS X 1001·자모·기호, 약 220KB)는 그 글자가 화면에 있을 때만 받습니다. `_tools/subset-fonts.py`가 빌드 결과에서 글자를 모아 두 조각과 `_sass/blog/_font-subset.scss`를 만듭니다. blog.js가 화면에 넣는 글자도 A에 들어갑니다(빠지면 그 한 글자 때문에 모든 페이지가 B를 받음).
 
 **Character:** 한 가족 산세리프가 제목부터 캡션까지 다 맡고, 굵기(700/600/500/400)와 회색 단계로만 위계를 만듭니다. 코드만 Source Code Pro로 바뀝니다.
 
@@ -360,6 +362,11 @@ components:
 ### 표
 - 글자 16px, 본문 줄간격. 머리글 700 먹색 왼쪽 정렬. 모든 칸 1px 표 선 테두리, 안쪽 8px. 폭 100%.
 - **칸 최소 폭 8em.** 없으면 keep-all 한글이 단어마다 줄을 바꿔서 폰에서 칸 하나가 열 줄 넘게 길어집니다. 칸 폭 합이 본문 칸보다 넓으면 표만 가로 스크롤(얇은 스크롤바, 표 선 색). 넘칠 때만 Tab이 들어갑니다(코드 창과 같은 규칙). 표 안 인라인 코드는 anywhere 대신 break-word로 끊습니다.
+
+### 그림 (본문·썸네일)
+- **본문 그림:** 8px 둥글기, 원본이 본문 칸보다 작으면 원본 폭 그대로. 첫 장만 바로(먼저) 받고 나머지는 화면 가까이 오면 받습니다. 크기 목록(`_data/images.yml`, `_tools/image-sizes.py`가 만듦)에 있는 그림은 width·height가 붙어서 늦게 와도 글이 안 밀리고, 크기별 주소(imgur 640·1024·원본 WebP)에서 화면에 맞는 것을 고릅니다. 원본보다 큰 버전은 쓰지 않습니다. 목록에 없는 새 그림은 원본 주소 그대로 나옵니다.
+- **썸네일:** 칸을 꽉 채워 잘라 보여 주는 그림이라 가로 1024까지만 씁니다(최신 글 카드도 같음).
+- **크기별 주소가 없는 호스트의 큰 그림**(imgchest 3장)은 `assets/images/posts/`의 WebP 사본(640·1024·1600)으로 화면에서만 바꿔 끼웁니다. 글 마크다운·front matter·og 메타는 원본 주소 그대로입니다.
 
 ### 인용문과 강조 상자
 - **인용문:** 안개 녹색 면 + 왼쪽 3px 숲 녹색 선, 안쪽 16px, 둥글기 0 6px 6px 0. 글자는 본문과 같음.
