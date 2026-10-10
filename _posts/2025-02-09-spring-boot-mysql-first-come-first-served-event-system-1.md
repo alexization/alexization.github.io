@@ -23,7 +23,7 @@ toc_sticky: true
 date: 2025-02-09
 last_modified_at: 2025-02-09 
 ---
-![선착순 도서 선물 이벤트 응모 페이지: 응모기간은 매일 오후 1시부터 10분간이고, 이름과 전화번호를 넣어 참여하는 폼이 있는 화면](https://i.imgur.com/v6JGz86.png)
+![선착순 도서 선물 이벤트 응모 페이지: 응모기간은 매일 오후 1시부터 10분간이고, 이름과 전화번호를 넣어 참여하는 폼이 있는 화면](https://i.imgur.com/v6JGz86.png "응모 페이지 화면: 화면 속 문구와 달리 글은 선착순 100명 기준")
 
 **“매일 오후 1시에 선착순 100명에게 도서를 증정하는 이벤트 시스템”** 을 개발하게 되었습니다.
 
@@ -175,7 +175,7 @@ Apply apply = Apply.builder()
 
 초당 1,666개의 요청이 발생하는 환경에서 중복 체크 로직에 동시성 문제가 발생했습니다.
 
-![DB 조회 결과: 같은 전화번호 01012345678로 응모 행이 26번부터 50번까지 중복 저장된 모습](https://i.imgur.com/lmBkNkj.png)
+![DB 조회 결과: 같은 전화번호 01012345678로 응모 행이 26번부터 50번까지 중복 저장된 모습](https://i.imgur.com/lmBkNkj.png "같은 전화번호로 응모가 여러 번 저장된 DB")
 
 ![타임라인 구조도: 스레드 A와 B가 둘 다 중복 체크에서 없음을 확인한 뒤 각자 저장해 같은 번호의 레코드가 2개 생기는 흐름](https://i.imgur.com/BhPgaND.png)
 
@@ -211,7 +211,7 @@ Apply apply = Apply.builder()
 boolean existsByPhoneNumber(String phoneNumber);
 ```
 
-![DB 조회 결과: 비관적 락 적용 뒤 전화번호 01012345678 응모 행이 1건만 저장된 모습](https://i.imgur.com/J8sjmAc.png)
+![DB 조회 결과: 비관적 락 적용 뒤 전화번호 01012345678 응모 행이 1건만 저장된 모습](https://i.imgur.com/J8sjmAc.png "비관적 락 적용 후: 같은 번호는 1건만 저장")
 
 #### MySQL InnoDB의 트랜잭션 락 메커니즘 이해
 

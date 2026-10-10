@@ -26,17 +26,13 @@ last_modified_at: 2025-01-24
 2. 미용사/병원 이름 `name` 기반 검색
 3. 뱃지 `badge` (#대형견, #중형견, #노견 등) 기반 검색
 
-![댕글 서비스 검색 화면](https://i.imgur.com/iitj66f.png)
-
-댕글 서비스 검색 화면
+![댕글 서비스 검색 화면](https://i.imgur.com/iitj66f.png "댕글 서비스 검색 화면")
 
 ## 데이터베이스 구조
 
 문제를 이해하기 위해 먼저 관련 테이블의 구조를 살펴보겠습니다. 미용사 테이블 `groomers` 은 뱃지 테이블 `grooming_badges` 과 자격증 테이블 `groomer_business_licenses` 과 1:N 관계를 가지고 있습니다.
 
-![데이터베이스 구조](https://i.imgur.com/s1cFX5h.png)
-
-데이터베이스 구조
+![데이터베이스 구조](https://i.imgur.com/s1cFX5h.png "데이터베이스 구조")
 
 ```java
 @Entity

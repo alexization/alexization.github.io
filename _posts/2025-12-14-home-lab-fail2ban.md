@@ -44,7 +44,7 @@ last_modified_at: 2026-03-30
 
 ## SSH 키 인증을 켰는데도 로그는 계속 시끄러웠다
 
-![터미널 출력: auth.log에 00:01부터 00:17까지 여러 외부 IP의 Invalid user 시도와 root 계정 인증 전(preauth) 연결 종료 기록이 수십 줄 반복된 모습](https://i.imgur.com/TPqlHh8.png)
+![터미널 출력: auth.log에 00:01부터 00:17까지 여러 외부 IP의 Invalid user 시도와 root 계정 인증 전(preauth) 연결 종료 기록이 수십 줄 반복된 모습](https://i.imgur.com/TPqlHh8.png "실제 auth.log: 00:01부터 00:17까지 여러 IP의 로그인 시도")
 
 보안을 강화한 뒤 가장 먼저 확인한 것은 `/var/log/auth.log`였습니다.
 

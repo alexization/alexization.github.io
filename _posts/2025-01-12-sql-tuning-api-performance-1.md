@@ -310,25 +310,25 @@ CREATE INDEX idx_care_estimates_user_pet ON care_estimates (user_id, pet_id);
 
 기존 코드에서는 사용자의 모든 반려동물을 조회한 후, 각 반려동물별로 개별 쿼리를 실행하는 방식을 사용했습니다.
 
-![튜닝 전 서비스 코드: 사용자의 반려동물 목록을 for문으로 돌며 반려동물마다 견적서 조회 쿼리를 따로 호출하는 findGeneralCarePets 메서드](https://i.imgur.com/6BKmdC9.png)
+![튜닝 전 서비스 코드: 사용자의 반려동물 목록을 for문으로 돌며 반려동물마다 견적서 조회 쿼리를 따로 호출하는 findGeneralCarePets 메서드](https://i.imgur.com/6BKmdC9.png "튜닝 전 서비스: 반려동물마다 견적서 조회를 따로 호출")
 
-![튜닝 전 리포지토리 메서드: status, proposal, petId로 견적서 1건을 찾는 findTopByStatusAndProposalAndPetId 선언](https://i.imgur.com/PociW20.png)
+![튜닝 전 리포지토리 메서드: status, proposal, petId로 견적서 1건을 찾는 findTopByStatusAndProposalAndPetId 선언](https://i.imgur.com/PociW20.png "튜닝 전 리포지토리: petId로 견적서를 1건씩 조회")
 
-![Postman 응답: 튜닝 전 API가 반려동물별 견적서 목록 JSON을 돌려주는 데 6.57s가 걸린 결과](https://i.imgur.com/9rzxo4j.png)
+![Postman 응답: 튜닝 전 API가 반려동물별 견적서 목록 JSON을 돌려주는 데 6.57s가 걸린 결과](https://i.imgur.com/9rzxo4j.png "튜닝 전 API 응답 시간: 6.57s")
 
-![Hibernate 쿼리 로그: users와 pets 조회 뒤 care_estimates 조회 쿼리가 반려동물 수만큼 13번 반복 실행된 N+1 모습](https://i.imgur.com/JYsqKFt.png)
+![Hibernate 쿼리 로그: users와 pets 조회 뒤 care_estimates 조회 쿼리가 반려동물 수만큼 13번 반복 실행된 N+1 모습](https://i.imgur.com/JYsqKFt.png "튜닝 전 쿼리 로그: 견적서 조회가 반려동물 수만큼 반복")
 
 ### SQL 튜닝 후 코드 (JOIN을 활용한 단일 쿼리)
 
 SQL 튜닝 후에는 **`JOIN` 을 활용한 단일 쿼리**로 변경하여 성능을 크게 개선했습니다.
 
-![튜닝 후 서비스 코드: 반복문 없이 findByStatusAndProposalAndUserId 한 번으로 반려동물별 견적서를 가져오는 findGeneralCarePets 메서드](https://i.imgur.com/uD9nYPj.png)
+![튜닝 후 서비스 코드: 반복문 없이 findByStatusAndProposalAndUserId 한 번으로 반려동물별 견적서를 가져오는 findGeneralCarePets 메서드](https://i.imgur.com/uD9nYPj.png "튜닝 후 서비스: 반복문 없이 한 번에 조회")
 
-![튜닝 후 리포지토리 메서드: CareEstimates와 Pets를 petId로 JOIN하고 userId, status, proposal로 거르는 @Query 선언](https://i.imgur.com/QHE6zY0.png)
+![튜닝 후 리포지토리 메서드: CareEstimates와 Pets를 petId로 JOIN하고 userId, status, proposal로 거르는 @Query 선언](https://i.imgur.com/QHE6zY0.png "튜닝 후 리포지토리: pets와 JOIN한 쿼리 하나")
 
-![Postman 응답: 튜닝 후 같은 API가 반려동물별 견적서 목록 JSON을 409ms 만에 돌려준 결과](https://i.imgur.com/9oOT18a.png)
+![Postman 응답: 튜닝 후 같은 API가 반려동물별 견적서 목록 JSON을 409ms 만에 돌려준 결과](https://i.imgur.com/9oOT18a.png "튜닝 후 API 응답 시간: 409ms")
 
-![Hibernate 쿼리 로그: users와 pets 조회 뒤 care_estimates와 pets를 JOIN한 쿼리가 단 한 번만 실행된 모습](https://i.imgur.com/3XRsQtG.png)
+![Hibernate 쿼리 로그: users와 pets 조회 뒤 care_estimates와 pets를 JOIN한 쿼리가 단 한 번만 실행된 모습](https://i.imgur.com/3XRsQtG.png "튜닝 후 쿼리 로그: JOIN 쿼리 한 번만 실행")
 
 ## 마무리
 

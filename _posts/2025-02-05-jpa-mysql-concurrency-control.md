@@ -25,7 +25,7 @@ last_modified_at: 2025-02-05
 > 현재 꾸미 서비스에는 좋아요/싫어요 기능의 **동시성 제어를 위해 Redis를 사용하고 있었습니다.**
 그러나 기능 분석 결과, Redis 사용이 **오버 엔지니어링이라고 판단**했습니다.
 
-![꾸미 서비스 화면: 그림책 표지 아래에 좋아요와 싫어요 버튼이 놓인 모습](https://i.imgur.com/ULF1Qk1.png)
+![꾸미 서비스 화면: 그림책 표지 아래에 좋아요와 싫어요 버튼이 놓인 모습](https://i.imgur.com/ULF1Qk1.png "꾸미 서비스의 좋아요·싫어요 버튼")
 
 좋아요/싫어요 기능은 SNS 서비스와 달리 **실시간성이 매우 중요한 기능이 아닙니다.** 사용자들이 동시에 좋아요 버튼을 누르는 상황이 자주 발생하지 않으며, 초당 처리해야 할 트랜잭션 수가 많지 않습니다.
 
@@ -470,13 +470,9 @@ void concurrentLikeTest() throws InterruptedException {
 
 ```
 
-`동시성 문제가 발생하는 경우`
+![테스트 실행 결과: 동시 좋아요 테스트에서 기대값 10과 달리 실제 좋아요 수가 2로 나와 실패한 모습](https://i.imgur.com/uRBfLOj.png "동시성 문제 발생: 기대 10, 실제 2로 실패")
 
-![테스트 실행 결과: 동시 좋아요 테스트에서 기대값 10과 달리 실제 좋아요 수가 2로 나와 실패한 모습](https://i.imgur.com/uRBfLOj.png)
-
-`동시성 문제를 해결한 경우`
-
-![테스트 실행 결과: 동시성 문제를 해결한 뒤 동시 좋아요 테스트가 통과한 모습](https://i.imgur.com/sXg5GLC.png)
+![테스트 실행 결과: 동시성 문제를 해결한 뒤 동시 좋아요 테스트가 통과한 모습](https://i.imgur.com/sXg5GLC.png "동시성 문제 해결 후: 테스트 통과")
 
 ### Lost Update 검증
 
@@ -542,13 +538,9 @@ void concurrentLikeAndHateTest() throws InterruptedException {
 }
 ```
 
-`동시성 문제가 발생하는 경우`
+![테스트 실행 결과: 좋아요와 싫어요를 동시에 누르는 테스트가 Expected 5, Actual 2로 실패한 모습](https://i.imgur.com/jUM5XHY.png "동시성 문제 발생: 기대 5, 실제 2로 실패")
 
-![테스트 실행 결과: 좋아요와 싫어요를 동시에 누르는 테스트가 Expected 5, Actual 2로 실패한 모습](https://i.imgur.com/jUM5XHY.png)
-
-`동시성 문제를 해결한 경우`
-
-![테스트 실행 결과: 동시성 문제를 해결한 뒤 좋아요와 싫어요 동시 요청 테스트가 통과한 모습](https://i.imgur.com/B81tLX2.png)
+![테스트 실행 결과: 동시성 문제를 해결한 뒤 좋아요와 싫어요 동시 요청 테스트가 통과한 모습](https://i.imgur.com/B81tLX2.png "동시성 문제 해결 후: 테스트 통과")
 
 ---
 
