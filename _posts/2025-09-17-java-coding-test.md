@@ -22,7 +22,7 @@ last_modified_at: 2025-09-19
 {% raw %}
 ## 입력받고 출력하기
 
-### 1. Scanner VS BufferedReader 선택 기준
+### Scanner VS BufferedReader 선택 기준
 
 #### Scanner
 
@@ -63,7 +63,7 @@ for(int i = 0; i < n; i++) {
 }
 ```
 
-### 2. 2차원 배열 입력 패턴
+### 2차원 배열 입력 패턴
 
 #### 공백으로 구분된 숫자
 
@@ -132,7 +132,7 @@ for(int i = 0; i < n; i++) {
 }
 ```
 
-### 3. 출력 최적화
+### 출력 최적화
 
 #### System.out.println
 
@@ -175,7 +175,7 @@ bw.close();
 
 ## 자료구조
 
-### 1. 배열과 리스트
+### 배열과 리스트
 
 #### 배열 (Array)
 
@@ -249,7 +249,7 @@ graph.get(0).add(1);  // 0번 노드에 1번 노드 연결
 graph.get(0).add(2);  // 0번 노드에 2번 노드 연결
 ```
 
-### 2. Stack과 Queue
+### Stack과 Queue
 
 #### Stack (LIFO - 후입선출)
 
@@ -306,7 +306,7 @@ int first = deque.pollFirst();   // 앞에서 제거, 없으면 null
 int last = deque.pollLast();     // 뒤에서 제거, 없으면 null
 ```
 
-### 3. 우선순위 큐 (Priority Queue / Heap)
+### 우선순위 큐 (Priority Queue / Heap)
 
 > 우선순위가 높은 원소부터 제거
 >
@@ -368,7 +368,7 @@ pq.clear();              // 모두 제거 O(n)
 pq.contains(2);          // 포함 여부 확인 O(n)
 ```
 
-### 4. Map과 Set
+### Map과 Set
 
 #### HashMap
 
@@ -490,7 +490,7 @@ treeSet.floor(2);   // 2 이하인 마지막 원소, 2
 
 ## 문자열 처리
 
-### 1. 문자열 기본 조작
+### 문자열 기본 조작
 
 > `String` 은 불변(immutable) 객체이므로 문자열 열결 시 새로운 객체를 생성한다.
 >
@@ -530,7 +530,7 @@ String replaced = str.replace("World", "Java");    // "Hello Java"
 String replacedAll = str.replaceAll("[0-9]", "");  // 정규 표현식 활용
 ```
 
-### 2. 문자열 분리와 결합
+### 문자열 분리와 결합
 
 ```java
 // split
@@ -567,7 +567,7 @@ String result2 = new StringBuilder()
     .toString();
 ```
 
-### 3. 문자와 숫자 변환
+### 문자와 숫자 변환
 
 ```java
 // 문자 <-> 숫자
@@ -601,7 +601,7 @@ int fromBinary = Integer.parseInt("1010", 2);  // 10
 int fromHex = Integer.parseInt("FF", 16);      // 255
 ```
 
-### 4. 문자 판별과 처리
+### 문자 판별과 처리
 
 ```java
 char ch = 'A';
@@ -623,7 +623,7 @@ String fromChars = new String(chars);         // "hello"
 String fromChars2 = String.valueOf(chars);    // "hello"
 ```
 
-### 5. 정규표현식
+### 정규표현식
 
 ```java
 String text = "abc123DEF456";
@@ -654,7 +654,7 @@ boolean isEmail = "test@test.com".matches(".*@.*\\..*"); // true
 
 ## 배열 다루기
 
-### 1. 배열 복사
+### 배열 복사
 
 #### 1차원 배열 깊은 복사
 
@@ -697,7 +697,7 @@ for(int i = 0; i < matrix.legnth; i++) {
 }
 ```
 
-### 2. 컬렉션 변환
+### 컬렉션 변환
 
 #### List ↔ Array
 
@@ -747,7 +747,7 @@ List<Integer> listFromSet = new ArrayList<>(set2);
 
 ## 정렬과 탐색
 
-### 1. 정렬
+### 정렬
 
 #### 1차원 배열 정렬
 
@@ -832,7 +832,7 @@ Arrays.sort(words, new Comparator<String>() {
 });
 ```
 
-### 2. 이진 탐색 (Binary Search)
+### 이진 탐색 (Binary Search)
 
 > 정렬된 배열/리스트에서 사용가능하며, O(log n)의 시간복잡도를 가짐
 >
@@ -914,7 +914,7 @@ int count = upperBound(arr, target) - lowerBound(arr, target);
 
 ## 수학과 비트 연산
 
-### 1. 기본 수학 연산
+### 기본 수학 연산
 
 ```java
 // 절댓값, 최대/최소
@@ -936,7 +936,7 @@ double log = Math.log(Math.E);    // 1.0 (자연로그)
 double log10 = Math.log10(100);   // 2.0 (상용로그)
 ```
 
-### 2. 최대공약수와 최소공배수
+### 최대공약수와 최소공배수
 
 #### 최대공약수 (Greatest Common Divisor)
 
@@ -983,7 +983,7 @@ public int lcmMultiple(int[] arr) {
 }
 ```
 
-### 3. 소수 판별과 에라토스테네스의 체
+### 소수 판별과 에라토스테네스의 체
 
 #### 단일 소수 판별 O(√n)
 
@@ -1041,7 +1041,7 @@ public List<Integer> primeFactorization(int n) {
 }
 ```
 
-### 4. 비트 연산
+### 비트 연산
 
 #### 기본 비트 연산
 
@@ -1108,7 +1108,7 @@ for(int mask = 0; mask < (1 << n); mask++) {
 
 ## 순열과 조합
 
-### 1. 순열 (Permutation)
+### 순열 (Permutation)
 
 > 순서가 있는 선택, nPr = n! / (n-r)!
 >
@@ -1162,7 +1162,7 @@ public void permutationWithRep(int[] arr, int[] output, int depth, int n, int r)
 }
 ```
 
-### 2. 조합 (Combination)
+### 조합 (Combination)
 
 > 순서가 없는 선택, nCr = n! / (r! * (n-r)!)
 >

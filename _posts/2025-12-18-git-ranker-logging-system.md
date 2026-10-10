@@ -37,7 +37,7 @@ Git Ranker는 단일 Spring Boot 애플리케이션이지만 실행 경로가 �
 이 글은 "로그를 많이 남기는 법"이 아니라, Git Ranker가 <strong>요청 단위 상관관계 ID</strong>, <strong>도메인 이벤트 중심 구조화 로그</strong>, <strong>배치와 외부 API 관측</strong>, <strong>Loki/Grafana 검색</strong>까지 어떻게 이어 붙였는지 설명합니다. 분산 트레이싱까지는 아니지만, 단일 Spring Boot 서비스에서 운영 가능한 관측 기반을 만드는 데 필요한 수준을 목표로 했습니다.
 </aside>
 
-## 1. 로그를 "출력"이 아니라 "관측 데이터"로 다시 정의했다
+## 로그를 "출력"이 아니라 "관측 데이터"로 다시 정의했다
 
 프로젝트 초반 로그는 흔히 보는 형태였습니다.
 
@@ -72,7 +72,7 @@ log.info("회원가입 성공, ID: {}", user.getId());
 - 메서드 진입과 종료보다 상태 변화가 있는 이벤트를 남겨야 한다.
 - 검색을 위한 차원과 상세 문맥을 분리해 저장소의 비용과 검색성을 함께 관리해야 한다.
 
-## 2. 요청 진입점은 `Controller`가 아니라 `Filter`였다
+## 요청 진입점은 `Controller`가 아니라 `Filter`였다
 
 ![구조도: Client 요청이 Web Context의 Filter를 가장 먼저 지난 뒤 Spring Context의 DispatcherServlet, Interceptor, Controller 순으로 전달되는 흐름(Filter 강조)](https://i.imgur.com/izwcCPF.png)
 
@@ -139,14 +139,14 @@ public class LoggingFilter implements Filter {
 
 이 동작은 테스트로도 고정했습니다. `LoggingFilterTest`에서는 2xx 응답이 `success`, 4xx/5xx 응답이 `failure`, 느린 2xx 응답이 `warning`으로 기록되는지를 검증합니다. 즉, 로그 레벨과 결과 분류가 운영자 감각이 아니라 코드 계약이 되도록 했습니다.
 
-## 3. HTTP 밖의 흐름도 같은 방식으로 추적했다
+## HTTP 밖의 흐름도 같은 방식으로 추적했다
 
 HTTP 요청만 추적해서는 충분하지 않았습니다. Git Ranker의 중요한 작업 두 개는 HTTP 바깥에서 일어났기 때문입니다.
 
 - 매일 자정에 실행되는 Spring Batch 점수 재계산
 - GitHub GraphQL API 호출과 rate limit 관리
 
-### 3.1 배치는 스케줄러에서 직접 `trace_id`를 발급했다
+### 배치는 스케줄러에서 직접 `trace_id`를 발급했다
 
 배치는 `Filter`를 거치지 않습니다. 그래서 `BatchScheduler`는 배치를 시작할 때 직접 `trace_id`를 발급하고, 시작과 종료, 실패를 이벤트로 남깁니다.
 
@@ -187,7 +187,7 @@ public void runDailyScoreRecalculationJob() {
 
 즉, "배치가 돌았다"에서 끝나는 것이 아니라 **어느 단계에서 얼마나 실패했고, 재시도 가능한 오류인지**까지 로그만으로 설명할 수 있게 됐습니다.
 
-### 3.2 AOP는 버린 것이 아니라, GitHub API 경계로 옮겼다
+### AOP는 버린 것이 아니라, GitHub API 경계로 옮겼다
 
 반대로 AOP는 완전히 버린 도구가 아닙니다. 요청 진입점에는 맞지 않았지만, `GitHubGraphQLClient`처럼 **특정 협력자 경계**를 감싸는 데는 오히려 잘 맞았습니다.
 
@@ -239,7 +239,7 @@ public Object logGithubApiCall(ProceedingJoinPoint joinPoint) throws Throwable {
 
 그리고 `GitHubGraphQLClient` 내부에서는 남은 예산이 임계치 아래로 떨어지면 `RATE_LIMIT_WARNING` 이벤트를 남기고 예외를 발생시킵니다. 즉, Git Ranker에서 AOP는 "모든 것을 감싸는 도구"가 아니라, **경계가 분명한 외부 API 호출을 관찰하는 도구**로 자리를 잡았습니다.
 
-## 4. `MDC`만 쓰지 않고 `LogContext`로 로그 계약을 고정했다
+## `MDC`만 쓰지 않고 `LogContext`로 로그 계약을 고정했다
 
 여기서부터가 실제로 가장 중요했습니다. `MDC`는 편리하지만, 그대로 쓰면 결국 각 클래스가 제멋대로 키를 넣는 **자유로운 해시맵**이 됩니다. 그렇게 되면 로그는 남아도 검색과 집계는 점점 어려워집니다.
 
@@ -288,9 +288,9 @@ LogContext.event(Event.USER_REFRESH_REQUESTED)
 같은 요청 안에서도 `trace_id`, `request_uri` 같은 값은 유지되어야 하지만, `status`, `error_code`, `job_name` 같은 이벤트 필드는 다음 로그로 흘러가면 안 됩니다. Git Ranker는 요청 스코프와 이벤트 스코프를 분리해, 한 요청 안의 여러 로그가 서로의 문맥은 공유하되 이벤트 데이터는 오염시키지 않도록 설계했습니다.
 </aside>
 
-## 5. 로그 품질은 양이 아니라 규칙에서 결정됐다
+## 로그 품질은 양이 아니라 규칙에서 결정됐다
 
-### 5.1 메서드 시작과 종료보다 상태 변화가 있는 순간만 남겼다
+### 메서드 시작과 종료보다 상태 변화가 있는 순간만 남겼다
 
 초기 로깅에서 가장 먼저 줄인 것은 "컨트롤러 시작", "서비스 진입", "서비스 종료" 같은 기계적인 로그였습니다. 이런 로그는 많을수록 안심이 되기보다는, 오히려 중요한 사건을 묻어버립니다.
 
@@ -308,7 +308,7 @@ LogContext.event(Event.USER_REFRESH_REQUESTED)
 
 이벤트 이름을 보면 공통점이 있습니다. **무언가의 상태가 바뀌었거나, 운영자가 관심 가져야 할 결과가 확정된 시점**만 남깁니다. 예를 들어 `UserRegistrationService`는 신규 사용자 저장이 끝난 뒤 `initial_score`, `initial_tier`와 함께 `USER_REGISTERED`를 남기고, `BadgeService`는 배지 생성 시 `BADGE_VIEWED`를 남깁니다. 반면 메서드 진입과 종료 같은 정보는 의도적으로 줄였습니다.
 
-### 5.2 레벨과 민감 정보도 함께 통제했다
+### 레벨과 민감 정보도 함께 통제했다
 
 좋은 로그는 "무조건 많이"가 아니라 **주의를 어디에 쓰게 만들 것인지**까지 설계해야 합니다.
 
@@ -320,7 +320,7 @@ Git Ranker에서는 이 원칙을 두 가지로 적용했습니다.
 
 둘째, 개인 식별 정보는 로그 친화적으로 다듬었습니다. `LogSanitizer`는 `username`, `target_username`을 자동 마스킹하고, `ScoreRecalculationProcessor`는 예기치 못한 배치 오류를 감쌀 때 raw username 대신 고정 길이 해시를 남깁니다. 덕분에 **같은 사용자를 식별할 수는 있지만, 원문을 그대로 노출하지는 않는** 균형을 맞출 수 있었습니다.
 
-## 6. 운영 환경에서는 JSON 로그와 메트릭을 함께 흘렸다
+## 운영 환경에서는 JSON 로그와 메트릭을 함께 흘렸다
 
 개발 환경과 운영 환경에서 로그의 목적은 다릅니다. 로컬에서는 사람이 콘솔을 읽기 쉬워야 하고, 운영에서는 수집기와 검색기가 파싱하기 쉬워야 합니다.
 
@@ -383,7 +383,7 @@ Git Ranker는 이 구분을 실제 수집 파이프라인에 반영했습니다.
 
 > **로그가 한 사건의 맥락을 설명한다면, 메트릭은 같은 사건의 빈도와 추세를 보여줍니다.** 한쪽만 있으면 장애는 늦게 발견되거나, 발견해도 설명되지 않습니다.
 
-## 7. 결과와 한계
+## 결과와 한계
 
 지금의 Git Ranker에서는 `trace_id` 하나만 있으면 적어도 아래 흐름은 꽤 안정적으로 복원할 수 있습니다.
 

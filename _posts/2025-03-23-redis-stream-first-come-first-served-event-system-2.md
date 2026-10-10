@@ -109,7 +109,7 @@ Redis에서 메시징을 구현할 수 있는 방법은 여러 가지가 있었�
 
 Redis Stream을 선착순 이벤트 시스템에 적용해보겠습니다.
 
-### 1. 메시지 구성 (Entry)
+### 메시지 구성 (Entry)
 
 사용자가 이벤트에 응모하면 아래와 같은 정보를 포함한 메시지가 생성됩니다.
 
@@ -120,7 +120,7 @@ Redis Stream을 선착순 이벤트 시스템에 적용해보겠습니다.
 - `1742648840457-0` 은 메시지 ID (타임스탬프-시퀀스)
 - `name`, `phoneNumber`, `applyTime` 은 응모 정보를 담고 있는 필드들
 
-### 2. 스트림 (Stream)
+### 스트림 (Stream)
 
 모든 응모 정보는 `apply:stream` 이라는 스트림에 시간순으로 저장됩니다.
 
@@ -133,7 +133,7 @@ Redis Stream을 선착순 이벤트 시스템에 적용해보겠습니다.
 
 이벤트 시작 직후의 스트림 상태는 위와 같이 들어갈 것입니다.
 
-### 3. 컨슈머 그룹과 컨슈머
+### 컨슈머 그룹과 컨슈머
 
 이 응모 데이터를 처리하기 위해 `apply-processors` 라는 컨슈머 그룹을 생성하고 여러 컨슈머 인스턴스를 실행합니다.
 
@@ -147,7 +147,7 @@ XGROUP CREATE apply:stream apply-processors 0
 
 ## Redis Stream 구현
 
-### 1. Redis 설정 및 Stream 초기화
+### Redis 설정 및 Stream 초기화
 
 먼저 Redis 연결 및 Stream을 초기화하는 설정 코드를 작성했습니다.
 
@@ -222,7 +222,7 @@ public class StreamConfig {
 }
 ```
 
-### 2. 메시지 리스너 구현
+### 메시지 리스너 구현
 
 Redis Stream에서 메시지를 소비하고 데이터베이스에 저장하는 리스너를 구현했습니다.
 
@@ -269,7 +269,7 @@ public class ApplyStreamListener implements StreamListener<String, MapRecord<Str
 }
 ```
 
-### 3. 응모 서비스 구현
+### 응모 서비스 구현
 
 긱존의 직접 DB로 접근하는 방식에서 Redis Stream을 활용한 비동기 처리 방식으로 변경했습니다.
 
