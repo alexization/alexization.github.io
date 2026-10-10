@@ -7,8 +7,30 @@ layout: base
   표는 가로 스크롤 상자로 감쌈(넘칠 때만 blog.js가 Tab을 받게 함).
   이미지는 첫 장만 바로(먼저 받음), 나머지는 화면 가까이 오면 불러옴.
   크기 목록(_data/images.yml)에 있는 그림은 크기별 주소·width·height를 붙임(blog/img-attrs.html).
+  그림 한 장뿐인 문단에 제목(![alt](주소 "캡션"))이 있으면 figure로 바꿔 캡션을 그림 아래에 보여 줌.
+  title은 지움(마우스 말풍선으로 같은 글이 또 뜨지 않게). alt는 그대로.
 {%- endcomment -%}
 {%- assign post_html = content | replace: '<table>', '<div class="table-scroll"><table>' | replace: '</table>', '</table></div>' | replace: '<img ', '<img loading="lazy" decoding="async" ' | replace_first: 'loading="lazy"', 'loading="eager" fetchpriority="high"' -%}
+{%- assign image_paragraphs = post_html | split: '<p><img ' -%}
+{%- capture post_html -%}
+  {{- image_paragraphs | first -}}
+  {%- for paragraph in image_paragraphs offset: 1 -%}
+    {%- assign image_tag = paragraph | split: '</p>' | first -%}
+    {%- assign image_tag_end = image_tag | slice: -2, 2 -%}
+    {%- assign has_caption = false -%}
+    {%- if image_tag contains ' title="' and image_tag_end == '/>' -%}
+      {%- unless image_tag contains '<' -%}{%- assign has_caption = true -%}{%- endunless -%}
+    {%- endif -%}
+    {%- if has_caption -%}
+      {%- assign caption = image_tag | split: ' title="' | last | split: '"' | first -%}
+      {%- assign title_attr = ' title="' | append: caption | append: '"' -%}
+      <figure><img {{ image_tag | remove_first: title_attr }}<figcaption>{{ caption }}</figcaption></figure>
+      {{- paragraph | remove_first: image_tag | remove_first: '</p>' -}}
+    {%- else -%}
+      <p><img {{ paragraph -}}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endcapture -%}
 {%- for image in site.data.images -%}
   {%- assign image_url = image[0] -%}
   {%- assign image_src = 'src="' | append: image_url | append: '"' -%}

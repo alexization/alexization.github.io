@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "_layouts/post.html"
+        ],
+        "createdAt": "2026-10-10T04:48:22.287Z",
+        "reason": "Claude: <img {{ ... }} in Liquid template; src comes from the kramdown img tag spliced in at build time, verified in built _site"
+      }
+    ]
+  }
+}
